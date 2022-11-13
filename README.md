@@ -1,26 +1,7 @@
 # alpha-pentago
-
-## Zero Knowledge Pentago Engine
-
-- Establish the search tree
-- Use the neural net to prune the search tree
-
-## Definition: Value Network
-- ``` V = f(Board) ```
-
-## State(Board):
-
-Pieces(3):
-- Blank
-- Red
-- Black
-
-6x6x3 = 108 bits (vector of 0 or 1)
-
 ## Rules:
 ### Starting:
 > Start with an empty board  and decide who goes first and who's playing what colour.
-- In our game red will always go firsts
 ### Object:
 > The object is to get five marbles in a row, in any direction, anywhere on the board, before your opponent does,
 ### Playing:
