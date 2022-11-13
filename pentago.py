@@ -8,6 +8,17 @@ from typing import Generator
 class Node:
     red: bool = None
 
+    def update(self, nodestring: str):
+        if nodestring not in ["r", "b", "."]:
+            raise ValueError("Node string format is invalid")
+
+        if nodestring == ".":
+            self.red = None
+        elif nodestring == "r":
+            self.red = True
+        else:
+            self.red = False
+
     def __str__(self):
         if self.red is None:
             return "."
@@ -21,7 +32,7 @@ class Square:
     Square representing 3x3 nodes.
     Can be rotated 90 degrees in either direction.
     '''
-    nodes: list[list[str]]
+    nodes: list[list[Node]]
 
     def __init__(self):
         self.nodes = [
@@ -45,9 +56,9 @@ class Square:
 
     def _rotate_counterclockwise(self):
         self.nodes = [
-            [self.nodes[0][2], self.nodes[0][1], self.nodes[0][0]],
-            [self.nodes[1][2], self.nodes[1][1], self.nodes[1][0]],
-            [self.nodes[2][2], self.nodes[2][1], self.nodes[2][0]],
+            [self.nodes[0][2], self.nodes[1][2], self.nodes[2][2]],
+            [self.nodes[0][1], self.nodes[1][1], self.nodes[2][1]],
+            [self.nodes[0][0], self.nodes[1][0], self.nodes[2][0]],
         ]
 
 @dataclass
@@ -100,17 +111,40 @@ class Board:
     5  . . . . . .
     '''
     squares: list[list[Square]]
+    moves: list[Move]
 
     def __init__(self):
         self.squares = [
             [Square(), Square()],
             [Square(), Square()],
         ]
+        self.moves = []
+
+    def from_string(boardstring: str):
+        if not re.fullmatch(r"([r|b|.]{6}\/){5}[r|b|.]{6}", boardstring):
+            raise ValueError("Board string format is invalid")
+
+        boardstring = [list(x) for x in boardstring.split("/")]
+        board = Board()
+        for i, row in enumerate(board.nodes()):
+            for j, node in enumerate(row):
+                node.update(boardstring[i][j])
+
+        return board
+
+    def pop(self):
+        move = self.moves.pop()
+        square_row = move.square // 2
+        square_col = move.square % 2
+        self.squares[square_row][square_col].rotate(not move.clockwise)
+        nodes = list(self.nodes())
+        nodes[move.row][move.col].red = None
 
     def push(self, move: Move):
         if move not in self.legal_moves(move.red):
             raise ValueError("Move is not legal")
 
+        self.moves.append(move)
         square_row = move.square // 2
         square_col = move.square % 2
         nodes = list(self.nodes())
@@ -135,8 +169,8 @@ class Board:
 
 if __name__ == "__main__":
     board = Board()
-    print(board)
-    red = True
-    move = Move.from_string("ra0-3L")
+    move = Move(True, 1, 2, 0, True)
     board.push(move)
+    print(board)
+    board.pop()
     print(board)
