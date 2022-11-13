@@ -126,7 +126,10 @@ class Board:
         ]
         self.moves = []
 
-    # TODO: Decide what happens when both players win
+    @property
+    def current_player(self):
+        return len(self.moves) % 2 == 0 # Red starts
+
     def outcome(self):
         nodes = [[node.red for node in row] for row in self.nodes()]
         full = True
@@ -152,20 +155,25 @@ class Board:
                 [nodes[j][i] for j in range(1, 6)]
             ]
 
+        outcome = None
+        red_win = False
+        black_win = False
         # Checking for win
         for part in parts:
             if None not in part:
                 if all(part):
-                    return Board.Outcome.RED_WIN
+                    red_win = True
+                    outcome = Board.Outcome.RED_WIN
                 elif not any(part):
-                    return Board.Outcome.BLACK_WIN
+                    black_win = True
+                    outcome = Board.Outcome.BLACK_WIN
             else:
                 full = False
 
-        if full:
+        if full or (red_win and black_win):
             return Board.Outcome.DRAW
         else:
-            return None
+            return outcome
 
     def from_string(boardstring: str):
         if not re.fullmatch(r"([r|b|.]{6}\/){5}[r|b|.]{6}", boardstring):
@@ -188,7 +196,7 @@ class Board:
         nodes[move.row][move.col].red = None
 
     def push(self, move: Move):
-        if move not in self.legal_moves(move.red):
+        if move not in self.legal_moves():
             raise ValueError("Move is not legal")
 
         self.moves.append(move)
@@ -198,7 +206,8 @@ class Board:
         nodes[move.row][move.col].red = move.red
         self.squares[square_row][square_col].rotate(move.clockwise)
 
-    def legal_moves(self, red: bool) -> Generator[Move, None, None]:
+    def legal_moves(self) -> Generator[Move, None, None]:
+        red = self.current_player
         for i, row in enumerate(self.nodes()):
             for j, node in enumerate(row):
                 if node.red is None:
