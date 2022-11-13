@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from enum import Enum
 import re
 from string import ascii_lowercase
 from typing import Generator
@@ -113,12 +114,58 @@ class Board:
     squares: list[list[Square]]
     moves: list[Move]
 
+    class Outcome(Enum):
+        RED_WIN = 1
+        BLACK_WIN = 2
+        DRAW = 3
+
     def __init__(self):
         self.squares = [
             [Square(), Square()],
             [Square(), Square()],
         ]
         self.moves = []
+
+    # TODO: Decide what happens when both players win
+    def outcome(self):
+        nodes = [[node.red for node in row] for row in self.nodes()]
+        full = True
+        # Diagonals
+        parts = [
+            # Top Left -> Bottom Right
+            [nodes[i][i] for i in range(5)],
+            [nodes[i][i] for i in range(1, 6)],
+            [nodes[i+1][i] for i in range(5)],
+            [nodes[i][i+1] for i in range(5)],
+            # Bottom Right -> Top Left
+            [nodes[5-i][i] for i in range(5)],
+            [nodes[5-i][i] for i in range(1, 6)],
+            [nodes[4-i][i] for i in range(5)],
+            [nodes[5-i][i+1] for i in range(5)],
+        ]
+        # Horizontal + Vertical
+        for i in range(6):
+            parts += [
+                nodes[i][0:5],
+                nodes[i][1:6],
+                [nodes[j][i] for j in range(5)],
+                [nodes[j][i] for j in range(1, 6)]
+            ]
+
+        # Checking for win
+        for part in parts:
+            if None not in part:
+                if all(part):
+                    return Board.Outcome.RED_WIN
+                elif not any(part):
+                    return Board.Outcome.BLACK_WIN
+            else:
+                full = False
+
+        if full:
+            return Board.Outcome.DRAW
+        else:
+            return None
 
     def from_string(boardstring: str):
         if not re.fullmatch(r"([r|b|.]{6}\/){5}[r|b|.]{6}", boardstring):
@@ -168,9 +215,6 @@ class Board:
         return "\n".join(" ".join([str(node) for node in row]) for row in self.nodes())
 
 if __name__ == "__main__":
-    board = Board()
-    move = Move(True, 1, 2, 0, True)
-    board.push(move)
+    board = Board.from_string("r...../.r..../..r.../...r../....r./......")
     print(board)
-    board.pop()
-    print(board)
+    print(board.outcome())
