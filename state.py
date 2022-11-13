@@ -1,0 +1,4 @@
+import pentago
+
+class State():
+    ...
