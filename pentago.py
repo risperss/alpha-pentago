@@ -140,7 +140,7 @@ class Board:
             [nodes[i][i] for i in range(1, 6)],
             [nodes[i+1][i] for i in range(5)],
             [nodes[i][i+1] for i in range(5)],
-            # Bottom Right -> Top Left
+            # Bottom Left -> Top Right
             [nodes[5-i][i] for i in range(5)],
             [nodes[5-i][i] for i in range(1, 6)],
             [nodes[4-i][i] for i in range(5)],
