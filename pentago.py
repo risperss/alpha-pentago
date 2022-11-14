@@ -188,13 +188,15 @@ class Board:
 
         return board
 
-    def pop(self):
+    def pop(self) -> Move:
         move = self.moves.pop()
         square_row = move.square // 2
         square_col = move.square % 2
         self.squares[square_row][square_col].rotate(not move.clockwise)
         nodes = list(self.nodes())
         nodes[move.row][move.col].red = None
+
+        return move
 
     def push(self, move: Move):
         if move not in self.legal_moves():
@@ -224,24 +226,51 @@ class Board:
     def __str__(self):
         return "\n".join(" ".join([str(node) for node in row]) for row in self.nodes())
 
-if __name__ == "__main__":
-    red_wins = 0
-    black_wins = 0
-    draws = 0
+@dataclass
+class Foo:
+    NODES: int = 0
 
-    for i in range(1000):
-        board = Board()
+foo = Foo()
 
-        while board.outcome() is None:
-            legal_moves = list(board.legal_moves())
-            move = random.choice(legal_moves)
-            board.push(move)
-
-        if board.outcome() == Board.Outcome.RED_WIN:
-            red_wins += 1
-        elif board.outcome() == Board.Outcome.BLACK_WIN:
-            black_wins += 1
+def minimax(board, depth, alpha, beta, red):
+    outcome = board.outcome()
+    if depth == 0 or outcome is not None:
+        foo.NODES += 1
+        print(foo.NODES)
+        if outcome == Board.Outcome.RED_WIN:
+            return 1
+        elif outcome == Board.Outcome.BLACK_WIN:
+            return -1
         else:
-            draws += 1
+            return 0
 
-    print(red_wins, black_wins, draws)
+    if red: # We'll pick red as the maximixing player
+        max_eval = -2
+        for move in board.legal_moves():
+            board.push(move)
+            eval = minimax(board, depth-1, alpha, beta, not red)
+            board.pop()
+            max_eval = max(max_eval, eval)
+            alpha = max(alpha, eval)
+            if beta <= alpha:
+                break
+        foo.NODES += 1
+        print(foo.NODES)
+        return max_eval
+    else:
+        min_eval = 2
+        for move in board.legal_moves():
+            board.push(move)
+            eval = minimax(board, depth-1, alpha, beta, not red)
+            board.pop()
+            min_eval = min(min_eval, eval)
+            beta = min(beta, eval)
+            if beta <= alpha:
+                break
+        foo.NODES += 1
+        print(foo.NODES)
+        return min_eval
+
+if __name__ == "__main__":
+    board = Board.from_string("rrrr../bbbb../....../....../....../......")
+    print(minimax(board, 3, -2, 2, board.current_player))
