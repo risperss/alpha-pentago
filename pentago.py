@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
+import random
 import re
 from string import ascii_lowercase
 from typing import Generator
@@ -224,6 +225,23 @@ class Board:
         return "\n".join(" ".join([str(node) for node in row]) for row in self.nodes())
 
 if __name__ == "__main__":
-    board = Board.from_string("r...../.r..../..r.../...r../....r./......")
-    print(board)
-    print(board.outcome())
+    red_wins = 0
+    black_wins = 0
+    draws = 0
+
+    for i in range(1000):
+        board = Board()
+
+        while board.outcome() is None:
+            legal_moves = list(board.legal_moves())
+            move = random.choice(legal_moves)
+            board.push(move)
+
+        if board.outcome() == Board.Outcome.RED_WIN:
+            red_wins += 1
+        elif board.outcome() == Board.Outcome.BLACK_WIN:
+            black_wins += 1
+        else:
+            draws += 1
+
+    print(red_wins, black_wins, draws)
