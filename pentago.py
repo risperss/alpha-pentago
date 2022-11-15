@@ -31,6 +31,7 @@ class Move:
         rotation = "R" if self.clockwise else "L"
         return f"{colour}{col}{self.row}-{self.square}{rotation}"
 
+
 class Board:
     nodes: list[bool]
     moves: list[Move]

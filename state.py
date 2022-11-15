@@ -1,5 +1,6 @@
 from pentago import Board
 
+
 class State():
     board: Board
 
