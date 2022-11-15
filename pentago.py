@@ -6,36 +6,6 @@ from string import ascii_lowercase
 from typing import Generator
 
 
-# class Square:
-#     nodes: list[list[Node]]
-
-#     def __init__(self):
-#         self.nodes = [
-#             [Node(), Node(), Node()],
-#             [Node(), Node(), Node()],
-#             [Node(), Node(), Node()],
-#         ]
-
-#     def rotate(self, clockwise: bool):
-#         if clockwise:
-#             self._rotate_clockwise()
-#         else:
-#             self._rotate_counterclockwise()
-
-#     def _rotate_clockwise(self):
-#         self.nodes = [
-#             [self.nodes[2][0], self.nodes[1][0], self.nodes[0][0]],
-#             [self.nodes[2][1], self.nodes[1][1], self.nodes[0][1]],
-#             [self.nodes[2][2], self.nodes[1][2], self.nodes[0][2]],
-#         ]
-
-#     def _rotate_counterclockwise(self):
-#         self.nodes = [
-#             [self.nodes[0][2], self.nodes[1][2], self.nodes[2][2]],
-#             [self.nodes[0][1], self.nodes[1][1], self.nodes[2][1]],
-#             [self.nodes[0][0], self.nodes[1][0], self.nodes[2][0]],
-#         ]
-
 @dataclass
 class Move:
     red: bool
