@@ -6,93 +6,54 @@ from string import ascii_lowercase
 from typing import Generator
 
 
-@dataclass
-class Node:
-    red: bool = None
+# class Square:
+#     nodes: list[list[Node]]
 
-    def update(self, nodestring: str):
-        if nodestring not in ["r", "b", "."]:
-            raise ValueError("Node string format is invalid")
+#     def __init__(self):
+#         self.nodes = [
+#             [Node(), Node(), Node()],
+#             [Node(), Node(), Node()],
+#             [Node(), Node(), Node()],
+#         ]
 
-        if nodestring == ".":
-            self.red = None
-        elif nodestring == "r":
-            self.red = True
-        else:
-            self.red = False
+#     def rotate(self, clockwise: bool):
+#         if clockwise:
+#             self._rotate_clockwise()
+#         else:
+#             self._rotate_counterclockwise()
 
-    def __str__(self):
-        if self.red is None:
-            return "."
-        elif self.red:
-            return "r"
-        else:
-            return "b"
+#     def _rotate_clockwise(self):
+#         self.nodes = [
+#             [self.nodes[2][0], self.nodes[1][0], self.nodes[0][0]],
+#             [self.nodes[2][1], self.nodes[1][1], self.nodes[0][1]],
+#             [self.nodes[2][2], self.nodes[1][2], self.nodes[0][2]],
+#         ]
 
-class Square:
-    '''
-    Square representing 3x3 nodes.
-    Can be rotated 90 degrees in either direction.
-    '''
-    nodes: list[list[Node]]
-
-    def __init__(self):
-        self.nodes = [
-            [Node(), Node(), Node()],
-            [Node(), Node(), Node()],
-            [Node(), Node(), Node()],
-        ]
-
-    def rotate(self, clockwise: bool):
-        if clockwise:
-            self._rotate_clockwise()
-        else:
-            self._rotate_counterclockwise()
-
-    def _rotate_clockwise(self):
-        self.nodes = [
-            [self.nodes[2][0], self.nodes[1][0], self.nodes[0][0]],
-            [self.nodes[2][1], self.nodes[1][1], self.nodes[0][1]],
-            [self.nodes[2][2], self.nodes[1][2], self.nodes[0][2]],
-        ]
-
-    def _rotate_counterclockwise(self):
-        self.nodes = [
-            [self.nodes[0][2], self.nodes[1][2], self.nodes[2][2]],
-            [self.nodes[0][1], self.nodes[1][1], self.nodes[2][1]],
-            [self.nodes[0][0], self.nodes[1][0], self.nodes[2][0]],
-        ]
+#     def _rotate_counterclockwise(self):
+#         self.nodes = [
+#             [self.nodes[0][2], self.nodes[1][2], self.nodes[2][2]],
+#             [self.nodes[0][1], self.nodes[1][1], self.nodes[2][1]],
+#             [self.nodes[0][0], self.nodes[1][0], self.nodes[2][0]],
+#         ]
 
 @dataclass
 class Move:
-    '''
-    colour: r, b
-    col: a-f
-    row: 0-5
-    square: 0-3
-    rotation: R, L (clockwise, counterclockwise)
-    Move: (colour)(col)(row)-(square)(direction)
-
-    Example encoding: ra0-3L
-    '''
     red: bool
-    row: int
-    col: int
+    i: int
     square: int
     clockwise: bool
 
     def from_string(movestring: str):
-        if not re.fullmatch(r"[r|b][a-f][0-5]-[0-3][R|L]", movestring):
+        if not re.fullmatch(r"[r|b][0-35]-[0-3][R|L]", movestring):
             raise ValueError("Move string format is invalid")
 
-        red, row, col, _, square, clockwise = list(movestring)
+        red, i, _, square, clockwise = list(movestring)
+
         red = (red == "r")
-        row = ascii_lowercase.index(row)
-        col = int(col)
         square = int(square)
         clockwise = (clockwise == "R")
 
-        return Move(red, row, col, square, clockwise)
+        return Move(red, i, square, clockwise)
 
     def __str__(self):
         colour = "r" if self.red else "b"
@@ -101,19 +62,18 @@ class Move:
         return f"{colour}{col}{self.row}-{self.square}{rotation}"
 
 class Board:
-    '''
-    Board has 6x6 nodes, and 2x2 Squares
-
-       a b c d e f
-    0  . . . . . .
-    1  . 0 . . 1 .
-    2  . . . . . .
-    3  . . . . . .
-    4  . 2 . . 3 .
-    5  . . . . . .
-    '''
-    squares: list[list[Square]]
+    nodes: list[bool]
     moves: list[Move]
+    num_moves: int
+
+    NODE_STR = {
+        None: ".",
+        True: "r",
+        False: "b",
+        ".": None,
+        "r": True,
+        "b": False,
+    }
 
     class Outcome(Enum):
         RED_WIN = 1
@@ -121,45 +81,41 @@ class Board:
         DRAW = 3
 
     def __init__(self):
-        self.squares = [
-            [Square(), Square()],
-            [Square(), Square()],
-        ]
+        self.nodes = [None for _ in range(36)]
         self.moves = []
 
     @property
     def current_player(self):
-        return len(self.moves) % 2 == 0 # Red starts
+        return self.num_moves % 2 == 0 # Red plays first
+
+    def heuristic_value(self):
+        # For now just a random float from -1 to 1
+        return random.choice([-1, 1]) * random.random()
 
     def outcome(self):
-        nodes = [[node.red for node in row] for row in self.nodes()]
         full = True
         # Diagonals
         parts = [
-            # Top Left -> Bottom Right
-            [nodes[i][i] for i in range(5)],
-            [nodes[i][i] for i in range(1, 6)],
-            [nodes[i+1][i] for i in range(5)],
-            [nodes[i][i+1] for i in range(5)],
-            # Bottom Left -> Top Right
-            [nodes[5-i][i] for i in range(5)],
-            [nodes[5-i][i] for i in range(1, 6)],
-            [nodes[4-i][i] for i in range(5)],
-            [nodes[5-i][i+1] for i in range(5)],
+            self.nodes[0:29:7],
+            self.nodes[7:36:7],
+            self.nodes[6:35:7],
+            self.nodes[1:29:7],
+            self.nodes[5:26:5],
+            self.nodes[10:31:5],
+            self.nodes[4:25:5],
+            self.nodes[11:32:5],
         ]
-        # Horizontal + Vertical
         for i in range(6):
+            hstart = 6*i
             parts += [
-                nodes[i][0:5],
-                nodes[i][1:6],
-                [nodes[j][i] for j in range(5)],
-                [nodes[j][i] for j in range(1, 6)]
+                self.nodes[hstart:hstart+6],
+                self.nodes[i:i+31:6],
             ]
 
         outcome = None
         red_win = False
         black_win = False
-        # Checking for win
+
         for part in parts:
             if None not in part:
                 if all(part):
@@ -180,71 +136,78 @@ class Board:
         if not re.fullmatch(r"([r|b|.]{6}\/){5}[r|b|.]{6}", boardstring):
             raise ValueError("Board string format is invalid")
 
-        boardstring = [list(x) for x in boardstring.split("/")]
+        boardstring = boardstring.replace("/", "")
         board = Board()
-        for i, row in enumerate(board.nodes()):
-            for j, node in enumerate(row):
-                node.update(boardstring[i][j])
-
-        return board
+        board.num_moves = 36 - boardstring.count(".")
+        for i, nodestr in enumerate(boarstring): 
+            board.nodes[i] = NODE_STR[nodestr]
 
     def pop(self) -> Move:
         move = self.moves.pop()
-        square_row = move.square // 2
-        square_col = move.square % 2
-        self.squares[square_row][square_col].rotate(not move.clockwise)
-        nodes = list(self.nodes())
-        nodes[move.row][move.col].red = None
-
+        self.rotate(move.square, not move.clockwise)
+        nodes[move.i].red = None
+        self.num_moves -= 1
         return move
 
     def push(self, move: Move):
         if move not in self.legal_moves():
             raise ValueError("Move is not legal")
 
+        nodes[i] = move.red
+        self.rotate(move.square, move.clockwise)
         self.moves.append(move)
-        square_row = move.square // 2
-        square_col = move.square % 2
-        nodes = list(self.nodes())
-        nodes[move.row][move.col].red = move.red
-        self.squares[square_row][square_col].rotate(move.clockwise)
+        self.num_moves += 1
+
+    # TODO: Write rotate methods for 1d board array
+    def rotate(self, square: int, clockwise: bool):
+        if clockwise:
+            self._rotate_clockwise()
+        else:
+            self._rotate_counterclockwise()
+
+    def _rotate_clockwise(self, square: int):
+        self.nodes = [
+            [self.nodes[2][0], self.nodes[1][0], self.nodes[0][0]],
+            [self.nodes[2][1], self.nodes[1][1], self.nodes[0][1]],
+            [self.nodes[2][2], self.nodes[1][2], self.nodes[0][2]],
+        ]
+
+    def _rotate_counterclockwise(self, square: int):
+        self.nodes = [
+            [self.nodes[0][2], self.nodes[1][2], self.nodes[2][2]],
+            [self.nodes[0][1], self.nodes[1][1], self.nodes[2][1]],
+            [self.nodes[0][0], self.nodes[1][0], self.nodes[2][0]],
+        ]
+
 
     def legal_moves(self) -> Generator[Move, None, None]:
-        red = self.current_player
-        for i, row in enumerate(self.nodes()):
-            for j, node in enumerate(row):
-                if node.red is None:
-                    for k in range(4):
-                        yield Move(red, i, j, k, True)
-                        yield Move(red, i, j, k, False)
-
-    def nodes(self) -> Generator[list[Node], None, None]:
-        for i in range(2):
-                for j in range(3):
-                    yield [*self.squares[i][0].nodes[j], *self.squares[i][1].nodes[j]]
+        for i in range(36):
+            if self.nodes[i] == None:
+                for j in range(4):
+                    yield Move(self.current_player, i, k, True)
+                    yield Move(self.current_player, i, k, False)
 
     def __str__(self):
-        return "\n".join(" ".join([str(node) for node in row]) for row in self.nodes())
+        s = ""
+        for i in range(36):
+            s += self.NODE_STR[nodes[i]]
+            if i % 6 == 5:
+                s += "\n"
+        return s
 
-@dataclass
-class Foo:
-    NODES: int = 0
-
-foo = Foo()
-
-def minimax(board, depth, alpha, beta, red):
+def minimax(board: Board, depth, red, alpha=-2, beta=2):
     outcome = board.outcome()
     if depth == 0 or outcome is not None:
-        foo.NODES += 1
-        print(foo.NODES)
         if outcome == Board.Outcome.RED_WIN:
             return 1
         elif outcome == Board.Outcome.BLACK_WIN:
             return -1
-        else:
+        elif outcome == Board.Outcome.DRAW:
             return 0
+        else:
+            return board.heuristic_value()
 
-    if red: # We'll pick red as the maximixing player
+    if red:
         max_eval = -2
         for move in board.legal_moves():
             board.push(move)
@@ -254,8 +217,6 @@ def minimax(board, depth, alpha, beta, red):
             alpha = max(alpha, eval)
             if beta <= alpha:
                 break
-        foo.NODES += 1
-        print(foo.NODES)
         return max_eval
     else:
         min_eval = 2
@@ -267,10 +228,7 @@ def minimax(board, depth, alpha, beta, red):
             beta = min(beta, eval)
             if beta <= alpha:
                 break
-        foo.NODES += 1
-        print(foo.NODES)
         return min_eval
 
 if __name__ == "__main__":
-    board = Board.from_string("rrrr../bbbb../....../....../....../......")
-    print(minimax(board, 3, -2, 2, board.current_player))
+    print("Hello, world!")
