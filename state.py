@@ -15,13 +15,22 @@ class State():
         return self.board.legal_moves()
 
     def value(self):
-        return self.minimax(self.board, 3)
+        return self.minimax(36, self.board.current_player)
 
     def heuristic_value(self):
-        # For now just a random float from -1 to 1
-        # Returning a heuristic value makes the minimax a lot faster
-        # It allows the ab pruning to actually prune the tree
-        return 0
+        # First simple solution: Computing percentage of 16 central squares occupied
+        rednodes = 0
+        blacknodes = 0
+
+        for i in range(4):
+            for j in range(4):
+                node = self.board.nodes[(7+6*i)+j]
+                if node == True:
+                    rednodes += 1
+                elif node == False:
+                    blacknodes += 1
+
+        return (rednodes - blacknodes) / 16
 
     def minimax(self, depth, red, alpha=-2, beta=2):
         outcome = self.board.outcome()
@@ -61,4 +70,4 @@ class State():
 
 if __name__ == "__main__":
     s = State()
-    print(s.minimax(4, s.board.current_player))
+    print(s.value())

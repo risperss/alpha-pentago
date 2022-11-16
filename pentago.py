@@ -66,7 +66,7 @@ class Board:
             self.nodes[0:29:7],
             self.nodes[7:36:7],
             self.nodes[6:35:7],
-            self.nodes[1:29:7],
+            self.nodes[1:30:7],
             self.nodes[5:26:5],
             self.nodes[10:31:5],
             self.nodes[4:25:5],
@@ -75,9 +75,13 @@ class Board:
         for i in range(6):
             hstart = 6*i
             parts += [
-                self.nodes[hstart:hstart+6],
-                self.nodes[i:i+31:6],
+                self.nodes[hstart:hstart+5],
+                self.nodes[hstart+1:hstart+6],
+                self.nodes[i:i+30:6],
+                self.nodes[i+6:i+31:6],
             ]
+
+        import pdb; pdb.set_trace()
 
         outcome = None
         red_win = False
@@ -180,45 +184,10 @@ class Board:
     def __str__(self):
         s = ""
         for i in range(36):
-            s += self.NODE_STR[self.nodes[i]]
+            s += self.NODE_STR[self.nodes[i]] + " "
             if i % 6 == 5:
                 s += "\n"
         return s
-
-def minimax(board: Board, depth, red, alpha=-2, beta=2):
-    outcome = board.outcome()
-    if depth == 0 or outcome is not None:
-        if outcome == Board.Outcome.RED_WIN:
-            return 1
-        elif outcome == Board.Outcome.BLACK_WIN:
-            return -1
-        elif outcome == Board.Outcome.DRAW:
-            return 0
-        else:
-            return board.heuristic_value()
-
-    if red:
-        max_eval = -2
-        for move in board.legal_moves():
-            board.push(move)
-            eval = minimax(board, depth-1, alpha, beta, not red)
-            board.pop()
-            max_eval = max(max_eval, eval)
-            alpha = max(alpha, eval)
-            if beta <= alpha:
-                break
-        return max_eval
-    else:
-        min_eval = 2
-        for move in board.legal_moves():
-            board.push(move)
-            eval = minimax(board, depth-1, alpha, beta, not red)
-            board.pop()
-            min_eval = min(min_eval, eval)
-            beta = min(beta, eval)
-            if beta <= alpha:
-                break
-        return min_eval
 
 if __name__ == "__main__":
     board = Board()
