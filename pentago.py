@@ -118,10 +118,10 @@ class Board:
         self.num_moves -= 1
         return move
 
-    def push(self, move: Move):
-        if move not in self.legal_moves():
+    def push(self, move: Move, human_move=False):
+        if human_move and self.nodes[move.i] is not None:
             raise ValueError("Move is not legal")
-
+            
         self.nodes[move.i] = move.red
         self.rotate(move.square, move.clockwise)
         self.moves.append(move)
