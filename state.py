@@ -1,4 +1,5 @@
 from pentago import Board
+import random
 
 
 class State():
@@ -16,6 +17,12 @@ class State():
     def value(self):
         return self.minimax(self.board, 3)
 
+    def heuristic_value(self):
+        # For now just a random float from -1 to 1
+        # Returning a heuristic value makes the minimax a lot faster
+        # It allows the ab pruning to actually prune the tree
+        return 0
+
     def minimax(self, depth, red, alpha=-2, beta=2):
         outcome = self.board.outcome()
         if depth == 0 or outcome is not None:
@@ -26,7 +33,7 @@ class State():
             elif outcome == Board.Outcome.DRAW:
                 return 0
             else:
-                return self.board.heuristic_value()
+                return self.heuristic_value()
 
         if red:
             max_eval = -2
@@ -53,4 +60,5 @@ class State():
 
 
 if __name__ == "__main__":
-    print("foobar")
+    s = State()
+    print(s.minimax(4, s.board.current_player))

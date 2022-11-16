@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from enum import Enum
-import random
 import re
 from string import ascii_lowercase
 from typing import Generator
@@ -54,14 +53,11 @@ class Board:
     def __init__(self):
         self.nodes = [None for _ in range(36)]
         self.moves = []
+        self.num_moves = 0
 
     @property
     def current_player(self):
         return self.num_moves % 2 == 0 # Red plays first
-
-    def heuristic_value(self):
-        # For now just a random float from -1 to 1
-        return random.choice([-1, 1]) * random.random()
 
     def outcome(self):
         full = True
@@ -110,13 +106,13 @@ class Board:
         boardstring = boardstring.replace("/", "")
         board = Board()
         board.num_moves = 36 - boardstring.count(".")
-        for i, nodestr in enumerate(boarstring): 
+        for i, nodestr in enumerate(boarstring):
             board.nodes[i] = NODE_STR[nodestr]
 
     def pop(self) -> Move:
         move = self.moves.pop()
         self.rotate(move.square, not move.clockwise)
-        nodes[move.i].red = None
+        self.nodes[move.i] = None
         self.num_moves -= 1
         return move
 
@@ -124,44 +120,67 @@ class Board:
         if move not in self.legal_moves():
             raise ValueError("Move is not legal")
 
-        nodes[i] = move.red
+        self.nodes[move.i] = move.red
         self.rotate(move.square, move.clockwise)
         self.moves.append(move)
         self.num_moves += 1
 
     # TODO: Write rotate methods for 1d board array
     def rotate(self, square: int, clockwise: bool):
-        if clockwise:
-            self._rotate_clockwise()
+        if square == 0:
+            refnode = 0
+        elif square == 1:
+            refnode = 3
+        elif square == 2:
+            refnode = 18
         else:
-            self._rotate_counterclockwise()
+            refnode = 21
 
-    def _rotate_clockwise(self, square: int):
-        self.nodes = [
-            [self.nodes[2][0], self.nodes[1][0], self.nodes[0][0]],
-            [self.nodes[2][1], self.nodes[1][1], self.nodes[0][1]],
-            [self.nodes[2][2], self.nodes[1][2], self.nodes[0][2]],
-        ]
+        if clockwise:
+            self._rotate_clockwise(refnode)
+        else:
+            self._rotate_counterclockwise(refnode)
 
-    def _rotate_counterclockwise(self, square: int):
-        self.nodes = [
-            [self.nodes[0][2], self.nodes[1][2], self.nodes[2][2]],
-            [self.nodes[0][1], self.nodes[1][1], self.nodes[2][1]],
-            [self.nodes[0][0], self.nodes[1][0], self.nodes[2][0]],
-        ]
+    def _rotate_clockwise(self, refnode: int):
+        copynodes = self.nodes.copy()
 
+        copynodes[refnode] = self.nodes[refnode+12]
+        copynodes[refnode+1] = self.nodes[refnode+6]
+        copynodes[refnode+2] = self.nodes[refnode]
+        copynodes[refnode+6] = self.nodes[refnode+13]
+        copynodes[refnode+8] = self.nodes[refnode+1]
+        copynodes[refnode+12] = self.nodes[refnode+14]
+        copynodes[refnode+13] = self.nodes[refnode+8]
+        copynodes[refnode+14] = self.nodes[refnode+2]
+
+        self.nodes = copynodes
+
+    def _rotate_counterclockwise(self, refnode: int):
+        copynodes = self.nodes.copy()
+
+        # TODO: there is a clear pattern here that I'm too lazy to implement with an algo
+        copynodes[refnode] = self.nodes[refnode+2]
+        copynodes[refnode+1] = self.nodes[refnode+8]
+        copynodes[refnode+2] = self.nodes[refnode+14]
+        copynodes[refnode+6] = self.nodes[refnode+1]
+        copynodes[refnode+8] = self.nodes[refnode+13]
+        copynodes[refnode+12] = self.nodes[refnode]
+        copynodes[refnode+13] = self.nodes[refnode+6]
+        copynodes[refnode+14] = self.nodes[refnode+12]
+
+        self.nodes = copynodes
 
     def legal_moves(self) -> Generator[Move, None, None]:
         for i in range(36):
             if self.nodes[i] == None:
                 for j in range(4):
-                    yield Move(self.current_player, i, k, True)
-                    yield Move(self.current_player, i, k, False)
+                    yield Move(self.current_player, i, j, True)
+                    yield Move(self.current_player, i, j, False)
 
     def __str__(self):
         s = ""
         for i in range(36):
-            s += self.NODE_STR[nodes[i]]
+            s += self.NODE_STR[self.nodes[i]]
             if i % 6 == 5:
                 s += "\n"
         return s
@@ -202,4 +221,8 @@ def minimax(board: Board, depth, red, alpha=-2, beta=2):
         return min_eval
 
 if __name__ == "__main__":
-    print("Hello, world!")
+    board = Board()
+    board.push(Move(True, 21, 2, True))
+    board.push(Move(False, 21, 2, True))
+    board.push(Move(True, 21, 2, False))
+    print(board)
