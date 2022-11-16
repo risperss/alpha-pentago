@@ -81,8 +81,6 @@ class Board:
                 self.nodes[i+6:i+31:6],
             ]
 
-        import pdb; pdb.set_trace()
-
         outcome = None
         red_win = False
         black_win = False
