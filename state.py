@@ -1,5 +1,6 @@
 from pentago import Board
 import random
+from timeit import default_timer
 
 class State():
     board: Board
@@ -17,7 +18,7 @@ class State():
 
     def value(self, d: int):
         self.checks = 0
-        return self.minimax(d, self.board.current_player)
+        return self.minimax(d, self.board.current_player, -2, 2)
 
     def heuristic_value(self):
         # First simple solution: Computing percentage of 16 central squares occupied
@@ -34,11 +35,10 @@ class State():
 
         return (rednodes - blacknodes) / 16
 
-    def minimax(self, depth, red, alpha=-2, beta=2):
+    def minimax(self, depth, red, alpha, beta):
         outcome = self.board.outcome()
         if depth == 0 or outcome is not None:
             self.checks += 1
-            print(self.checks)
             if outcome == Board.Outcome.RED_WIN:
                 return 1
             elif outcome == Board.Outcome.BLACK_WIN:
@@ -52,7 +52,7 @@ class State():
             max_eval = -2
             for move in self.board.legal_moves():
                 self.board.push(move)
-                eval_ = self.minimax(depth-1, alpha, beta, not red)
+                eval_ = self.minimax(depth-1, not red, alpha, beta)
                 self.board.pop()
                 max_eval = max(max_eval, eval_)
                 alpha = max(alpha, eval_)
@@ -63,7 +63,7 @@ class State():
             min_eval = 2
             for move in self.board.legal_moves():
                 self.board.push(move)
-                eval_ = self.minimax(depth-1, alpha, beta, not red)
+                eval_ = self.minimax(depth-1, not red, alpha, beta)
                 self.board.pop()
                 min_eval = min(min_eval, eval_)
                 beta = min(beta, eval_)
@@ -74,6 +74,9 @@ class State():
 
 if __name__ == "__main__":
     s = State()
-    for i in range(9, 10):
-        s.value(i)
-        print(i, s.checks)
+    # Can check to see if I am improving the algorithm
+    for i in range(1, 5):
+        start = default_timer()
+        val = s.value(i)
+        end = default_timer()
+        print(f"d={i}, time={(end-start):.3f}, value={val}, checks={s.checks}")
