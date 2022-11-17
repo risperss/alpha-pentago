@@ -5,10 +5,12 @@ from timeit import default_timer
 class State():
     board: Board
     checks: int
+    lookup: dict[int, int]
 
     def __init__(self):
         self.board = Board()
         self.checks = 0
+        self.lookup = {}
 
     def serialize(self):
         ...
@@ -36,7 +38,11 @@ class State():
         return (rednodes - blacknodes) / 16
 
     def minimax(self, depth, red, alpha, beta):
-        outcome = self.board.outcome()
+        if self.board.num_moves >= 9:
+            outcome = self.board.outcome()
+        else:
+            outcome = None
+
         if depth == 0 or outcome is not None:
             self.checks += 1
             if outcome == Board.Outcome.RED_WIN:
@@ -75,7 +81,7 @@ class State():
 if __name__ == "__main__":
     s = State()
     # Can check to see if I am improving the algorithm
-    for i in range(1, 5):
+    for i in range(1, 6):
         start = default_timer()
         val = s.value(i)
         end = default_timer()
