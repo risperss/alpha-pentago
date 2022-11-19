@@ -3,8 +3,8 @@ def all_possible_move_strings():
 	for col in ["a", "b", "c", "d", "e", "f"]:
 		for row in range(1, 7):
 			for square in range(1, 5):
-				movestrings.append(f"{col}{row}{square}L")
-				movestrings.append(f"{col}{row}{square}R")
+				movestrings.append(f"{col}{row}L{square}")
+				movestrings.append(f"{col}{row}R{square}")
 	print(len(movestrings))
 	print('", "'.join(movestrings))
 
@@ -21,4 +21,4 @@ def print_board_indices():
 
 
 if __name__ == "__main__":
-	print_board_indices()
+	all_possible_move_strings()

@@ -170,16 +170,16 @@ public:
 
     constexpr std::uint16_t as_int() const { return square_; }
 
-    static bool IsCrossTranspose(std::uint16_t square) {
-        return !(square - kCrossTransposeMask);
+    static bool IsCrossSymmetrical(std::uint16_t square) {
+        return !(square - kCrossSymmetryMask);
     }
-    static bool IsXTranspose(std::uint16_t square) {
-        return !(square - kXTransposeMask);
+    static bool IsXSymmetrical(std::uint16_t square) {
+        return !(square - kXSymmetryMask);
     }
 
-    static bool IsTranspose(const BitBoard& board, int squarePos) {
+    static bool IsSymmetrical(const BitBoard& board, int squarePos) {
         BoardSquare square = BoardSquare(board, squarePos);
-        return IsCrossTranspose(square.as_int()) || IsXTranspose(square.as_int());
+        return IsCrossSymmetrical(square.as_int()) || IsXSymmetrical(square.as_int());
     }
 
     void rotate(bool clockwise) {
@@ -214,8 +214,8 @@ private:
 
     enum Masks : uint16_t {
         kSquareMask = 0b0111000101000111,
-        kCrossTransposeMask = 0b0010000101000010,
-        kXTransposeMask = 0b0101000000000101,
+        kCrossSymmetryMask = 0b0010000101000010,
+        kXSymmetryMask = 0b0101000000000101,
         kClockwisePlus12Mask = 0b0000000000000100,
         kClockwiseMinus12Mask = 0b0100000000000000,
         kClockwisePlus7Mask = 0b0000000001000000,
