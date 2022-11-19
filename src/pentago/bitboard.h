@@ -7,49 +7,49 @@ namespace pen {
 
 class BoardNode {
 public:
-	constexpr BoardNode() {}
-	constexpr BoardNode(std::uint8_t num) : node_(num) {}
-	constexpr BoardNode(int row, int col) : BoardNode(row * 6 + col) {}
-	BoardNode(const std::string& str)
-		: BoardNode(str[1] - '1', str[0] - 'a') {}
+    constexpr BoardNode() {}
+    constexpr BoardNode(std::uint8_t num) : node_(num) {}
+    constexpr BoardNode(int row, int col) : BoardNode(row * 6 + col) {}
+    BoardNode(const std::string& str)
+        : BoardNode(str[1] - '1', str[0] - 'a') {}
 
-	constexpr std::uint8_t as_int() const { return node_; }
-	constexpr std::uint64_t as_board() const { return 1ULL << node_; }
+    constexpr std::uint8_t as_int() const { return node_; }
+    constexpr std::uint64_t as_board() const { return 1ULL << node_; }
 
-	void set(int row, int col) { node_ = row * 6 + col; }
+    void set(int row, int col) { node_ = row * 6 + col; }
 
-	int row() const { return node_ / 6; }
-	int col() const { return node_ % 6; }
+    int row() const { return node_ / 6; }
+    int col() const { return node_ % 6; }
 
-	static bool IsValidCoord(int x) { return x >= 0 && x < 6; }
-	static bool isValid(int row, int col) {
-		return IsValidCoord(row) && IsValidCoord(col);
-	}
+    static bool IsValidCoord(int x) { return x >= 0 && x < 6; }
+    static bool isValid(int row, int col) {
+        return IsValidCoord(row) && IsValidCoord(col);
+    }
 
-	constexpr bool operator==(const BoardNode& other) const {
-		return node_ == other.node_;
-	}
-	constexpr bool operator!=(const BoardNode& other) const {
-		return node_ != other.node_;
-	}
+    constexpr bool operator==(const BoardNode& other) const {
+        return node_ == other.node_;
+    }
+    constexpr bool operator!=(const BoardNode& other) const {
+        return node_ != other.node_;
+    }
 
-	std::string as_string() const {
-		return std::string(1, 'a' + col()) + std::string(1, '1' + row());
-	}
+    std::string as_string() const {
+        return std::string(1, 'a' + col()) + std::string(1, '1' + row());
+    }
 
 private:
-	std::uint8_t node_ = 0;
+    std::uint8_t node_ = 0;
 };
 
 class BitBoard {
 public:
-	constexpr BitBoard(std::uint64_t board) : board_(board) {}
-	BitBoard() = default;
-	BitBoard(const BitBoard&) = default;
-	BitBoard& operator=(const BitBoard&) = default;
+    constexpr BitBoard(std::uint64_t board) : board_(board) {}
+    BitBoard() = default;
+    BitBoard(const BitBoard&) = default;
+    BitBoard& operator=(const BitBoard&) = default;
 
-	std::uint64_t as_int() const { return board_; }
-	void clear() { board_ = 0; }
+    std::uint64_t as_int() const { return board_; }
+    void clear() { board_ = 0; }
 
     int count() const {
         #if defined(NO_POPCNT)
@@ -67,50 +67,50 @@ public:
         #endif
     }
 
-	int count_few() const {
-		#if defined(NO_POPCNT)
-		    std::uint64_t x = board_;
-		    int count;
-		    for (count = 0; x != 0; ++count) {
-		      // Clear the rightmost set bit.
-		      x &= x - 1;
-		    }
-		    return count;
-		#else
-		    return count();
-		#endif
-	}
+    int count_few() const {
+        #if defined(NO_POPCNT)
+            std::uint64_t x = board_;
+            int count;
+            for (count = 0; x != 0; ++count) {
+              // Clear the rightmost set bit.
+              x &= x - 1;
+            }
+            return count;
+        #else
+            return count();
+        #endif
+    }
 
-	void set_if(BoardNode node, bool cond) { set_if(node.as_int(), cond); }
-	void set_if(std::uint8_t pos, bool cond) {
-		board_ |= (std::uint64_t(cond) << pos);
-	}
-	void set_if(int row, int col, bool cond) {
-		set_if(BoardNode(row, col), cond);
-	}
+    void set_if(BoardNode node, bool cond) { set_if(node.as_int(), cond); }
+    void set_if(std::uint8_t pos, bool cond) {
+        board_ |= (std::uint64_t(cond) << pos);
+    }
+    void set_if(int row, int col, bool cond) {
+        set_if(BoardNode(row, col), cond);
+    }
 
-	void set(BoardNode node) { set(node.as_int()); }
-  	void set(std::uint8_t pos) { board_ |= (std::uint64_t(1) << pos); }
-  	void set(int row, int col) { set(BoardNode(row, col)); }
+    void set(BoardNode node) { set(node.as_int()); }
+    void set(std::uint8_t pos) { board_ |= (std::uint64_t(1) << pos); }
+    void set(int row, int col) { set(BoardNode(row, col)); }
 
- 	void reset(BoardNode node) { reset(node.as_int()); }
-  	void reset(std::uint8_t pos) { board_ &= ~(std::uint64_t(1) << pos); }
-  	void reset(int row, int col) { reset(BoardNode(row, col)); }
+    void reset(BoardNode node) { reset(node.as_int()); }
+    void reset(std::uint8_t pos) { board_ &= ~(std::uint64_t(1) << pos); }
+    void reset(int row, int col) { reset(BoardNode(row, col)); }
 
- 	bool get(BoardNode node) const { return get(node.as_int()); }
-  	bool get(std::uint8_t pos) const {
-    	return board_ & (std::uint64_t(1) << pos);
-  	}
-  	bool get(int row, int col) const { return get(BoardNode(row, col)); }
+    bool get(BoardNode node) const { return get(node.as_int()); }
+    bool get(std::uint8_t pos) const {
+        return board_ & (std::uint64_t(1) << pos);
+    }
+    bool get(int row, int col) const { return get(BoardNode(row, col)); }
 
-  	bool empty() const { return board_ == 0; }
+    bool empty() const { return board_ == 0; }
 
-  	bool intersects(const BitBoard& other) const { return board_ & other.board_; }
+    bool intersects(const BitBoard& other) const { return board_ & other.board_; }
 
 
-	bool operator==(const BitBoard& other) const {
-	   return board_ == other.board_;
-	}
+    bool operator==(const BitBoard& other) const {
+       return board_ == other.board_;
+    }
 
     bool operator!=(const BitBoard& other) const {
        return board_ != other.board_;
@@ -208,7 +208,7 @@ private:
     std::uint8_t square_ = 0;
 
     void rotateClockwise() {
-        square_ = 
+        square_ =
             ((square_ & kClockwisePlus12Mask) << 12) &
             ((square_ & kClockwiseMinus12Mask) >> 12) &
             ((square_ & kClockwisePlus7Mask) << 7) &
@@ -219,7 +219,7 @@ private:
             ((square_ & kClockwiseMinus2Mask) >> 2);
     }
     void rotateCounterClockwise() {
-        square_ = 
+        square_ =
             ((square_ & kCounterClockwisePlus12Mask) << 12) &
             ((square_ & kCounterClockwiseMinus12Mask) >> 12) &
             ((square_ & kCounterClockwisePlus7Mask) << 7) &
@@ -257,9 +257,9 @@ private:
 class Move {
 public:
     Move() = default;
-    constexpr Move(std::uint16_t move) : data_(move) {}
+    constexpr Move(std::uint16_t num) : data_(num) {}
     constexpr Move(BoardNode node, int squarePos, bool clockwise)
-        : data_(node.as_int() + (squarePos << 6) + 
+        : data_(node.as_int() + (squarePos << 6) +
             (std::uint16_t(clockwise) << 8)) {}
     Move(const std::string& str)
         : Move(BoardNode(str.substr(0, 2)), str[3] - '1', str[4] == 'R') {}
