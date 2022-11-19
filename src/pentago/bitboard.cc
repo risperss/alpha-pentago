@@ -1,74 +1,59 @@
 #include <cassert>
+#include <string>
+#include <iostream>
 
 #include "bitboard.h"
 
-namespace apentago {
+
+namespace pen {
 
 namespace {
 
 const Move kMove[] = {
-	"a1L1", "a1R1", "a1L2", "a1R2", "a1L3", "a1R3", "a1L4", "a1R4", 
-	"a2L1", "a2R1", "a2L2", "a2R2", "a2L3", "a2R3", "a2L4", "a2R4", 
-	"a3L1", "a3R1", "a3L2", "a3R2", "a3L3", "a3R3", "a3L4", "a3R4", 
-	"a4L1", "a4R1", "a4L2", "a4R2", "a4L3", "a4R3", "a4L4", "a4R4", 
-	"a5L1", "a5R1", "a5L2", "a5R2", "a5L3", "a5R3", "a5L4", "a5R4", 
-	"a6L1", "a6R1", "a6L2", "a6R2", "a6L3", "a6R3", "a6L4", "a6R4", 
-	"b1L1", "b1R1", "b1L2", "b1R2", "b1L3", "b1R3", "b1L4", "b1R4", 
-	"b2L1", "b2R1", "b2L2", "b2R2", "b2L3", "b2R3", "b2L4", "b2R4", 
-	"b3L1", "b3R1", "b3L2", "b3R2", "b3L3", "b3R3", "b3L4", "b3R4", 
-	"b4L1", "b4R1", "b4L2", "b4R2", "b4L3", "b4R3", "b4L4", "b4R4", 
-	"b5L1", "b5R1", "b5L2", "b5R2", "b5L3", "b5R3", "b5L4", "b5R4", 
-	"b6L1", "b6R1", "b6L2", "b6R2", "b6L3", "b6R3", "b6L4", "b6R4", 
-	"c1L1", "c1R1", "c1L2", "c1R2", "c1L3", "c1R3", "c1L4", "c1R4", 
-	"c2L1", "c2R1", "c2L2", "c2R2", "c2L3", "c2R3", "c2L4", "c2R4", 
-	"c3L1", "c3R1", "c3L2", "c3R2", "c3L3", "c3R3", "c3L4", "c3R4", 
-	"c4L1", "c4R1", "c4L2", "c4R2", "c4L3", "c4R3", "c4L4", "c4R4", 
-	"c5L1", "c5R1", "c5L2", "c5R2", "c5L3", "c5R3", "c5L4", "c5R4", 
-	"c6L1", "c6R1", "c6L2", "c6R2", "c6L3", "c6R3", "c6L4", "c6R4", 
-	"d1L1", "d1R1", "d1L2", "d1R2", "d1L3", "d1R3", "d1L4", "d1R4", 
-	"d2L1", "d2R1", "d2L2", "d2R2", "d2L3", "d2R3", "d2L4", "d2R4", 
-	"d3L1", "d3R1", "d3L2", "d3R2", "d3L3", "d3R3", "d3L4", "d3R4", 
-	"d4L1", "d4R1", "d4L2", "d4R2", "d4L3", "d4R3", "d4L4", "d4R4", 
-	"d5L1", "d5R1", "d5L2", "d5R2", "d5L3", "d5R3", "d5L4", "d5R4", 
-	"d6L1", "d6R1", "d6L2", "d6R2", "d6L3", "d6R3", "d6L4", "d6R4", 
-	"e1L1", "e1R1", "e1L2", "e1R2", "e1L3", "e1R3", "e1L4", "e1R4", 
-	"e2L1", "e2R1", "e2L2", "e2R2", "e2L3", "e2R3", "e2L4", "e2R4", 
-	"e3L1", "e3R1", "e3L2", "e3R2", "e3L3", "e3R3", "e3L4", "e3R4", 
-	"e4L1", "e4R1", "e4L2", "e4R2", "e4L3", "e4R3", "e4L4", "e4R4", 
-	"e5L1", "e5R1", "e5L2", "e5R2", "e5L3", "e5R3", "e5L4", "e5R4", 
-	"e6L1", "e6R1", "e6L2", "e6R2", "e6L3", "e6R3", "e6L4", "e6R4", 
-	"f1L1", "f1R1", "f1L2", "f1R2", "f1L3", "f1R3", "f1L4", "f1R4", 
-	"f2L1", "f2R1", "f2L2", "f2R2", "f2L3", "f2R3", "f2L4", "f2R4", 
-	"f3L1", "f3R1", "f3L2", "f3R2", "f3L3", "f3R3", "f3L4", "f3R4", 
-	"f4L1", "f4R1", "f4L2", "f4R2", "f4L3", "f4R3", "f4L4", "f4R4", 
-	"f5L1", "f5R1", "f5L2", "f5R2", "f5L3", "f5R3", "f5L4", "f5R4", 
-	"f6L1", "f6R1", "f6L2", "f6R2", "f6L3", "f6R3", "f6L4", "f6R4"};
-
+	"a1-1R", "a1-1L", "a1-2R", "a1-2L", "a1-3R", "a1-3L", "a1-4R", "a1-4L",
+	"a2-1R", "a2-1L", "a2-2R", "a2-2L", "a2-3R", "a2-3L", "a2-4R", "a2-4L", 
+	"a3-1R", "a3-1L", "a3-2R", "a3-2L", "a3-3R", "a3-3L", "a3-4R", "a3-4L", 
+	"a4-1R", "a4-1L", "a4-2R", "a4-2L", "a4-3R", "a4-3L", "a4-4R", "a4-4L", 
+	"a5-1R", "a5-1L", "a5-2R", "a5-2L", "a5-3R", "a5-3L", "a5-4R", "a5-4L", 
+	"a6-1R", "a6-1L", "a6-2R", "a6-2L", "a6-3R", "a6-3L", "a6-4R", "a6-4L", 
+	"b1-1R", "b1-1L", "b1-2R", "b1-2L", "b1-3R", "b1-3L", "b1-4R", "b1-4L", 
+	"b2-1R", "b2-1L", "b2-2R", "b2-2L", "b2-3R", "b2-3L", "b2-4R", "b2-4L", 
+	"b3-1R", "b3-1L", "b3-2R", "b3-2L", "b3-3R", "b3-3L", "b3-4R", "b3-4L", 
+	"b4-1R", "b4-1L", "b4-2R", "b4-2L", "b4-3R", "b4-3L", "b4-4R", "b4-4L", 
+	"b5-1R", "b5-1L", "b5-2R", "b5-2L", "b5-3R", "b5-3L", "b5-4R", "b5-4L", 
+	"b6-1R", "b6-1L", "b6-2R", "b6-2L", "b6-3R", "b6-3L", "b6-4R", "b6-4L", 
+	"c1-1R", "c1-1L", "c1-2R", "c1-2L", "c1-3R", "c1-3L", "c1-4R", "c1-4L", 
+	"c2-1R", "c2-1L", "c2-2R", "c2-2L", "c2-3R", "c2-3L", "c2-4R", "c2-4L", 
+	"c3-1R", "c3-1L", "c3-2R", "c3-2L", "c3-3R", "c3-3L", "c3-4R", "c3-4L", 
+	"c4-1R", "c4-1L", "c4-2R", "c4-2L", "c4-3R", "c4-3L", "c4-4R", "c4-4L", 
+	"c5-1R", "c5-1L", "c5-2R", "c5-2L", "c5-3R", "c5-3L", "c5-4R", "c5-4L", 
+	"c6-1R", "c6-1L", "c6-2R", "c6-2L", "c6-3R", "c6-3L", "c6-4R", "c6-4L", 
+	"d1-1R", "d1-1L", "d1-2R", "d1-2L", "d1-3R", "d1-3L", "d1-4R", "d1-4L", 
+	"d2-1R", "d2-1L", "d2-2R", "d2-2L", "d2-3R", "d2-3L", "d2-4R", "d2-4L", 
+	"d3-1R", "d3-1L", "d3-2R", "d3-2L", "d3-3R", "d3-3L", "d3-4R", "d3-4L", 
+	"d4-1R", "d4-1L", "d4-2R", "d4-2L", "d4-3R", "d4-3L", "d4-4R", "d4-4L", 
+	"d5-1R", "d5-1L", "d5-2R", "d5-2L", "d5-3R", "d5-3L", "d5-4R", "d5-4L", 
+	"d6-1R", "d6-1L", "d6-2R", "d6-2L", "d6-3R", "d6-3L", "d6-4R", "d6-4L", 
+	"e1-1R", "e1-1L", "e1-2R", "e1-2L", "e1-3R", "e1-3L", "e1-4R", "e1-4L", 
+	"e2-1R", "e2-1L", "e2-2R", "e2-2L", "e2-3R", "e2-3L", "e2-4R", "e2-4L", 
+	"e3-1R", "e3-1L", "e3-2R", "e3-2L", "e3-3R", "e3-3L", "e3-4R", "e3-4L", 
+	"e4-1R", "e4-1L", "e4-2R", "e4-2L", "e4-3R", "e4-3L", "e4-4R", "e4-4L", 
+	"e5-1R", "e5-1L", "e5-2R", "e5-2L", "e5-3R", "e5-3L", "e5-4R", "e5-4L", 
+	"e6-1R", "e6-1L", "e6-2R", "e6-2L", "e6-3R", "e6-3L", "e6-4R", "e6-4L", 
+	"f1-1R", "f1-1L", "f1-2R", "f1-2L", "f1-3R", "f1-3L", "f1-4R", "f1-4L", 
+	"f2-1R", "f2-1L", "f2-2R", "f2-2L", "f2-3R", "f2-3L", "f2-4R", "f2-4L", 
+	"f3-1R", "f3-1L", "f3-2R", "f3-2L", "f3-3R", "f3-3L", "f3-4R", "f3-4L", 
+	"f4-1R", "f4-1L", "f4-2R", "f4-2L", "f4-3R", "f4-3L", "f4-4R", "f4-4L", 
+	"f5-1R", "f5-1L", "f5-2R", "f5-2L", "f5-3R", "f5-3L", "f5-4R", "f5-4L", 
+	"f6-1R", "f6-1L", "f6-2R", "f6-2L", "f6-3R", "f6-3L", "f6-4R", "f6-4L"};
 }
-
-BoardSquare::BoardSquare(const BitBoard& board, int squarePos)  {
-        int shiftValue = 0;
-        switch (squarePos) {
-        case 1:
-            break;
-        case 2:
-            shiftValue = 3;
-            break;
-        case 3:
-            shiftValue = 18;
-            break;
-        case 4:
-            shiftValue = 21;
-            break;
-        default:
-            assert(false);
-        }
-        square_ = (board.as_int() >> shiftValue) & kSquareMask;
-    }
-
 
 }
 
 int main(void) {
-	return 0;
+	for (int i = 0; i < 288; i++) {
+		pen::Move move = pen::Move(pen::kMove[i]);
+		std::cout << move.as_string() << std::endl;
+	}
 }
+

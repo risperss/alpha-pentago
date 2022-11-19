@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-namespace apentago {
+namespace pen {
 
 class BoardNode {
 public:
@@ -166,7 +166,25 @@ public:
     BoardSquare() = default;
     constexpr BoardSquare(std::uint16_t square) : square_(square) {}
     BoardSquare(const BoardSquare&) = default;
-    BoardSquare(const BitBoard& board, int squarePos);
+    BoardSquare(const BitBoard& board, int squarePos) {
+        int shiftValue = 0;
+        switch (squarePos) {
+        case 1:
+            break;
+        case 2:
+            shiftValue = 3;
+            break;
+        case 3:
+            shiftValue = 18;
+            break;
+        case 4:
+            shiftValue = 21;
+            break;
+        default:
+            assert(false);
+        }
+        square_ = (board.as_int() >> shiftValue) & kSquareMask;
+    }
 
     constexpr std::uint16_t as_int() const { return square_; }
 
@@ -239,10 +257,12 @@ private:
 class Move {
 public:
     Move() = default;
+    constexpr Move(std::uint16_t move) : data_(move) {}
     constexpr Move(BoardNode node, int squarePos, bool clockwise)
-      : data_(node.as_int() + (squarePos << 6) + 
-            (std::uint8_t(clockwise) << 8)) {}
-    Move(const std::string& str);
+        : data_(node.as_int() + (squarePos << 6) + 
+            (std::uint16_t(clockwise) << 8)) {}
+    Move(const std::string& str)
+        : Move(BoardNode(str.substr(0, 2)), str[3] - '1', str[4] == 'R') {}
     Move(const char* str) : Move(std::string(str)) {}
 
     constexpr std::uint16_t as_int() const { return data_; }
@@ -260,7 +280,8 @@ public:
     }
 
     std::string as_string() {
-        return node().as_string() 
+        return node().as_string()
+            + "-"
             + std::string(1, '1' + squarePos())
             + std::string(1, clockwise() ? 'R' : 'L');
     }
@@ -281,4 +302,4 @@ private:
 
 using MoveList = std::vector<Move>;
 
-} // namespace apentago
+} // namespace pen
