@@ -1,5 +1,5 @@
-stash/*
-bin/*
+stash
+bin
 *.h.gch
 
 # Prerequisites
