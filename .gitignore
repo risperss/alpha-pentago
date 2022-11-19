@@ -1,6 +1,7 @@
 stash
 bin
 *.h.gch
+.DS_Store
 
 # Prerequisites
 *.d
