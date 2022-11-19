@@ -2,7 +2,7 @@ def all_possible_move_strings():
 	movestrings = []
 	for col in ["a", "b", "c", "d", "e", "f"]:
 		for row in range(1, 7):
-			for square in range(4):
+			for square in range(1, 5):
 				movestrings.append(f"{col}{row}{square}L")
 				movestrings.append(f"{col}{row}{square}R")
 	print(len(movestrings))
