@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cassert>
 #include <cstdint>
 #include <string>
@@ -20,6 +22,18 @@ public:
 
     int row() const { return node_ / 6; }
     int col() const { return node_ % 6; }
+
+    int squarePos() const {
+        if (row() < 3 && col() < 3) {
+            return 0;
+        } else if (row() < 3) {
+            return 1;
+        } else if (col() < 3) {
+            return 2;
+        } else {
+            return 3;
+        }
+    }
 
     static bool IsValidCoord(int x) { return x >= 0 && x < 6; }
     static bool isValid(int row, int col) {
@@ -166,43 +180,48 @@ public:
     BoardSquare() = default;
     constexpr BoardSquare(std::uint16_t square) : square_(square) {}
     BoardSquare(const BoardSquare&) = default;
-    BoardSquare(const BitBoard& board, int squarePos) {
-        int shiftValue = 0;
-        switch (squarePos) {
-        case 1:
-            break;
-        case 2:
-            shiftValue = 3;
-            break;
-        case 3:
-            shiftValue = 18;
-            break;
-        case 4:
-            shiftValue = 21;
-            break;
-        default:
-            assert(false);
-        }
-        square_ = (board.as_int() >> shiftValue) & kSquareMask;
-    }
+    BoardSquare(const BitBoard& board, int squarePos) : 
+        BoardSquare(
+            std::uint16_t((board.as_int() >> (3*(squarePos%2) + 18*(squarePos/2)) & kSquareMask))
+        ) {}
 
     constexpr std::uint16_t as_int() const { return square_; }
 
-    static bool IsCrossSymmetrical(std::uint16_t square) {
-        return !(square - kCrossSymmetryMask);
+    bool empty() const {
+        return square_ == 0;
     }
-    static bool IsXSymmetrical(std::uint16_t square) {
-        return !(square - kXSymmetryMask);
+    bool IsCrossSymmetrical() {
+        return square_ - kCrossSymmetryMask == 0;
+    }
+    bool IsXSymmetrical() {
+        return square_ - kXSymmetryMask == 0;
     }
 
-    static bool IsSymmetrical(const BitBoard& board, int squarePos) {
-        BoardSquare square = BoardSquare(board, squarePos);
-        return IsCrossSymmetrical(square.as_int()) || IsXSymmetrical(square.as_int());
+    bool IsSymmetrical() {
+        return empty() || IsCrossSymmetrical() || IsXSymmetrical();
     }
 
     void rotate(bool clockwise) {
         clockwise ? rotateClockwise() : rotateCounterClockwise();
     }
+
+    std::string DebugString() const {
+        std::string res;
+        std::uint16_t kOneBitMask = 0b0000000000000001;
+
+        for (int i = 2; i >= 0; --i) {
+            for (int j = 0; j < 3; ++j) {
+                if (as_int() & (kOneBitMask << (i * 6 + j))) {
+                    res += '#';
+                } else {
+                    res += '.';
+                }
+            }
+            res += '\n';
+        }
+        return res;
+    }
+
 
 private:
     std::uint8_t square_ = 0;
@@ -267,16 +286,20 @@ public:
 
     constexpr std::uint16_t as_int() const { return data_; }
 
-    BoardNode node() const { return BoardNode(data_ & kToMask); }
+    BoardNode node() const { return BoardNode(data_ & kNodeMask); }
     int squarePos() const { return (data_ & kSquarePosMask) >> 6; }
     bool clockwise() const { return (data_ & kClockwiseMask) >> 8; }
 
-    void SetNode(BoardNode node) { data_ = (data_ & ~kToMask) | node.as_int(); }
+    void SetNode(BoardNode node) { data_ = (data_ & ~kNodeMask) | node.as_int(); }
     void SetSquarePos(int square) {
         data_ = (data_ & ~kSquarePosMask) | (square << 6);
     }
     void SetClockwise(bool clockwise) {
         data_ = (data_ & ~kClockwiseMask) | (std::uint16_t(clockwise) << 8);
+    }
+
+    bool nodeOnSquare() const {
+        return squarePos() == node().squarePos();
     }
 
     std::string as_string() {
@@ -287,14 +310,14 @@ public:
     }
 
 private:
-    uint16_t data_ = 0;
+    std::uint16_t data_ = 0;
     // Move, using the following encoding:
     // bits 0..5 "to"-node
     // bits 6..7 rotation-square-index
     // bit 8 clockwise-rotation
 
     enum Masks : uint16_t {
-        kToMask = 0b0000000000111111,
+        kNodeMask = 0b0000000000111111,
         kSquarePosMask = 0b0000000011000000,
         kClockwiseMask = 0b0000000100000000,
     };

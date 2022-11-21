@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cstdint>
 
 #include "bitboard.h"
@@ -15,12 +17,12 @@ public:
 
     std::string DebugString() const;
 
-    BitBoard red_pieces() const { return red_pieces_; }
-    BitBoard black_pieces() const { return black_pieces_; }
+    BitBoard our_pieces() const { return our_pieces_; }
+    BitBoard their_pieces() const { return their_pieces_; }
 
 private:
-    BitBoard red_pieces_;
-    BitBoard black_pieces_;
+    BitBoard our_pieces_;
+    BitBoard their_pieces_;
 };
 
 } // namespace pen

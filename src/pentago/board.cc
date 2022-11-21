@@ -1,3 +1,7 @@
+#include <iostream>
+
+#include "board.h"
+#include "bitboard.h"
 
 
 namespace pen {
@@ -43,13 +47,66 @@ namespace {
     };
 }
 
-void PentagoBoard::ApplyMove(Move move) {
+MoveList PentagoBoard::GenerateLegalMoves() const {
     MoveList result;
     result.reserve(288);
 
-    for (std::uint16_t num : kMoveNum) {
-        Move move = Move(num);
+    BitBoard ourPieces = our_pieces();
+
+    int i = 0;
+    while (i < 288) {
+        Move move = Move(kMoveNum[i]);
+
+        if (our_pieces().get(move.node()) || their_pieces().get(move.node())) {
+            i += 8;
+            continue;
+        }
+
+        bool nodePlaced = false;
+        bool nodeOnRotatedSquare = false;
+        int j = 0;
+
+
+        while (j < 8) {
+            Move nodeMove = Move(kMoveNum[i+j]);
+
+            if (!nodeOnRotatedSquare && nodeMove.nodeOnSquare()) {
+                nodeOnRotatedSquare = true;
+                ourPieces.set(nodeMove.node());
+            }
+
+            BoardSquare ourSquare = BoardSquare(ourPieces, nodeMove.squarePos());
+            BoardSquare theirSquare = BoardSquare(their_pieces(), nodeMove.squarePos());
+
+            if (!(ourSquare.IsSymmetrical() && theirSquare.IsSymmetrical())) {
+                nodePlaced = true;
+                result.emplace_back(nodeMove);
+                result.emplace_back(Move(kMoveNum[i+j+1]));
+            }
+
+            if (nodeOnRotatedSquare) {
+                ourPieces.reset(nodeMove.node());
+            }
+
+            j += 2;
+        }
+
+        if (!nodePlaced) {
+            result.emplace_back(move);
+        }
+        i += 8;
     }
+    return result;
 }
 
+}
+
+int main(void) {
+    pen::PentagoBoard pboard = pen::PentagoBoard();
+
+    for( pen::Move move : pboard.GenerateLegalMoves() ) {
+        std::cout << move.as_string() << std::endl;
+    }
+
+    return 0;
 }
