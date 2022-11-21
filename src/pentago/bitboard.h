@@ -55,6 +55,106 @@ private:
     std::uint8_t node_ = 0;
 };
 
+
+class BoardSquare {
+public:
+    BoardSquare() = default;
+    constexpr BoardSquare(std::uint16_t square) : square_(square) {}
+    BoardSquare(const BoardSquare&) = default;
+    BoardSquare(std::uint64_t board, int squarePos) : 
+        BoardSquare(
+            std::uint16_t((board >> shiftValue(squarePos) & kSquareMask))
+        ) {}
+
+    constexpr std::uint16_t as_int() const { return square_; }
+    constexpr std::uint64_t as_board(int squarePos) const { 
+        return std::uint64_t(square_) << shiftValue(squarePos);
+    }
+
+    static constexpr int shiftValue(int squarePos) { 
+        return (3*(squarePos%2) + 18*(squarePos/2)); 
+    }
+
+    bool empty() const { return square_ == 0; }
+    bool IsCrossSymmetrical() const { return square_ - kCrossSymmetryMask == 0; }
+    bool IsXSymmetrical() const { return square_ - kXSymmetryMask == 0; }
+
+    bool IsSymmetrical() {
+        return empty() || IsCrossSymmetrical() || IsXSymmetrical();
+    }
+
+    void rotate(bool clockwise) {
+        clockwise ? rotateClockwise() : rotateCounterClockwise();
+    }
+
+    std::string DebugString() const {
+        std::string res;
+        std::uint16_t kOneBitMask = 0b0000000000000001;
+
+        for (int i = 2; i >= 0; --i) {
+            for (int j = 0; j < 3; ++j) {
+                if (as_int() & (kOneBitMask << (i * 6 + j))) {
+                    res += '#';
+                } else {
+                    res += '.';
+                }
+            }
+            res += '\n';
+        }
+        return res;
+    }
+
+
+private:
+    std::uint16_t square_ = 0;
+
+    void rotateClockwise() {
+        square_ =
+            ((square_ & kClockwisePlus12Mask) << 12) |
+            ((square_ & kClockwiseMinus12Mask) >> 12) |
+            ((square_ & kClockwisePlus7Mask) << 7) |
+            ((square_ & kClockwiseMinus7Mask) >> 7) |
+            ((square_ & kClockwisePlus5Mask) << 5) |
+            ((square_ & kClockwiseMinus5Mask) >> 5) |
+            ((square_ & kClockwisePlus2Mask) << 2) |
+            ((square_ & kClockwiseMinus2Mask) >> 2);
+    }
+    void rotateCounterClockwise() {
+        square_ =
+            ((square_ & kCounterClockwisePlus12Mask) << 12) |
+            ((square_ & kCounterClockwiseMinus12Mask) >> 12) |
+            ((square_ & kCounterClockwisePlus7Mask) << 7) |
+            ((square_ & kCounterClockwiseMinus7Mask) >> 7) |
+            ((square_ & kCounterClockwisePlus5Mask) << 5) |
+            ((square_ & kCounterClockwiseMinus5Mask) >> 5) |
+            ((square_ & kCounterClockwisePlus2Mask) << 2) |
+            ((square_ & kCounterClockwiseMinus2Mask) >> 2);
+    }
+
+    enum Masks : uint16_t {
+        kSquareMask = 0b0111000101000111,
+        kCrossSymmetryMask = 0b0010000101000010,
+        kXSymmetryMask = 0b0101000000000101,
+        kClockwisePlus12Mask = 0b0000000000000100,
+        kClockwiseMinus12Mask = 0b0100000000000000,
+        kClockwisePlus7Mask = 0b0000000001000000,
+        kClockwiseMinus7Mask = 0b0000000100000000,
+        kClockwisePlus5Mask = 0b0000000000000010,
+        kClockwiseMinus5Mask = 0b0010000000000000,
+        kClockwisePlus2Mask = 0b0001000000000000,
+        kClockwiseMinus2Mask = 0b0000000000000100,
+        kCounterClockwisePlus12Mask = 0b0000000000000100,
+        kCounterClockwiseMinus12Mask = 0b0001000000000000,
+        kCounterClockwisePlus7Mask = 0b0000000000000010,
+        kCounterClockwiseMinus7Mask = 0b0010000000000000,
+        kCounterClockwisePlus5Mask = 0b0000000100000000,
+        kCounterClockwiseMinus5Mask = 0b0000000001000000,
+        kCounterClockwisePlus2Mask = 0b0000000000000001,
+        kCounterClockwiseMinus2Mask = 0b0100000000000000,
+    };
+};
+
+
 class BitBoard {
 public:
     constexpr BitBoard(std::uint64_t board) : board_(board) {}
@@ -106,6 +206,12 @@ public:
     void set(BoardNode node) { set(node.as_int()); }
     void set(std::uint8_t pos) { board_ |= (std::uint64_t(1) << pos); }
     void set(int row, int col) { set(BoardNode(row, col)); }
+    void set(BoardSquare square, int squarePos) {
+        std::uint64_t kSquareMask = 
+            std::uint64_t(0b0111000101000111) << BoardSquare::shiftValue(squarePos);
+        std::uint64_t newBoard = as_int() & ~kSquareMask;
+        board_ = newBoard | square.as_board(squarePos);
+    }
 
     void reset(BoardNode node) { reset(node.as_int()); }
     void reset(std::uint8_t pos) { board_ &= ~(std::uint64_t(1) << pos); }
@@ -173,104 +279,6 @@ public:
 
 private:
     std::uint64_t board_ = 0;
-};
-
-class BoardSquare {
-public:
-    BoardSquare() = default;
-    constexpr BoardSquare(std::uint16_t square) : square_(square) {}
-    BoardSquare(const BoardSquare&) = default;
-    BoardSquare(const BitBoard& board, int squarePos) : 
-        BoardSquare(
-            std::uint16_t((board.as_int() >> shiftValue(squarePos) & kSquareMask))
-        ) {}
-
-    constexpr std::uint16_t as_int() const { return square_; }
-    constexpr std::uint64_t as_board(int squarePos) const { 
-        return std::uint64_t(square_) << shiftValue(squarePos);
-    }
-
-    constexpr int shiftValue(int squarePos) const { 
-        return (3*(squarePos%2) + 18*(squarePos/2)); 
-    }
-
-    bool empty() const { return square_ == 0; }
-    bool IsCrossSymmetrical() const { return square_ - kCrossSymmetryMask == 0; }
-    bool IsXSymmetrical() const { return square_ - kXSymmetryMask == 0; }
-
-    bool IsSymmetrical() {
-        return empty() || IsCrossSymmetrical() || IsXSymmetrical();
-    }
-
-    void rotate(bool clockwise) {
-        clockwise ? rotateClockwise() : rotateCounterClockwise();
-    }
-
-    std::string DebugString() const {
-        std::string res;
-        std::uint16_t kOneBitMask = 0b0000000000000001;
-
-        for (int i = 2; i >= 0; --i) {
-            for (int j = 0; j < 3; ++j) {
-                if (as_int() & (kOneBitMask << (i * 6 + j))) {
-                    res += '#';
-                } else {
-                    res += '.';
-                }
-            }
-            res += '\n';
-        }
-        return res;
-    }
-
-
-private:
-    std::uint16_t square_ = 0;
-
-    void rotateClockwise() {
-        square_ =
-            ((square_ & kClockwisePlus12Mask) << 12) &
-            ((square_ & kClockwiseMinus12Mask) >> 12) &
-            ((square_ & kClockwisePlus7Mask) << 7) &
-            ((square_ & kClockwiseMinus7Mask) >> 7) &
-            ((square_ & kClockwisePlus5Mask) << 5) &
-            ((square_ & kClockwiseMinus5Mask) >> 5) &
-            ((square_ & kClockwisePlus2Mask) << 2) &
-            ((square_ & kClockwiseMinus2Mask) >> 2);
-    }
-    void rotateCounterClockwise() {
-        square_ =
-            ((square_ & kCounterClockwisePlus12Mask) << 12) &
-            ((square_ & kCounterClockwiseMinus12Mask) >> 12) &
-            ((square_ & kCounterClockwisePlus7Mask) << 7) &
-            ((square_ & kCounterClockwiseMinus7Mask) >> 7) &
-            ((square_ & kCounterClockwisePlus5Mask) << 5) &
-            ((square_ & kCounterClockwiseMinus5Mask) >> 5) &
-            ((square_ & kCounterClockwisePlus2Mask) << 2) &
-            ((square_ & kCounterClockwiseMinus2Mask) >> 2);
-    }
-
-    enum Masks : uint16_t {
-        kSquareMask = 0b0111000101000111,
-        kCrossSymmetryMask = 0b0010000101000010,
-        kXSymmetryMask = 0b0101000000000101,
-        kClockwisePlus12Mask = 0b0000000000000100,
-        kClockwiseMinus12Mask = 0b0100000000000000,
-        kClockwisePlus7Mask = 0b0000000001000000,
-        kClockwiseMinus7Mask = 0b0000000100000000,
-        kClockwisePlus5Mask = 0b0000000000000010,
-        kClockwiseMinus5Mask = 0b0010000000000000,
-        kClockwisePlus2Mask = 0b0001000000000000,
-        kClockwiseMinus2Mask = 0b0000000000000100,
-        kCounterClockwisePlus12Mask = 0b0000000000000100,
-        kCounterClockwiseMinus12Mask = 0b0001000000000000,
-        kCounterClockwisePlus7Mask = 0b0000000000000010,
-        kCounterClockwiseMinus7Mask = 0b0010000000000000,
-        kCounterClockwisePlus5Mask = 0b0000000100000000,
-        kCounterClockwiseMinus5Mask = 0b0000000001000000,
-        kCounterClockwisePlus2Mask = 0b0000000000000001,
-        kCounterClockwiseMinus2Mask = 0b0100000000000000,
-    };
 };
 
 

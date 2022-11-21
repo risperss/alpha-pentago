@@ -73,8 +73,8 @@ MoveList PentagoBoard::GenerateLegalMoves() const {
                 ourPieces.set(nodeMove.node());
             }
 
-            BoardSquare ourSquare = BoardSquare(ourPieces, nodeMove.squarePos());
-            BoardSquare theirSquare = BoardSquare(their_pieces(), nodeMove.squarePos());
+            BoardSquare ourSquare = BoardSquare(ourPieces.as_int(), nodeMove.squarePos());
+            BoardSquare theirSquare = BoardSquare(their_pieces().as_int(), nodeMove.squarePos());
 
             if (!(ourSquare.IsSymmetrical() && theirSquare.IsSymmetrical())) {
                 nodePlaced = true;
@@ -98,10 +98,30 @@ MoveList PentagoBoard::GenerateLegalMoves() const {
     return result;
 }
 
+void PentagoBoard::ApplyMove(Move move) {
+    our_pieces_.set(move.node());
+
+    BoardSquare ourSquare = BoardSquare(our_pieces().as_int(), move.squarePos());
+    BoardSquare theirSquare = BoardSquare(their_pieces().as_int(), move.squarePos());
+
+    ourSquare.rotate(move.clockwise());
+    theirSquare.rotate(move.clockwise());
+
+    our_pieces_.set(ourSquare, move.squarePos());
+    their_pieces_.set(theirSquare, move.squarePos());
+}
+
 } // namespace pen
 
 int main(void) {
     pen::PentagoBoard pboard = pen::PentagoBoard();
+    pen::MoveList legalMoves = pboard.GenerateLegalMoves();
+    pen::Move move = legalMoves.back();
+
+    pboard.ApplyMove(move);
+
+    std::cout << move.as_string() << std::endl;
+    std::cout << pboard.our_pieces().DebugString() << std::endl;
 
     for( pen::Move move : pboard.GenerateLegalMoves() ) {
         std::cout << move.as_string() << std::endl;
