@@ -111,6 +111,23 @@ void PentagoBoard::ApplyMove(Move move) {
     their_pieces_.set(theirSquare, move.squarePos());
 }
 
+std::string PentagoBoard::DebugString() const {
+    std::string res;
+    for (int i = 5; i >= 0; --i) {
+        for (int j = 0; j < 6; ++j) {
+            if (our_pieces().get(i, j)) {
+                res += 'r';
+            } else if (their_pieces().get(i, j)) {
+                res += 'b';
+            } else {
+                res += '.';
+            }
+        }
+        res += '\n';
+    }
+    return res;
+}
+
 } // namespace pen
 
 int main(void) {
@@ -122,11 +139,7 @@ int main(void) {
 
     std::cout << move.as_string() << std::endl;
     std::cout << pboard.our_pieces().DebugString() << std::endl;
-
-    for( pen::Move move : pboard.GenerateLegalMoves() ) {
-        std::cout << move.as_string() << std::endl;
-    }
-    std::cout << pboard.GenerateLegalMoves().size() << std::endl;
+    std::cout << pboard.DebugString() << std::endl;
 
     return 0;
 }
