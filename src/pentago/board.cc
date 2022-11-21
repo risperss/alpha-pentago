@@ -71,8 +71,10 @@ MoveList PentagoBoard::GenerateLegalMoves() const {
             continue;
         }
 
-        bool nodePlaced = false;
+        bool placedNode = false;
         bool nodeOnRotatedSquare = false;
+        bool passMoveRecorded = false;
+        Move passMove;
         int j = 0;
 
         while (j < 8) {
@@ -87,9 +89,12 @@ MoveList PentagoBoard::GenerateLegalMoves() const {
             BoardSquare theirSquare = BoardSquare(their_pieces().as_int(), nodeMove.squarePos());
 
             if (!(ourSquare.IsSymmetrical() && theirSquare.IsSymmetrical())) {
-                nodePlaced = true;
+                placedNode = true;
                 result.emplace_back(nodeMove);
                 result.emplace_back(Move(kMoveNum[i+j+1]));
+            } else if (!passMoveRecorded) {
+                passMoveRecorded = true;
+                passMove = nodeMove;
             }
 
             if (nodeOnRotatedSquare) {
@@ -99,8 +104,10 @@ MoveList PentagoBoard::GenerateLegalMoves() const {
             j += 2;
         }
 
-        if (!nodePlaced) {
+        if (!placedNode) {
             result.emplace_back(move);
+        } else if (passMoveRecorded) {
+            result.emplace_back(passMove);
         }
 
         i += 8;
@@ -142,14 +149,11 @@ std::string PentagoBoard::DebugString() const {
 
 int main(void) {
     pen::PentagoBoard pboard = pen::PentagoBoard();
-    pen::MoveList legalMoves = pboard.GenerateLegalMoves();
-    pen::Move move = legalMoves.back();
-
-    pboard.ApplyMove(move);
-
-    std::cout << move.as_string() << std::endl;
-    std::cout << pboard.our_pieces().DebugString() << std::endl;
-    std::cout << pboard.DebugString() << std::endl;
+    
+    for ( pen::Move move : pboard.GenerateLegalMoves() ) {
+        std::cout << move.as_string() << std::endl;
+    }
+    std::cout << pboard.GenerateLegalMoves().size() << std::endl;
 
     return 0;
 }
