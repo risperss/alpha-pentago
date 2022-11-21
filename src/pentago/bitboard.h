@@ -182,20 +182,21 @@ public:
     BoardSquare(const BoardSquare&) = default;
     BoardSquare(const BitBoard& board, int squarePos) : 
         BoardSquare(
-            std::uint16_t((board.as_int() >> (3*(squarePos%2) + 18*(squarePos/2)) & kSquareMask))
+            std::uint16_t((board.as_int() >> shiftValue(squarePos) & kSquareMask))
         ) {}
 
     constexpr std::uint16_t as_int() const { return square_; }
+    constexpr std::uint64_t as_board(int squarePos) const { 
+        return std::uint64_t(square_) << shiftValue(squarePos);
+    }
 
-    bool empty() const {
-        return square_ == 0;
+    constexpr int shiftValue(int squarePos) const { 
+        return (3*(squarePos%2) + 18*(squarePos/2)); 
     }
-    bool IsCrossSymmetrical() {
-        return square_ - kCrossSymmetryMask == 0;
-    }
-    bool IsXSymmetrical() {
-        return square_ - kXSymmetryMask == 0;
-    }
+
+    bool empty() const { return square_ == 0; }
+    bool IsCrossSymmetrical() const { return square_ - kCrossSymmetryMask == 0; }
+    bool IsXSymmetrical() const { return square_ - kXSymmetryMask == 0; }
 
     bool IsSymmetrical() {
         return empty() || IsCrossSymmetrical() || IsXSymmetrical();
