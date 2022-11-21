@@ -51,8 +51,30 @@ const Move kMove[] = {
 }
 
 int main(void) {
-    for (int i = 0; i < 288; i++) {
-        pen::Move move = pen::Move(pen::kMove[i]);
-        printf("0x%X, ", move.as_int());
+    pen::BitBoard board = pen::BitBoard();
+
+
+    int foo[8][5] = {
+        {0, 7, 14, 21, 28},
+        {7, 14, 21, 28, 35},
+        {5, 10, 15, 20, 25},
+        {10, 15, 20, 25, 30},
+
+        {6, 13, 20, 27, 34},
+        {1, 8, 15, 22, 29},
+
+        {4, 9, 14, 19, 24},
+        {11, 16, 21, 26, 31}
+    };
+
+    for (int i = 0; i < 8; i++) {
+        board.set(foo[i][0]);
+        board.set(foo[i][1]);
+        board.set(foo[i][2]);
+        board.set(foo[i][3]);
+        board.set(foo[i][4]);
+
+        printf("0x%016llX\n", board.as_int());
+        board.clear();
     }
 }
