@@ -224,7 +224,7 @@ public:
 
 
 private:
-    std::uint8_t square_ = 0;
+    std::uint16_t square_ = 0;
 
     void rotateClockwise() {
         square_ =
