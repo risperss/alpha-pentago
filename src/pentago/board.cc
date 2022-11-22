@@ -58,15 +58,15 @@ namespace {
 
 MoveList PentagoBoard::GenerateLegalMoves() const {
     MoveList result;
-    result.reserve(288);
+    result.reserve(144);
 
-    BitBoard ourPieces = our_pieces();
+    BitBoard redPieces = red_pieces();
 
     int i = 0;
     while (i < 288) {
         Move move = Move(kMoveNum[i]);
 
-        if (our_pieces().get(move.node()) || their_pieces().get(move.node())) {
+        if (red_pieces().get(move.node()) || black_pieces().get(move.node())) {
             i += 8;
             continue;
         }
@@ -82,13 +82,13 @@ MoveList PentagoBoard::GenerateLegalMoves() const {
 
             if (!nodeOnRotatedSquare && nodeMove.nodeOnSquare()) {
                 nodeOnRotatedSquare = true;
-                ourPieces.set(nodeMove.node());
+                redPieces.set(nodeMove.node());
             }
 
-            BoardSquare ourSquare = BoardSquare(ourPieces.as_int(), nodeMove.squarePos());
-            BoardSquare theirSquare = BoardSquare(their_pieces().as_int(), nodeMove.squarePos());
+            BoardSquare redSquare = BoardSquare(redPieces.as_int(), nodeMove.squarePos());
+            BoardSquare blackSquare = BoardSquare(black_pieces().as_int(), nodeMove.squarePos());
 
-            if (!(ourSquare.IsSymmetrical() && theirSquare.IsSymmetrical())) {
+            if (!(redSquare.IsSymmetrical() && blackSquare.IsSymmetrical())) {
                 placedNode = true;
                 result.emplace_back(nodeMove);
                 result.emplace_back(Move(kMoveNum[i+j+1]));
@@ -98,7 +98,7 @@ MoveList PentagoBoard::GenerateLegalMoves() const {
             }
 
             if (nodeOnRotatedSquare) {
-                ourPieces.reset(nodeMove.node());
+                redPieces.reset(nodeMove.node());
             }
 
             j += 2;
@@ -116,25 +116,52 @@ MoveList PentagoBoard::GenerateLegalMoves() const {
 }
 
 void PentagoBoard::ApplyMove(Move move) {
-    our_pieces_.set(move.node());
+    red_pieces_.set(move.node());
 
-    BoardSquare ourSquare = BoardSquare(our_pieces().as_int(), move.squarePos());
-    BoardSquare theirSquare = BoardSquare(their_pieces().as_int(), move.squarePos());
+    BoardSquare redSquare = BoardSquare(red_pieces().as_int(), move.squarePos());
+    BoardSquare blackSquare = BoardSquare(black_pieces().as_int(), move.squarePos());
 
-    ourSquare.rotate(move.clockwise());
-    theirSquare.rotate(move.clockwise());
+    redSquare.rotate(move.clockwise());
+    blackSquare.rotate(move.clockwise());
 
-    our_pieces_.set(ourSquare, move.squarePos());
-    their_pieces_.set(theirSquare, move.squarePos());
+    red_pieces_.set(redSquare, move.squarePos());
+    black_pieces_.set(blackSquare, move.squarePos());
+}
+
+GameResult PentagoBoard::ComputeGameResult() const {
+    bool redWon = false;
+    bool blackWon = false;
+
+    for ( std::uint64_t mask : kWinningMasks ) {
+        if (!redWon && red_pieces() & mask == mask) {
+            redWon = true;
+            continue;
+        }
+        if (!blackWon && black_pieces() & mask == mask) {
+            blackWon = true;
+        }
+    }
+
+    if (redWon && blackWon) {
+        return GameResult::DRAW;
+    } else if (redWon) {
+        return GameResult::RED_WON;
+    } else if (blackWon) {
+        return GameResult::BLACK_WON;
+    } else if (full()) {
+        return GameResult::DRAW;
+    } else {
+        return GameResult::UNDECIDED;
+    }
 }
 
 std::string PentagoBoard::DebugString() const {
     std::string res;
     for (int i = 5; i >= 0; --i) {
         for (int j = 0; j < 6; ++j) {
-            if (our_pieces().get(i, j)) {
+            if (red_pieces().get(i, j)) {
                 res += 'r';
-            } else if (their_pieces().get(i, j)) {
+            } else if (black_pieces().get(i, j)) {
                 res += 'b';
             } else {
                 res += '.';
