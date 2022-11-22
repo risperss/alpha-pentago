@@ -60,13 +60,13 @@ MoveList PentagoBoard::GenerateLegalMoves() const {
     MoveList result;
     result.reserve(144);
 
-    BitBoard redPieces = red_pieces();
+    BitBoard ourPieces = our_pieces();
 
     int i = 0;
     while (i < 288) {
         Move move = Move(kMoveNum[i]);
 
-        if (red_pieces().get(move.node()) || black_pieces().get(move.node())) {
+        if (our_pieces().get(move.node()) || their_pieces().get(move.node())) {
             i += 8;
             continue;
         }
@@ -82,13 +82,13 @@ MoveList PentagoBoard::GenerateLegalMoves() const {
 
             if (!nodeOnRotatedSquare && nodeMove.nodeOnSquare()) {
                 nodeOnRotatedSquare = true;
-                redPieces.set(nodeMove.node());
+                ourPieces.set(nodeMove.node());
             }
 
-            BoardSquare redSquare = BoardSquare(redPieces.as_int(), nodeMove.squarePos());
-            BoardSquare blackSquare = BoardSquare(black_pieces().as_int(), nodeMove.squarePos());
+            BoardSquare ourSquare = BoardSquare(ourPieces.as_int(), nodeMove.squarePos());
+            BoardSquare theirSquare = BoardSquare(their_pieces().as_int(), nodeMove.squarePos());
 
-            if (!(redSquare.IsSymmetrical() && blackSquare.IsSymmetrical())) {
+            if (!(ourSquare.IsSymmetrical() && theirSquare.IsSymmetrical())) {
                 placedNode = true;
                 result.emplace_back(nodeMove);
                 result.emplace_back(Move(kMoveNum[i+j+1]));
@@ -98,7 +98,7 @@ MoveList PentagoBoard::GenerateLegalMoves() const {
             }
 
             if (nodeOnRotatedSquare) {
-                redPieces.reset(nodeMove.node());
+                ourPieces.reset(nodeMove.node());
             }
 
             j += 2;
@@ -116,38 +116,38 @@ MoveList PentagoBoard::GenerateLegalMoves() const {
 }
 
 void PentagoBoard::ApplyMove(Move move) {
-    red_pieces_.set(move.node());
+    our_pieces_.set(move.node());
 
-    BoardSquare redSquare = BoardSquare(red_pieces().as_int(), move.squarePos());
-    BoardSquare blackSquare = BoardSquare(black_pieces().as_int(), move.squarePos());
+    BoardSquare ourSquare = BoardSquare(our_pieces().as_int(), move.squarePos());
+    BoardSquare theirSquare = BoardSquare(their_pieces().as_int(), move.squarePos());
 
-    redSquare.rotate(move.clockwise());
-    blackSquare.rotate(move.clockwise());
+    ourSquare.rotate(move.clockwise());
+    theirSquare.rotate(move.clockwise());
 
-    red_pieces_.set(redSquare, move.squarePos());
-    black_pieces_.set(blackSquare, move.squarePos());
+    our_pieces_.set(ourSquare, move.squarePos());
+    their_pieces_.set(theirSquare, move.squarePos());
 }
 
 GameResult PentagoBoard::ComputeGameResult() const {
-    bool redWon = false;
-    bool blackWon = false;
+    bool ourWon = false;
+    bool theirWon = false;
 
     for ( std::uint64_t mask : kWinningMasks ) {
-        if (!redWon && red_pieces() & mask == mask) {
-            redWon = true;
+        if (!ourWon && (our_pieces() & mask) == mask) {
+            ourWon = true;
             continue;
         }
-        if (!blackWon && black_pieces() & mask == mask) {
-            blackWon = true;
+        if (!theirWon && (their_pieces() & mask) == mask) {
+            theirWon = true;
         }
     }
 
-    if (redWon && blackWon) {
+    if (ourWon && theirWon) {
         return GameResult::DRAW;
-    } else if (redWon) {
-        return GameResult::RED_WON;
-    } else if (blackWon) {
-        return GameResult::BLACK_WON;
+    } else if (ourWon) {
+        return GameResult::OUR_WON;
+    } else if (theirWon) {
+        return GameResult::THEIR_WON;
     } else if (full()) {
         return GameResult::DRAW;
     } else {
@@ -159,9 +159,9 @@ std::string PentagoBoard::DebugString() const {
     std::string res;
     for (int i = 5; i >= 0; --i) {
         for (int j = 0; j < 6; ++j) {
-            if (red_pieces().get(i, j)) {
+            if (our_pieces().get(i, j)) {
                 res += 'r';
-            } else if (black_pieces().get(i, j)) {
+            } else if (their_pieces().get(i, j)) {
                 res += 'b';
             } else {
                 res += '.';

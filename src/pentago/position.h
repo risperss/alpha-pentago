@@ -11,7 +11,7 @@ public:
     Position(const PentagoBoard& board);
 
     std::uint64_t Hash() const;
-    bool IsBlackToMove() const { return move_count_ % 2 == 1; }
+    bool IsTheirToMove() const { return move_count_ % 2 == 1; }
 
     int GetMoveCount() const { return move_count_; }
 
@@ -23,7 +23,7 @@ private:
     PentagoBoard board_;
 
     int move_count_ = 0;
-}
+};
 
 class PositionHistory {
 public:
@@ -41,10 +41,10 @@ public:
 
     GameResult ComputeGameResult() const;
 
-    bool IsBlackToMove() const { return Last().IsBlackToMove(); }
+    bool IsTheirToMove() const { return Last().IsTheirToMove(); }
 
 private:
     std::vector<Position> positions_;
-}
+};
 
 } // namespace pen
