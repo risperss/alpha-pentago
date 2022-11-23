@@ -8,10 +8,10 @@ namespace pen {
 
 class Position {
 public:
-    Position(const PentagoBoard& board);
+    Position(const PentagoBoard& parent, Move m);
 
     std::uint64_t Hash() const;
-    bool IsTheirToMove() const { return move_count_ % 2 == 1; }
+    bool IsBlackToMove() const { return move_count_ % 2 == 1; }
 
     int GetMoveCount() const { return move_count_; }
 
