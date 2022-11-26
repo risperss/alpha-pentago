@@ -6,8 +6,7 @@
 
 namespace pen {
 
-enum class GameResult : uint8_t { UNDECIDED, THEIR_WON, DRAW, OUR_WON };
-GameResult operator-(const GameResult& res);
+enum class BoardResult : uint8_t { UNDECIDED, THEY_WON, DRAW, WE_WON };
 
 class PentagoBoard {
 public:
@@ -18,13 +17,13 @@ public:
     bool IsLegalMove(Move move) const;
     MoveList GenerateLegalMoves() const;
 
-    GameResult ComputeGameResult() const;
+    BoardResult ComputeBoardResult() const;
 
     bool full() const {
         return (our_pieces() & their_pieces()) == 0xFFFFFFFFF;
     }
 
-    std::string DebugString() const;
+    std::string DebugString(bool blackToMove) const;
 
     BitBoard our_pieces() const { return our_pieces_; }
     BitBoard their_pieces() const { return their_pieces_; }

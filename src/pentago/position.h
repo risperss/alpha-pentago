@@ -8,7 +8,7 @@ namespace pen {
 
 class Position {
 public:
-    Position(const PentagoBoard& parent, Move m);
+    Position(const Position& parent, Move m);
 
     std::uint64_t Hash() const;
     bool IsBlackToMove() const { return move_count_ % 2 == 1; }
@@ -24,6 +24,9 @@ private:
 
     int move_count_ = 0;
 };
+
+enum class GameResult : uint8_t { UNDECIDED, BLACK_WON, DRAW, WHITE_WON };
+GameResult operator-(const GameResult& res);
 
 class PositionHistory {
 public:
@@ -41,7 +44,7 @@ public:
 
     GameResult ComputeGameResult() const;
 
-    bool IsTheirToMove() const { return Last().IsTheirToMove(); }
+    bool IsBlackToMove() const { return Last().IsBlackToMove(); }
 
 private:
     std::vector<Position> positions_;

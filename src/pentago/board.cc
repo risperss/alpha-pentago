@@ -126,43 +126,48 @@ void PentagoBoard::ApplyMove(Move move) {
 
     our_pieces_.set(ourSquare, move.squarePos());
     their_pieces_.set(theirSquare, move.squarePos());
+
+    std::swap(our_pieces_, their_pieces_);
 }
 
-GameResult PentagoBoard::ComputeGameResult() const {
-    bool ourWon = false;
-    bool theirWon = false;
+BoardResult PentagoBoard::ComputeBoardResult() const {
+    bool weWon = false;
+    bool theyWon = false;
 
     for ( std::uint64_t mask : kWinningMasks ) {
-        if (!ourWon && (our_pieces() & mask) == mask) {
-            ourWon = true;
+        if (!weWon && (our_pieces() & mask) == mask) {
+            weWon = true;
             continue;
         }
-        if (!theirWon && (their_pieces() & mask) == mask) {
-            theirWon = true;
+        if (!theyWon && (their_pieces() & mask) == mask) {
+            theyWon = true;
         }
     }
 
-    if (ourWon && theirWon) {
-        return GameResult::DRAW;
-    } else if (ourWon) {
-        return GameResult::OUR_WON;
-    } else if (theirWon) {
-        return GameResult::THEIR_WON;
+    if (weWon && theyWon) {
+        return BoardResult::DRAW;
+    } else if (weWon) {
+        return BoardResult::WE_WON;
+    } else if (theyWon) {
+        return BoardResult::THEY_WON;
     } else if (full()) {
-        return GameResult::DRAW;
+        return BoardResult::DRAW;
     } else {
-        return GameResult::UNDECIDED;
+        return BoardResult::UNDECIDED;
     }
 }
 
-std::string PentagoBoard::DebugString() const {
+std::string PentagoBoard::DebugString(bool blackToMove) const {
     std::string res;
+    char usChar = blackToMove ? 'w' : 'b';
+    char themChar = blackToMove ? 'b' : 'w';
+
     for (int i = 5; i >= 0; --i) {
         for (int j = 0; j < 6; ++j) {
             if (our_pieces().get(i, j)) {
-                res += 'r';
+                res += usChar;
             } else if (their_pieces().get(i, j)) {
-                res += 'b';
+                res += themChar;
             } else {
                 res += '.';
             }
@@ -173,14 +178,3 @@ std::string PentagoBoard::DebugString() const {
 }
 
 } // namespace pen
-
-int main(void) {
-    pen::PentagoBoard pboard = pen::PentagoBoard();
-    
-    for ( pen::Move move : pboard.GenerateLegalMoves() ) {
-        std::cout << move.as_string() << std::endl;
-    }
-    std::cout << pboard.GenerateLegalMoves().size() << std::endl;
-
-    return 0;
-}
