@@ -6,6 +6,9 @@
 
 namespace pen {
 
+enum class GameResult : uint8_t { UNDECIDED, BLACK_WON, DRAW, WHITE_WON };
+GameResult operator-(const GameResult& res);
+
 class Position {
 public:
     Position(const Position& parent, Move m);
@@ -19,14 +22,13 @@ public:
 
     std::string DebugString() const;
 
+    GameResult ComputeGameResult() const;
+
 private:
     PentagoBoard board_;
 
     int move_count_ = 0;
 };
-
-enum class GameResult : uint8_t { UNDECIDED, BLACK_WON, DRAW, WHITE_WON };
-GameResult operator-(const GameResult& res);
 
 class PositionHistory {
 public:
@@ -42,7 +44,7 @@ public:
     void Append(Move m);
     void Pop() { positions_.pop_back(); }
 
-    GameResult ComputeGameResult() const;
+    GameResult ComputeGameResult() const { return Last().ComputeGameResult(); }
 
     bool IsBlackToMove() const { return Last().IsBlackToMove(); }
 

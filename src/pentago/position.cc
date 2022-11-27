@@ -13,14 +13,8 @@ std::string Position::DebugString() const {
 	return board_.DebugString(IsBlackToMove()); 
 }
 
-GameResult operator-(const GameResult& res) {
-  return res == GameResult::BLACK_WON   ? GameResult::WHITE_WON
-         : res == GameResult::WHITE_WON ? GameResult::BLACK_WON
-                                        : res;
-}
-
-GameResult PositionHistory::ComputeGameResult() const {
-	BoardResult result = Last().GetBoard().ComputeBoardResult();
+GameResult Position::ComputeGameResult() const {
+	BoardResult result = GetBoard().ComputeBoardResult();
 
 	if (result == BoardResult::UNDECIDED) {
 		return GameResult::UNDECIDED;
@@ -31,6 +25,13 @@ GameResult PositionHistory::ComputeGameResult() const {
 	} else {
 		return IsBlackToMove() ? GameResult::BLACK_WON : GameResult::WHITE_WON;
 	}
+
+}
+
+GameResult operator-(const GameResult& res) {
+  return res == GameResult::BLACK_WON   ? GameResult::WHITE_WON
+         : res == GameResult::WHITE_WON ? GameResult::BLACK_WON
+                                        : res;
 }
 
 void PositionHistory::Append(Move m) {
