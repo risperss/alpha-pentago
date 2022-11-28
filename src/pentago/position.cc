@@ -6,6 +6,7 @@ namespace pen {
 
 Position::Position(const Position& parent, Move m)
 	: move_count_(parent.move_count_ + 1) {
+	board_ = parent.GetBoard();
 	board_.ApplyMove(m);
 }
 
@@ -38,6 +39,10 @@ GameResult operator-(const GameResult& res) {
   return res == GameResult::BLACK_WON   ? GameResult::WHITE_WON
          : res == GameResult::WHITE_WON ? GameResult::BLACK_WON
                                         : res;
+}
+
+void PositionHistory::Append(Position p) {
+	positions_.emplace_back(p);
 }
 
 void PositionHistory::Append(Move m) {

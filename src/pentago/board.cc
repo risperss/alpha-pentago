@@ -60,8 +60,6 @@ MoveList PentagoBoard::GenerateLegalMoves() const {
     MoveList result;
     result.reserve(144);
 
-    BitBoard ourPieces = our_pieces();
-
     int i = 0;
     while (i < 288) {
         Move move = Move(kMoveNum[i]);
@@ -82,10 +80,10 @@ MoveList PentagoBoard::GenerateLegalMoves() const {
 
             if (!nodeOnRotatedSquare && nodeMove.nodeOnSquare()) {
                 nodeOnRotatedSquare = true;
-                ourPieces.set(nodeMove.node());
+                our_pieces().set(nodeMove.node());
             }
 
-            BoardSquare ourSquare = BoardSquare(ourPieces.as_int(), nodeMove.squarePos());
+            BoardSquare ourSquare = BoardSquare(our_pieces().as_int(), nodeMove.squarePos());
             BoardSquare theirSquare = BoardSquare(their_pieces().as_int(), nodeMove.squarePos());
 
             if (!(ourSquare.IsSymmetrical() && theirSquare.IsSymmetrical())) {
@@ -98,7 +96,7 @@ MoveList PentagoBoard::GenerateLegalMoves() const {
             }
 
             if (nodeOnRotatedSquare) {
-                ourPieces.reset(nodeMove.node());
+                our_pieces().reset(nodeMove.node());
             }
 
             j += 2;
@@ -171,6 +169,7 @@ std::string PentagoBoard::DebugString(bool blackToMove) const {
             } else {
                 res += '.';
             }
+            res += ' ';
         }
         res += '\n';
     }

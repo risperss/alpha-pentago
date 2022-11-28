@@ -15,7 +15,7 @@ public:
     Position(const PentagoBoard& board);
 
     std::uint64_t Hash() const;
-    bool IsBlackToMove() const { return move_count_ % 2 == 1; }
+    bool IsBlackToMove() const { return move_count_ % 2 == 0; }
 
     int GetMoveCount() const { return move_count_; }
 
@@ -28,7 +28,7 @@ public:
 private:
     PentagoBoard board_;
 
-    int move_count_ = 0;
+    int move_count_;
 };
 
 class PositionHistory {
@@ -43,6 +43,7 @@ public:
     int GetLength() const { return positions_.size(); }
 
     void Append(Move m);
+    void Append(Position p);
     void Pop() { positions_.pop_back(); }
 
     GameResult ComputeGameResult() const { return Last().ComputeGameResult(); }

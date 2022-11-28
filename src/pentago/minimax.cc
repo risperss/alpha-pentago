@@ -12,8 +12,6 @@ int minimax(Position position, int depth, int alpha, int beta) {
 		result = position.ComputeGameResult();
 	}
 
-	std::cout << 
-
 	if (depth == 0 || result != GameResult::UNDECIDED) {
 		if (result == GameResult::WHITE_WON) {
 			return 1;
@@ -59,16 +57,27 @@ int minimax(Position position, int depth, int alpha, int beta) {
 }
 
 int main(void) {
-	int depth = 3;
+	pen::PositionHistory history = pen::PositionHistory();
+	history.Append(pen::Position(pen::PentagoBoard()));
 
-	pen::PentagoBoard startingBoard = pen::PentagoBoard();
-	pen::Position startPosition = pen::Position(startingBoard);
+	while (true) {
+		pen::MoveList legalMoves = history.Last().GetBoard().GenerateLegalMoves();
 
-	std::cout << startPosition.GetMoveCount() << std::endl;
+		int i = rand() % legalMoves.size();
+		pen::Move move = legalMoves[i];
 
-	int value = pen::minimax(startPosition, depth, -2, 2);
+		history.Append(move);
 
-	std::cout << value << std::endl;
+		if (history.Last().ComputeGameResult() != pen::GameResult::UNDECIDED) {
+			break;
+		}
+	}
+
+	int len = history.GetLength();
+
+	for (int i = 0; i < len; i++) {
+		std::cout << history.GetPositionAt(i).DebugString() << std::endl;
+	}
 
 	return 0;
 }
