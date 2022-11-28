@@ -1,6 +1,5 @@
-// #pragma once
-
 #include <iostream>
+#include "stdlib.h"
 
 #include "position.h"
 
@@ -12,6 +11,8 @@ int minimax(Position position, int depth, int alpha, int beta) {
 	if (position.GetMoveCount() >= 9) {
 		result = position.ComputeGameResult();
 	}
+
+	std::cout << 
 
 	if (depth == 0 || result != GameResult::UNDECIDED) {
 		if (result == GameResult::WHITE_WON) {
@@ -60,11 +61,14 @@ int minimax(Position position, int depth, int alpha, int beta) {
 int main(void) {
 	int depth = 3;
 
-	pen::PositionHistory history = pen::PositionHistory();
+	pen::PentagoBoard startingBoard = pen::PentagoBoard();
+	pen::Position startPosition = pen::Position(startingBoard);
 
-	pen::Move m = pen::minimax(history.Last(), depth, -2, 2);
+	std::cout << startPosition.GetMoveCount() << std::endl;
 
-	std::cout << m.as_string() << std::endl;
+	int value = pen::minimax(startPosition, depth, -2, 2);
+
+	std::cout << value << std::endl;
 
 	return 0;
 }

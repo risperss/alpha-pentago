@@ -12,6 +12,7 @@ GameResult operator-(const GameResult& res);
 class Position {
 public:
     Position(const Position& parent, Move m);
+    Position(const PentagoBoard& board);
 
     std::uint64_t Hash() const;
     bool IsBlackToMove() const { return move_count_ % 2 == 1; }
