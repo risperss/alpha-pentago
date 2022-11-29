@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #include "bitboard.h"
+#include "hashcat.h"
 
 namespace pen {
 
@@ -11,6 +12,10 @@ enum class BoardResult : uint8_t { UNDECIDED, THEY_WON, DRAW, WE_WON };
 class PentagoBoard {
 public:
     PentagoBoard() = default;
+
+    std::uint64_t Hash() const {
+        return HashCat(our_pieces().as_int(), their_pieces().as_int());
+    }
 
     void ApplyMove(Move move);
 

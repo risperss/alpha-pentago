@@ -14,9 +14,11 @@ public:
     Position(const Position& parent, Move m);
     Position(const PentagoBoard& board);
 
-    std::uint64_t Hash() const;
-    bool IsBlackToMove() const { return move_count_ % 2 == 0; }
+    std::uint64_t Hash() const {
+        return GetBoard().Hash();
+    }
 
+    bool IsBlackToMove() const { return move_count_ % 2 == 0; }
     int GetMoveCount() const { return move_count_; }
 
     const PentagoBoard& GetBoard() const { return board_; }
@@ -33,7 +35,7 @@ private:
 
 class PositionHistory {
 public:
-    PositionHistory() = default;
+    PositionHistory();
 
     const Position& Starting() const { return positions_.front(); }
     const Position& Last() const { return positions_.back(); }

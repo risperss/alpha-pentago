@@ -1,4 +1,5 @@
 #include "position.h"
+#include "hashcat.h"
 
 #include <cstdint>
 
@@ -32,13 +33,16 @@ GameResult Position::ComputeGameResult() const {
 	} else {
 		return IsBlackToMove() ? GameResult::BLACK_WON : GameResult::WHITE_WON;
 	}
-
 }
 
 GameResult operator-(const GameResult& res) {
   return res == GameResult::BLACK_WON   ? GameResult::WHITE_WON
          : res == GameResult::WHITE_WON ? GameResult::BLACK_WON
                                         : res;
+}
+
+PositionHistory::PositionHistory() {
+	positions_.emplace_back(Position(PentagoBoard()));
 }
 
 void PositionHistory::Append(Position p) {
