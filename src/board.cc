@@ -60,6 +60,8 @@ MoveList PentagoBoard::GenerateLegalMoves() const {
     MoveList result;
     result.reserve(144);
 
+    BitBoard mut_our_pieces = our_pieces();
+
     int i = 0;
     while (i < 288) {
         Move move = Move(kMoveNum[i]);
@@ -80,10 +82,10 @@ MoveList PentagoBoard::GenerateLegalMoves() const {
 
             if (!nodeOnRotatedSquare && nodeMove.nodeOnSquare()) {
                 nodeOnRotatedSquare = true;
-                our_pieces().set(nodeMove.node());
+                mut_our_pieces.set(nodeMove.node());
             }
 
-            BoardSquare ourSquare = BoardSquare(our_pieces().as_int(), nodeMove.squarePos());
+            BoardSquare ourSquare = BoardSquare(mut_our_pieces.as_int(), nodeMove.squarePos());
             BoardSquare theirSquare = BoardSquare(their_pieces().as_int(), nodeMove.squarePos());
 
             if (!(ourSquare.IsSymmetrical() && theirSquare.IsSymmetrical())) {
@@ -96,7 +98,7 @@ MoveList PentagoBoard::GenerateLegalMoves() const {
             }
 
             if (nodeOnRotatedSquare) {
-                our_pieces().reset(nodeMove.node());
+                mut_our_pieces.reset(nodeMove.node());
             }
 
             j += 2;
@@ -116,7 +118,7 @@ MoveList PentagoBoard::GenerateLegalMoves() const {
 void PentagoBoard::ApplyMove(Move move) {
     our_pieces_.set(move.node());
 
-    BoardSquare ourSquare = BoardSquare(our_pieces().as_int(), move.squarePos());
+    BoardSquare ourSquare = BoardSquare(our_pieces_.as_int(), move.squarePos());
     BoardSquare theirSquare = BoardSquare(their_pieces().as_int(), move.squarePos());
 
     ourSquare.rotate(move.clockwise());
@@ -124,8 +126,6 @@ void PentagoBoard::ApplyMove(Move move) {
 
     our_pieces_.set(ourSquare, move.squarePos());
     their_pieces_.set(theirSquare, move.squarePos());
-
-    std::swap(our_pieces_, their_pieces_);
 }
 
 BoardResult PentagoBoard::ComputeBoardResult() const {

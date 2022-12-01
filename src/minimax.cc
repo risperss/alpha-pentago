@@ -12,6 +12,16 @@ std::unordered_map<std::uint64_t, int> lookup;
 int minimax(Position position, int depth, int alpha, int beta) {
 	GameResult result = GameResult::UNDECIDED;
 
+	std::cout << "--------------------" << std::endl;
+	std::cout << "Move count: " << position.GetMoveCount() << std::endl;
+	std::cout << "Black to move: " << (position.IsBlackToMove() ? "true" : "false") << std::endl;
+	std::cout << std::endl;
+	std::cout << position.DebugString() << std::endl;
+	std::cout << "Our Pieces:" << std::endl;
+	std::cout << position.GetBoard().our_pieces().DebugString() << std::endl;
+	std::cout << "Their Pieces:" << std::endl;
+	std::cout << position.GetBoard().their_pieces().DebugString() << std::endl;
+
 	if (position.GetMoveCount() >= 9) {
 		result = position.ComputeGameResult();
 	}
@@ -32,6 +42,9 @@ int minimax(Position position, int depth, int alpha, int beta) {
 	if (position.IsBlackToMove()) {
 		int minEval = 2;
 		for ( Move m : position.GetBoard().GenerateLegalMoves() ) {
+			std::cout << "Black to make move #" << position.GetMoveCount()+1 << std::endl;
+			std::cout << m.as_string() << std::endl;
+
 			Position p = Position(position, m);
 			std::uint64_t hash = p.Hash();
 			int eval;
@@ -40,7 +53,7 @@ int minimax(Position position, int depth, int alpha, int beta) {
 				eval = lookup.find(hash)->second;
 			} else {
 				eval = minimax(p, depth-1, alpha, beta);
-				lookup[hash] = eval;
+				// lookup[hash] = eval;
 			}
 
 			minEval = std::min(minEval, eval);
@@ -54,6 +67,9 @@ int minimax(Position position, int depth, int alpha, int beta) {
 	} else {
 		int maxEval = -2;
 		for ( Move m : position.GetBoard().GenerateLegalMoves() ) {
+			std::cout << "White to make move #" << position.GetMoveCount()+1 << std::endl;
+			std::cout << m.as_string() << std::endl;
+
 			Position p = Position(position, m);
 			std::uint64_t hash = p.Hash();
 			int eval;
@@ -62,7 +78,7 @@ int minimax(Position position, int depth, int alpha, int beta) {
 				eval = lookup.find(hash)->second;
 			} else {
 				eval = minimax(p, depth-1, alpha, beta);
-				lookup[hash] = eval;
+				// lookup[hash] = eval;
 			}
 
 			maxEval = std::max(maxEval, eval);
@@ -76,25 +92,34 @@ int minimax(Position position, int depth, int alpha, int beta) {
 	}
 }
 
+int value(Position position, int depth = 3) {
+	return minimax(position, depth, -2, 2);
+}
+
 }
 
 int main(void) {
-	pen::PositionHistory history = pen::PositionHistory();
+	// pen::PositionHistory history = pen::PositionHistory();
 
-	using std::chrono::high_resolution_clock;
-    using std::chrono::duration_cast;
-    using std::chrono::duration;
-    using std::chrono::milliseconds;
+	// using std::chrono::high_resolution_clock;
+    // using std::chrono::duration_cast;
+    // using std::chrono::duration;
+    // using std::chrono::milliseconds;
 
-    for (int depth = 1; depth <= 5; depth++) {
-    	auto t1 = high_resolution_clock::now();
-		int value = pen::minimax(history.Last(), depth, -2, 2);
-	    auto t2 = high_resolution_clock::now();
+    // for (int depth = 1; depth <= 36; depth++) {
+    // 	auto t1 = high_resolution_clock::now();
+	// 	int value = pen::value(history.Last(), depth);
+	//     auto t2 = high_resolution_clock::now();
 
-	    auto ms_int = duration_cast<milliseconds>(t2 - t1);
+	//     auto ms_int = duration_cast<milliseconds>(t2 - t1);
 
-		std::cout << "Depth: " << depth << " Value: " << value << " Duration(ms): " << ms_int.count() << std::endl;
-    }
+	// 	std::cout << "Depth: " << depth << " Value: " << value << " Duration(ms): " << ms_int.count() << std::endl;
+
+	// 	pen::lookup.clear();
+    // }
+
+    std::cout << pen::value(pen::Position(pen::PentagoBoard())) << std::endl;
+    // std::cout << pen::lookup.size() << std::endl;
 
 	return 0;
 }

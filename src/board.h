@@ -28,6 +28,10 @@ public:
         return (our_pieces() & their_pieces()) == 0xFFFFFFFFF;
     }
 
+    void SwapBitBoards() {
+        swap(our_pieces_, their_pieces_);
+    }
+
     std::string DebugString(bool blackToMove) const;
 
     BitBoard our_pieces() const { return our_pieces_; }

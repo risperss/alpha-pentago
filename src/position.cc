@@ -9,6 +9,7 @@ Position::Position(const Position& parent, Move m)
 	: move_count_(parent.move_count_ + 1) {
 	board_ = parent.GetBoard();
 	board_.ApplyMove(m);
+	board_.SwapBitBoards();
 }
 
 Position::Position(const PentagoBoard& board) {
@@ -41,16 +42,11 @@ GameResult operator-(const GameResult& res) {
                                         : res;
 }
 
-PositionHistory::PositionHistory() {
-	positions_.emplace_back(Position(PentagoBoard()));
-}
-
-void PositionHistory::Append(Position p) {
-	positions_.emplace_back(p);
-}
-
 void PositionHistory::Append(Move m) {
-	positions_.emplace_back(Position(Last()), m);
+	if (positions_.empty()) {
+		positions_.emplace_back(Position(PentagoBoard()));
+	}
+	positions_.emplace_back(Position(Last(), m));
 }
 
 } // namespace pen

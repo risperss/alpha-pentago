@@ -245,6 +245,7 @@ public:
                 } else {
                     res += '.';
                 }
+                res += ' ';
             }
             res += '\n';
         }
