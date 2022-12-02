@@ -9,7 +9,11 @@ namespace pen {
 
 std::unordered_map<std::uint64_t, int> lookup;
 
-int minimax(Position position, int depth, int alpha, int beta) {
+double heuristic_value(Position position) {
+    return 0.0;
+}
+
+double minimax(Position position, int depth, double alpha, double beta) {
 	GameResult result = GameResult::UNDECIDED;
 
 	if (position.GetPlyCount() >= 9) {
@@ -18,23 +22,22 @@ int minimax(Position position, int depth, int alpha, int beta) {
 
 	if (depth == 0 || result != GameResult::UNDECIDED) {
 		if (result == GameResult::WHITE_WON) {
-			return 1;
+			return 1.0;
 		} else if (result == GameResult::DRAW) {
-			return 0;
+			return 0.0;
 		} else if (result == GameResult::BLACK_WON) {
-			return -1;
+			return -1.0;
 		} else {
-			// TODO: implement heuristic value function
-			return 0;
+			return heuristic_value(position);
 		}
 	}
 
 	if (position.IsBlackToMove()) {
-		int minEval = 2;
+		double minEval = 2.0;
 		for ( Move m : position.GetBoard().GenerateLegalMoves() ) {
 			Position p = Position(position, m);
 			std::uint64_t hash = p.Hash();
-			int eval;
+			double eval;
 
 			if (lookup.find(hash) != lookup.end()) {
 				eval = lookup.find(hash)->second;
@@ -52,11 +55,11 @@ int minimax(Position position, int depth, int alpha, int beta) {
 		}
 		return minEval;
 	} else {
-		int maxEval = -2;
+		double maxEval = -2.0;
 		for ( Move m : position.GetBoard().GenerateLegalMoves() ) {
 			Position p = Position(position, m);
 			std::uint64_t hash = p.Hash();
-			int eval;
+			double eval;
 
 			if (lookup.find(hash) != lookup.end()) {
 				eval = lookup.find(hash)->second;
@@ -76,7 +79,7 @@ int minimax(Position position, int depth, int alpha, int beta) {
 	}
 }
 
-int value(Position position, int depth = 6) {
+double value(Position position, int depth = 6) {
 	return minimax(position, depth, -2, 2);
 }
 
@@ -90,9 +93,9 @@ int main(void) {
      using std::chrono::duration;
      using std::chrono::milliseconds;
 
-     for (int depth = 1; depth <= 6; depth++) {
+     for (int depth = 1; depth <= 9; depth++) {
         auto t1 = high_resolution_clock::now();
-        int value = pen::value(p, depth);
+        double value = pen::value(p, depth);
         auto t2 = high_resolution_clock::now();
 
         auto ms_int = duration_cast<milliseconds>(t2 - t1);
