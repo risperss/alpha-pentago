@@ -2,6 +2,7 @@ stash
 bin
 *.h.gch
 .DS_Store
+cmake-build-debug
 
 # Prerequisites
 *.d

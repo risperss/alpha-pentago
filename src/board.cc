@@ -157,8 +157,8 @@ BoardResult PentagoBoard::ComputeBoardResult() const {
 
 std::string PentagoBoard::DebugString(bool blackToMove) const {
     std::string res;
-    char usChar = blackToMove ? 'w' : 'b';
-    char themChar = blackToMove ? 'b' : 'w';
+    char usChar = blackToMove ? 'b' : 'w';
+    char themChar = blackToMove ? 'w' : 'b';
 
     for (int i = 5; i >= 0; --i) {
         for (int j = 0; j < 6; ++j) {

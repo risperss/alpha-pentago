@@ -6,7 +6,7 @@
 namespace pen {
 
 Position::Position(const Position& parent, Move m)
-	: move_count_(parent.move_count_ + 1) {
+	: ply_count_(parent.ply_count_ + 1) {
 	board_ = parent.GetBoard();
 	board_.ApplyMove(m);
 	board_.SwapBitBoards();
@@ -14,8 +14,8 @@ Position::Position(const Position& parent, Move m)
 
 Position::Position(const PentagoBoard& board) {
 	board_ = board;
-	move_count_ = board.our_pieces().count() + 
-					board.their_pieces().count();
+    ply_count_ = board.our_pieces().count() +
+                 board.their_pieces().count();
 }
 
 std::string Position::DebugString() const { 

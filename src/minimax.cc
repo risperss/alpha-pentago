@@ -12,16 +12,6 @@ std::unordered_map<std::uint64_t, int> lookup;
 int minimax(Position position, int depth, int alpha, int beta) {
 	GameResult result = GameResult::UNDECIDED;
 
-	std::cout << "--------------------" << std::endl;
-	std::cout << "Move count: " << position.GetMoveCount() << std::endl;
-	std::cout << "Black to move: " << (position.IsBlackToMove() ? "true" : "false") << std::endl;
-	std::cout << std::endl;
-	std::cout << position.DebugString() << std::endl;
-	std::cout << "Our Pieces:" << std::endl;
-	std::cout << position.GetBoard().our_pieces().DebugString() << std::endl;
-	std::cout << "Their Pieces:" << std::endl;
-	std::cout << position.GetBoard().their_pieces().DebugString() << std::endl;
-
 	if (position.GetMoveCount() >= 9) {
 		result = position.ComputeGameResult();
 	}
@@ -67,9 +57,6 @@ int minimax(Position position, int depth, int alpha, int beta) {
 	} else {
 		int maxEval = -2;
 		for ( Move m : position.GetBoard().GenerateLegalMoves() ) {
-			std::cout << "White to make move #" << position.GetMoveCount()+1 << std::endl;
-			std::cout << m.as_string() << std::endl;
-
 			Position p = Position(position, m);
 			std::uint64_t hash = p.Hash();
 			int eval;
@@ -99,27 +86,25 @@ int value(Position position, int depth = 3) {
 }
 
 int main(void) {
-	// pen::PositionHistory history = pen::PositionHistory();
+    pen::PositionHistory history = pen::PositionHistory();
+    history.Append(pen::Move("c3-1L"));
 
-	// using std::chrono::high_resolution_clock;
-    // using std::chrono::duration_cast;
-    // using std::chrono::duration;
-    // using std::chrono::milliseconds;
+    while (true) {
+        pen::MoveList legalMoves = history.Last().GetBoard().GenerateLegalMoves();
 
-    // for (int depth = 1; depth <= 36; depth++) {
-    // 	auto t1 = high_resolution_clock::now();
-	// 	int value = pen::value(history.Last(), depth);
-	//     auto t2 = high_resolution_clock::now();
+        int i = rand() % legalMoves.size();
+        pen::Move move = legalMoves[i];
 
-	//     auto ms_int = duration_cast<milliseconds>(t2 - t1);
+        history.Append(move);
 
-	// 	std::cout << "Depth: " << depth << " Value: " << value << " Duration(ms): " << ms_int.count() << std::endl;
+        std::cout << history.Last().DebugString() << std::endl;
+        std::cout << "Move Played: " << move.as_string() << std::endl;
+        std::cout << "----------------------------\n" << std::endl;
 
-	// 	pen::lookup.clear();
-    // }
-
-    std::cout << pen::value(pen::Position(pen::PentagoBoard())) << std::endl;
-    // std::cout << pen::lookup.size() << std::endl;
+        if (history.Last().ComputeGameResult() != pen::GameResult::UNDECIDED) {
+            break;
+        }
+    }
 
 	return 0;
 }

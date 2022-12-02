@@ -18,8 +18,8 @@ public:
         return GetBoard().Hash();
     }
 
-    bool IsBlackToMove() const { return move_count_ % 2 == 1; }
-    int GetMoveCount() const { return move_count_; }
+    bool IsBlackToMove() const { return ply_count_ % 2 == 1; }
+    int GetMoveCount() const { return ply_count_; }
 
     const PentagoBoard& GetBoard() const { return board_; }
 
@@ -30,7 +30,7 @@ public:
 private:
     PentagoBoard board_;
 
-    int move_count_;
+    int ply_count_ = 0;
 };
 
 class PositionHistory {
