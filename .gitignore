@@ -3,6 +3,7 @@ bin
 *.h.gch
 .DS_Store
 cmake-build-debug
+.idea
 
 # Prerequisites
 *.d
