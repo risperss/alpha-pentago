@@ -43,7 +43,7 @@ int minimax(Position position, int depth, int alpha, int beta) {
 				eval = lookup.find(hash)->second;
 			} else {
 				eval = minimax(p, depth-1, alpha, beta);
-				// lookup[hash] = eval;
+				 lookup[hash] = eval;
 			}
 
 			minEval = std::min(minEval, eval);
@@ -65,7 +65,7 @@ int minimax(Position position, int depth, int alpha, int beta) {
 				eval = lookup.find(hash)->second;
 			} else {
 				eval = minimax(p, depth-1, alpha, beta);
-				// lookup[hash] = eval;
+				 lookup[hash] = eval;
 			}
 
 			maxEval = std::max(maxEval, eval);
@@ -87,24 +87,8 @@ int value(Position position, int depth = 3) {
 
 int main(void) {
     pen::PositionHistory history = pen::PositionHistory();
-    history.Append(pen::Move("c3-1L"));
+    history.Append(pen::Position(pen::PentagoBoard()));
 
-    while (true) {
-        pen::MoveList legalMoves = history.Last().GetBoard().GenerateLegalMoves();
-
-        int i = rand() % legalMoves.size();
-        pen::Move move = legalMoves[i];
-
-        history.Append(move);
-
-        std::cout << history.Last().DebugString() << std::endl;
-        std::cout << "Move Played: " << move.as_string() << std::endl;
-        std::cout << "----------------------------\n" << std::endl;
-
-        if (history.Last().ComputeGameResult() != pen::GameResult::UNDECIDED) {
-            break;
-        }
-    }
 
 	return 0;
 }

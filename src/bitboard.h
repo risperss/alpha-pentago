@@ -109,48 +109,56 @@ private:
     std::uint16_t square_ = 0;
 
     void rotateClockwise() {
-        square_ =
-            ((square_ & kClockwisePlus12Mask) << 12) |
-            ((square_ & kClockwiseMinus12Mask) >> 12) |
-            ((square_ & kClockwisePlus7Mask) << 7) |
-            ((square_ & kClockwiseMinus7Mask) >> 7) |
-            ((square_ & kClockwisePlus5Mask) << 5) |
-            ((square_ & kClockwiseMinus5Mask) >> 5) |
-            ((square_ & kClockwisePlus2Mask) << 2) |
-            ((square_ & kClockwiseMinus2Mask) >> 2);
+        std::uint16_t square = 0;
+
+        square |= (square_ & kClockwiseLeft12Mask) << 12;
+        square |= (square_ & kClockwiseRight12Mask) >> 12;
+        square |= (square_ & kClockwiseLeft7Mask) << 7;
+        square |= (square_ & kClockwiseRight7Mask) >> 7;
+        square |= (square_ & kClockwiseLeft5Mask) << 5;
+        square |= (square_ & kClockwiseRight5Mask) >> 5;
+        square |= (square_ & kClockwiseLeft2Mask) << 2;
+        square |= (square_ & kClockwiseRight2Mask) >> 2;
+
+        square_ = square;
     }
     void rotateCounterClockwise() {
-        square_ =
-            ((square_ & kCounterClockwisePlus12Mask) << 12) |
-            ((square_ & kCounterClockwiseMinus12Mask) >> 12) |
-            ((square_ & kCounterClockwisePlus7Mask) << 7) |
-            ((square_ & kCounterClockwiseMinus7Mask) >> 7) |
-            ((square_ & kCounterClockwisePlus5Mask) << 5) |
-            ((square_ & kCounterClockwiseMinus5Mask) >> 5) |
-            ((square_ & kCounterClockwisePlus2Mask) << 2) |
-            ((square_ & kCounterClockwiseMinus2Mask) >> 2);
+        std::uint16_t square = 0;
+
+        square |= (square_ & kCounterClockwiseLeft12Mask) << 12;
+        square |= (square_ & kCounterClockwiseRight12Mask) >> 12;
+        square |= (square_ & kCounterClockwiseLeft7Mask) << 7;
+        square |= (square_ & kCounterClockwiseRight7Mask) >> 7;
+        square |= (square_ & kCounterClockwiseLeft5Mask) << 5;
+        square |= (square_ & kCounterClockwiseRight5Mask) >> 5;
+        square |= (square_ & kCounterClockwiseLeft2Mask) << 2;
+        square |= (square_ & kCounterClockwiseRight2Mask) >> 2;
+
+        square_ = square;
     }
 
     enum Masks : uint16_t {
-        kSquareMask = 0b0111000101000111,
+        kSquareMask =        0b0111000101000111,
         kCrossSymmetryMask = 0b0010000101000010,
-        kXSymmetryMask = 0b0101000000000101,
-        kClockwisePlus12Mask = 0b0000000000000100,
-        kClockwiseMinus12Mask = 0b0100000000000000,
-        kClockwisePlus7Mask = 0b0000000001000000,
-        kClockwiseMinus7Mask = 0b0000000100000000,
-        kClockwisePlus5Mask = 0b0000000000000010,
-        kClockwiseMinus5Mask = 0b0010000000000000,
-        kClockwisePlus2Mask = 0b0001000000000000,
-        kClockwiseMinus2Mask = 0b0000000000000100,
-        kCounterClockwisePlus12Mask = 0b0000000000000100,
-        kCounterClockwiseMinus12Mask = 0b0001000000000000,
-        kCounterClockwisePlus7Mask = 0b0000000000000010,
-        kCounterClockwiseMinus7Mask = 0b0010000000000000,
-        kCounterClockwisePlus5Mask = 0b0000000100000000,
-        kCounterClockwiseMinus5Mask = 0b0000000001000000,
-        kCounterClockwisePlus2Mask = 0b0000000000000001,
-        kCounterClockwiseMinus2Mask = 0b0100000000000000,
+        kXSymmetryMask =     0b0101000000000101,
+
+        kClockwiseLeft12Mask =  0b0000000000000001,
+        kClockwiseRight12Mask = 0b0100000000000000,
+        kClockwiseLeft7Mask =   0b0000000001000000,
+        kClockwiseRight7Mask =  0b0000000100000000,
+        kClockwiseLeft5Mask =   0b0000000000000010,
+        kClockwiseRight5Mask =  0b0010000000000000,
+        kClockwiseLeft2Mask =   0b0001000000000000,
+        kClockwiseRight2Mask =  0b0000000000000100,
+
+        kCounterClockwiseLeft12Mask =  0b0000000000000100,
+        kCounterClockwiseRight12Mask = 0b0001000000000000,
+        kCounterClockwiseLeft7Mask =   0b0000000000000010,
+        kCounterClockwiseRight7Mask =  0b0010000000000000,
+        kCounterClockwiseLeft5Mask =   0b0000000100000000,
+        kCounterClockwiseRight5Mask =  0b0000000001000000,
+        kCounterClockwiseLeft2Mask =   0b0000000000000001,
+        kCounterClockwiseRight2Mask =  0b0100000000000000,
     };
 };
 
