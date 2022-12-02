@@ -6,54 +6,64 @@
 
 namespace pen {
 
-enum class GameResult : uint8_t { UNDECIDED, BLACK_WON, DRAW, WHITE_WON };
-GameResult operator-(const GameResult& res);
+    enum class GameResult : uint8_t {
+        UNDECIDED, BLACK_WON, DRAW, WHITE_WON
+    };
 
-class Position {
-public:
-    Position(const Position& parent, Move m);
-    Position(const PentagoBoard& board);
+    GameResult operator-(const GameResult &res);
 
-    std::uint64_t Hash() const {
-        return GetBoard().Hash();
-    }
+    class Position {
+    public:
+        Position(const Position &parent, Move m);
 
-    bool IsBlackToMove() const { return ply_count_ % 2 == 1; }
-    int GetPlyCount() const { return ply_count_; }
+        Position(const PentagoBoard &board);
 
-    const PentagoBoard& GetBoard() const { return board_; }
+        std::uint64_t Hash() const {
+            return GetBoard().Hash();
+        }
 
-    std::string DebugString() const;
+        bool IsBlackToMove() const { return ply_count_ % 2 == 1; }
 
-    GameResult ComputeGameResult() const;
+        int GetPlyCount() const { return ply_count_; }
 
-private:
-    PentagoBoard board_;
+        const PentagoBoard &GetBoard() const { return board_; }
 
-    int ply_count_ = 0;
-};
+        std::string DebugString() const;
 
-class PositionHistory {
-public:
-    PositionHistory() = default;
+        GameResult ComputeGameResult() const;
 
-    const Position& Starting() const { return positions_.front(); }
-    const Position& Last() const { return positions_.back(); }
-    const Position& GetPositionAt(int idx) const { return positions_[idx]; }
+    private:
+        PentagoBoard board_;
 
-    void Reserve(int size) { positions_.reserve(size); }
-    int GetLength() const { return positions_.size(); }
+        int ply_count_ = 0;
+    };
 
-    void Append(Move m);
-    void Append(Position p);
-    void Pop() { positions_.pop_back(); }
+    class PositionHistory {
+    public:
+        PositionHistory() = default;
 
-    GameResult ComputeGameResult() const { return Last().ComputeGameResult(); }
+        const Position &Starting() const { return positions_.front(); }
 
-    bool IsBlackToMove() const { return Last().IsBlackToMove(); }
+        const Position &Last() const { return positions_.back(); }
 
-private:
-    std::vector<Position> positions_;
-};
+        const Position &GetPositionAt(int idx) const { return positions_[idx]; }
+
+        void Reserve(int size) { positions_.reserve(size); }
+
+        int GetLength() const { return positions_.size(); }
+
+        void Append(Move m);
+
+        void Append(Position p);
+
+        void Pop() { positions_.pop_back(); }
+
+        GameResult ComputeGameResult() const { return Last().ComputeGameResult(); }
+
+        bool IsBlackToMove() const { return Last().IsBlackToMove(); }
+
+    private:
+        std::vector<Position> positions_;
+    };
 
 } // namespace pen

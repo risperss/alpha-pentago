@@ -4,6 +4,7 @@ bin
 .DS_Store
 cmake-build-debug
 .idea
+Makefile
 
 # Prerequisites
 *.d
