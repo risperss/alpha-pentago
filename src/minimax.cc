@@ -12,7 +12,7 @@ std::unordered_map<std::uint64_t, int> lookup;
 int minimax(Position position, int depth, int alpha, int beta) {
 	GameResult result = GameResult::UNDECIDED;
 
-	if (position.GetMoveCount() >= 9) {
+	if (position.GetPlyCount() >= 9) {
 		result = position.ComputeGameResult();
 	}
 
@@ -32,9 +32,6 @@ int minimax(Position position, int depth, int alpha, int beta) {
 	if (position.IsBlackToMove()) {
 		int minEval = 2;
 		for ( Move m : position.GetBoard().GenerateLegalMoves() ) {
-			std::cout << "Black to make move #" << position.GetMoveCount()+1 << std::endl;
-			std::cout << m.as_string() << std::endl;
-
 			Position p = Position(position, m);
 			std::uint64_t hash = p.Hash();
 			int eval;
@@ -79,16 +76,31 @@ int minimax(Position position, int depth, int alpha, int beta) {
 	}
 }
 
-int value(Position position, int depth = 3) {
+int value(Position position, int depth = 6) {
 	return minimax(position, depth, -2, 2);
 }
 
 }
 
 int main(void) {
-    pen::PositionHistory history = pen::PositionHistory();
-    history.Append(pen::Position(pen::PentagoBoard()));
+     pen::Position p = pen::Position(pen::PentagoBoard());
 
+     using std::chrono::high_resolution_clock;
+     using std::chrono::duration_cast;
+     using std::chrono::duration;
+     using std::chrono::milliseconds;
+
+     for (int depth = 1; depth <= 6; depth++) {
+        auto t1 = high_resolution_clock::now();
+        int value = pen::value(p, depth);
+        auto t2 = high_resolution_clock::now();
+
+        auto ms_int = duration_cast<milliseconds>(t2 - t1);
+
+     	std::cout << "Depth: " << depth << " Value: " << value << " Duration(ms): " << ms_int.count() << std::endl;
+
+     	pen::lookup.clear();
+     }
 
 	return 0;
 }

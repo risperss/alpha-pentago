@@ -19,7 +19,7 @@ public:
     }
 
     bool IsBlackToMove() const { return ply_count_ % 2 == 1; }
-    int GetMoveCount() const { return ply_count_; }
+    int GetPlyCount() const { return ply_count_; }
 
     const PentagoBoard& GetBoard() const { return board_; }
 
