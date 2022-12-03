@@ -11,10 +11,10 @@ namespace pen {
         UNDECIDED, BLACK_WON, DRAW, WHITE_WON
     };
 
-    const std::map<GameResult, std::string> resultString {
+    const std::map<GameResult, std::string> resultString{
             {GameResult::WHITE_WON, "White Win"},
             {GameResult::BLACK_WON, "Black Win"},
-            {GameResult::DRAW, "Draw"},
+            {GameResult::DRAW,      "Draw"},
             {GameResult::UNDECIDED, "Undecided"}};
 
     GameResult operator-(const GameResult &res);
@@ -48,7 +48,8 @@ namespace pen {
     class PositionHistory {
     public:
         PositionHistory() = default;
-        PositionHistory(Position& starting);
+
+        PositionHistory(Position &starting);
 
         const Position &Starting() const { return positions_.front(); }
 

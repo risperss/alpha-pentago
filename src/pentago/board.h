@@ -14,8 +14,9 @@ namespace pen {
     class PentagoBoard {
     public:
         PentagoBoard() = default;
+
         // Gaetano Rispoli Notation!
-        PentagoBoard(const std::string& grn) { SetFromGrn(grn); }
+        PentagoBoard(const std::string &grn) { SetFromGrn(grn); }
 
         void Clear();
 

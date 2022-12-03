@@ -42,7 +42,7 @@ namespace pen {
                                                                            : res;
     }
 
-    PositionHistory::PositionHistory(Position& starting) {
+    PositionHistory::PositionHistory(Position &starting) {
         positions_.emplace_back(starting);
     }
 

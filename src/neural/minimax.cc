@@ -55,7 +55,7 @@ namespace pen {
                 value = heuristic_value(position);
             }
 
-            return std::pair<Move, double> {prevMove, value};
+            return std::pair<Move, double>{prevMove, value};
         }
 
         if (position.IsBlackToMove()) {
@@ -115,7 +115,7 @@ namespace pen {
         }
     }
 
-    std::pair<Move, double>  value(Position position, int depth = 10) {
+    std::pair<Move, double> value(Position position, int depth = 10) {
         // TODO: how to deal with this
         return minimax(position, Move("d6-4R"), depth, -2, 2);
     }

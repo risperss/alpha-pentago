@@ -58,7 +58,7 @@ namespace pen {
     }
 
     void PentagoBoard::Clear() {
-        std::memset(reinterpret_cast<void*>(this), 0, sizeof(PentagoBoard));
+        std::memset(reinterpret_cast<void *>(this), 0, sizeof(PentagoBoard));
     }
 
     void PentagoBoard::SetFromGrn(std::string grn) {
