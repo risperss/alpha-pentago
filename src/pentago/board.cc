@@ -203,23 +203,46 @@ namespace pen {
     }
 
     std::string PentagoBoard::DebugString(bool blackToMove) const {
+        const std::string white = "\u001b[37m";
+        const std::string black = "\u001b[30m";
+        const std::string redBackground = "\u001b[41m";
+        const std::string reset = "\u001b[0m";
+
+        const std::string* ourColor;
+        const std::string* theirColor;
+
         std::string res;
-        char usChar = blackToMove ? 'b' : 'w';
-        char themChar = blackToMove ? 'w' : 'b';
+
+        if (blackToMove) {
+            ourColor = &black;
+            theirColor = &white;
+        } else {
+            ourColor = &white;
+            theirColor = &black;
+        }
 
         for (int i = 5; i >= 0; --i) {
+            res.append(redBackground);
+
             for (int j = 0; j < 6; ++j) {
                 if (our_pieces().get(i, j)) {
-                    res += usChar;
+                    res.append(*ourColor);
+                    res += '#';
                 } else if (their_pieces().get(i, j)) {
-                    res += themChar;
+                    res.append(*theirColor);
+                    res += '#';
                 } else {
+                    res.append(white);
                     res += '.';
                 }
                 res += ' ';
             }
+
+            res.append(reset);
             res += '\n';
         }
+        res.append(reset);
+
         return res;
     }
 

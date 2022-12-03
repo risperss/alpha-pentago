@@ -115,15 +115,16 @@ namespace pen {
         }
     }
 
-    std::pair<Move, double> value(Position position, int depth = 10) {
-        // TODO: how to deal with this
+    std::pair<Move, double> value(Position position, int depth = 4) {
+        // TODO: how to deal with this Move I have to pass...
+        lookup.clear();
         return minimax(position, Move("d6-4R"), depth, -2, 2);
     }
 
 }
 
 int main(void) {
-    pen::PentagoBoard board = pen::PentagoBoard("..wwbb/wwbb../..wwbb/wwbb../wwbb../..wwbb");
+    pen::PentagoBoard board = pen::PentagoBoard("w....w/.b..b./....../....../.b..b./w....w");
     pen::Position starting = pen::Position(board);
     pen::PositionHistory history = pen::PositionHistory(starting);
 
@@ -132,8 +133,8 @@ int main(void) {
 
         std::cout << history.Last().DebugString() << std::endl;
         std::cout << "Value: " << std::get<double>(value) << std::endl;
-        std::cout << "Move: " << std::get<pen::Move>(value).as_string() << std::endl;
         std::cout << "------------------------------" << std::endl;
+        std::cout << "Move: " << std::get<pen::Move>(value).as_string() << std::endl;
 
         history.Append(std::get<pen::Move>(value));
     }
