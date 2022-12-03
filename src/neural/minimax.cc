@@ -22,10 +22,9 @@ namespace pen {
      *   313
      *   151
      *   313
-     *
      */
 
-    std::uint64_t kSidesMask =   0b010010101101010010010010101101010010;
+    std::uint64_t kSidesMask = 0b010010101101010010010010101101010010;
     std::uint64_t kCornersMask = 0b101101000000101101101101000000101101;
     std::uint64_t kCentresMask = 0b000000010010000000000000010010000000;
 
@@ -34,12 +33,12 @@ namespace pen {
         std::uint64_t theirs = position.GetBoard().their_pieces().as_int();
 
         int ourScore = count(ours & kSidesMask) +
-                        3 * count (ours & kCornersMask) +
-                        5 * count(ours & kCentresMask);
+                       3 * count(ours & kCornersMask) +
+                       5 * count(ours & kCentresMask);
 
         int theirScore = count(theirs & kSidesMask) +
-                        3 * count (theirs & kCornersMask) +
-                        5 * count(theirs & kCentresMask);
+                         3 * count(theirs & kCornersMask) +
+                         5 * count(theirs & kCentresMask);
 
         int score = ourScore - theirScore;
 
@@ -76,7 +75,7 @@ namespace pen {
         MoveList legalMoves = position.GetBoard().GenerateLegalMoves();
 
         if (position.IsBlackToMove()) {
-            int minEval = 99999;
+            int minEval = INT32_MAX;
             Move move;
 
             for (Move m: legalMoves) {
@@ -95,10 +94,7 @@ namespace pen {
                     minEval = eval;
                     move = m;
                 }
-                if (eval < beta) {
-                    beta = eval;
-                    move = m;
-                }
+                beta = std::min(eval, beta);
 
                 if (beta <= alpha) {
                     break;
@@ -106,7 +102,7 @@ namespace pen {
             }
             return std::pair<Move, int>(move, minEval);
         } else {
-            int maxEval = -999999;
+            int maxEval = -INT32_MAX;
             Move move;
 
             for (Move m: legalMoves) {
@@ -125,10 +121,7 @@ namespace pen {
                     maxEval = eval;
                     move = m;
                 }
-                if (eval > alpha) {
-                    alpha = eval;
-                    move = m;
-                }
+                alpha = std::max(eval, alpha);
 
                 if (beta <= alpha) {
                     break;
@@ -140,12 +133,13 @@ namespace pen {
 
     std::pair<Move, int> value(Position position, int depth = 4) {
         lookup.clear();
-        return minimax(position, Move("d6-4R"), depth, -2, 2);
+        return minimax(position, Move("d6-4R"), depth, -INT32_MAX, INT32_MAX);
     }
 }
 
 int main(void) {
-    pen::PentagoBoard board = pen::PentagoBoard("w..www/.b..b./....../..bb../.b..b./w....w");
+    pen::PentagoBoard board = pen::PentagoBoard("w....w/.b..b./....../....../.b..b./w....w");
+//    pen::PentagoBoard board = pen::PentagoBoard();
     pen::Position starting = pen::Position(board);
     pen::PositionHistory history = pen::PositionHistory(starting);
 
@@ -154,7 +148,8 @@ int main(void) {
 
         std::cout << "Ply Count: " << history.Last().GetPlyCount() << std::endl;
         std::cout << "To Move: " << (history.Last().IsBlackToMove() ? "Black" : "White") << std::endl;
-        std::cout << "Best Achievable Value: " << std::get<int>(value) << std::endl;
+        std::cout << "Value: " << std::get<int>(value) << std::endl;
+        std::cout << "Heuristic Value: " << pen::heuristic_value(history.Last()) << std::endl;
         std::cout << "Move to be made: " << std::get<pen::Move>(value).as_string() << std::endl;
         std::cout << history.Last().DebugString() << std::endl;
         std::cout << "------------------------------" << std::endl;
