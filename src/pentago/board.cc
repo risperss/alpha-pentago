@@ -227,10 +227,10 @@ namespace pen {
             for (int j = 0; j < 6; ++j) {
                 if (our_pieces().get(i, j)) {
                     res.append(*ourColor);
-                    res += '#';
+                    res.append("⬤");
                 } else if (their_pieces().get(i, j)) {
                     res.append(*theirColor);
-                    res += '#';
+                    res.append("⬤");
                 } else {
                     res.append(white);
                     res += '.';
