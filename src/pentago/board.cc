@@ -208,8 +208,8 @@ namespace pen {
         const std::string redBackground = "\u001b[41m";
         const std::string reset = "\u001b[0m";
 
-        const std::string* ourColor;
-        const std::string* theirColor;
+        const std::string *ourColor;
+        const std::string *theirColor;
 
         std::string res;
 

@@ -12,4 +12,4 @@ add_executable(alpha_pentago
         src/utils/hashcat.h
         src/neural/minimax.cc
         src/pentago/position.cc
-        src/pentago/position.h src/utils/exception.h)
+        src/pentago/position.h src/utils/exception.h src/utils/bitops.h)

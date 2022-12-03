@@ -6,40 +6,51 @@
 #include <random>
 
 #include "pentago/position.h"
+#include "utils/bitops.h"
 
 namespace pen {
 
-    auto rng = std::default_random_engine {};
-
     std::unordered_map<std::uint64_t, int> lookup;
 
-    // 110011 111111 011110 011110 111111 110011
-    std::uint64_t goodNodesMask = 0xCFF79EFF3;
+    /*
+     * For BoardSquare:
+     *   ###
+     *   ###
+     *   ###
+     *
+     * The weights are as follows:
+     *   313
+     *   151
+     *   313
+     *
+     */
 
-    double good_squares_score(BitBoard ourBoard, BitBoard theirBoard) {
-        int ourGoodSquares = ourBoard.count();
-        int theirGoodSquares = theirBoard.count();
+    std::uint64_t kSidesMask =   0b010010101101010010010010101101010010;
+    std::uint64_t kCornersMask = 0b101101000000101101101101000000101101;
+    std::uint64_t kCentresMask = 0b000000010010000000000000010010000000;
 
-        return (ourGoodSquares - theirGoodSquares) / 36.0;
-    }
+    int heuristic_value(Position position) {
+        std::uint64_t ours = position.GetBoard().our_pieces().as_int();
+        std::uint64_t theirs = position.GetBoard().their_pieces().as_int();
 
-    double heuristic_value(Position position) {
-        BitBoard ourBoard = BitBoard(position.GetBoard().our_pieces() & goodNodesMask);
-        BitBoard theirBoard = BitBoard(position.GetBoard().their_pieces() & goodNodesMask);
+        int ourScore = count(ours & kSidesMask) +
+                        3 * count (ours & kCornersMask) +
+                        5 * count(ours & kCentresMask);
 
-        int ourGoodSquares = ourBoard.count();
-        int theirGoodSquares = theirBoard.count();
+        int theirScore = count(theirs & kSidesMask) +
+                        3 * count (theirs & kCornersMask) +
+                        5 * count(theirs & kCentresMask);
 
-        double value = (ourGoodSquares - theirGoodSquares) / 36.0;
+        int score = ourScore - theirScore;
 
         if (position.IsBlackToMove()) {
-            value = -value;
+            score = -score;
         }
 
-        return value;
+        return score;
     }
 
-    std::pair<Move, double> minimax(Position position, Move prevMove, int depth, double alpha, double beta) {
+    std::pair<Move, int> minimax(Position position, Move prevMove, int depth, int alpha, int beta) {
         GameResult result = GameResult::UNDECIDED;
 
         if (position.GetPlyCount() >= 9) {
@@ -47,37 +58,36 @@ namespace pen {
         }
 
         if (depth == 0 || result != GameResult::UNDECIDED) {
-            double value;
+            int value;
 
             if (result == GameResult::WHITE_WON) {
-                value = 1.0;
+                value = 1000;
             } else if (result == GameResult::DRAW) {
-                value = 0.0;
+                value = 0;
             } else if (result == GameResult::BLACK_WON) {
-                value = -1.0;
+                value = -1000;
             } else {
                 value = heuristic_value(position);
             }
 
-            return std::pair<Move, double>{prevMove, value};
+            return std::pair<Move, int>{prevMove, value};
         }
 
         MoveList legalMoves = position.GetBoard().GenerateLegalMoves();
-        std::shuffle(std::begin(legalMoves), std::end(legalMoves), rng);
 
         if (position.IsBlackToMove()) {
-            double minEval = 2.0;
+            int minEval = 99999;
             Move move;
 
             for (Move m: legalMoves) {
                 Position p = Position(position, m);
                 std::uint64_t hash = p.Hash();
-                double eval;
+                int eval;
 
                 if (lookup.find(hash) != lookup.end()) {
                     eval = lookup.find(hash)->second;
                 } else {
-                    eval = std::get<double>(minimax(p, m, depth - 1, alpha, beta));
+                    eval = std::get<int>(minimax(p, m, depth - 1, alpha, beta));
                     lookup[hash] = eval;
                 }
 
@@ -85,26 +95,29 @@ namespace pen {
                     minEval = eval;
                     move = m;
                 }
-                beta = std::min(beta, eval);
+                if (eval < beta) {
+                    beta = eval;
+                    move = m;
+                }
 
                 if (beta <= alpha) {
                     break;
                 }
             }
-            return std::pair<Move, double>(move, minEval);
+            return std::pair<Move, int>(move, minEval);
         } else {
-            double maxEval = -2.0;
+            int maxEval = -999999;
             Move move;
 
             for (Move m: legalMoves) {
                 Position p = Position(position, m);
                 std::uint64_t hash = p.Hash();
-                double eval;
+                int eval;
 
                 if (lookup.find(hash) != lookup.end()) {
                     eval = lookup.find(hash)->second;
                 } else {
-                    eval = std::get<double>(minimax(p, m, depth - 1, alpha, beta));
+                    eval = std::get<int>(minimax(p, m, depth - 1, alpha, beta));
                     lookup[hash] = eval;
                 }
 
@@ -112,36 +125,39 @@ namespace pen {
                     maxEval = eval;
                     move = m;
                 }
-                alpha = std::max(alpha, eval);
+                if (eval > alpha) {
+                    alpha = eval;
+                    move = m;
+                }
 
                 if (beta <= alpha) {
                     break;
                 }
             }
-            return std::pair<Move, double>(move, maxEval);
+            return std::pair<Move, int>(move, maxEval);
         }
     }
 
-    std::pair<Move, double> value(Position position, int depth = 4) {
-        // TODO: how to deal with this Move I have to pass...
+    std::pair<Move, int> value(Position position, int depth = 4) {
         lookup.clear();
         return minimax(position, Move("d6-4R"), depth, -2, 2);
     }
-
 }
 
 int main(void) {
-//    pen::PentagoBoard board = pen::PentagoBoard("w....w/.b..b./....../....../.b..b./w....w");
-    pen::Position starting = pen::Position(pen::PentagoBoard());
+    pen::PentagoBoard board = pen::PentagoBoard("w..www/.b..b./....../..bb../.b..b./w....w");
+    pen::Position starting = pen::Position(board);
     pen::PositionHistory history = pen::PositionHistory(starting);
 
     while (history.ComputeGameResult() == pen::GameResult::UNDECIDED) {
-        std::pair<pen::Move, double> value = pen::value(history.Last());
+        std::pair<pen::Move, int> value = pen::value(history.Last());
 
+        std::cout << "Ply Count: " << history.Last().GetPlyCount() << std::endl;
+        std::cout << "To Move: " << (history.Last().IsBlackToMove() ? "Black" : "White") << std::endl;
+        std::cout << "Best Achievable Value: " << std::get<int>(value) << std::endl;
+        std::cout << "Move to be made: " << std::get<pen::Move>(value).as_string() << std::endl;
         std::cout << history.Last().DebugString() << std::endl;
-        std::cout << "Value: " << std::get<double>(value) << std::endl;
         std::cout << "------------------------------" << std::endl;
-        std::cout << "Move: " << std::get<pen::Move>(value).as_string() << std::endl;
 
         history.Append(std::get<pen::Move>(value));
     }
