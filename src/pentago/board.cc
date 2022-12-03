@@ -233,7 +233,7 @@ namespace pen {
                     res.append("⬤");
                 } else {
                     res.append(white);
-                    res += '.';
+                    res.append("·");
                 }
                 res += ' ';
             }

@@ -2,10 +2,14 @@
 #include <chrono>
 #include <unordered_map>
 #include "stdlib.h"
+#include <algorithm>
+#include <random>
 
 #include "pentago/position.h"
 
 namespace pen {
+
+    auto rng = std::default_random_engine {};
 
     std::unordered_map<std::uint64_t, int> lookup;
 
@@ -58,11 +62,14 @@ namespace pen {
             return std::pair<Move, double>{prevMove, value};
         }
 
+        MoveList legalMoves = position.GetBoard().GenerateLegalMoves();
+        std::shuffle(std::begin(legalMoves), std::end(legalMoves), rng);
+
         if (position.IsBlackToMove()) {
             double minEval = 2.0;
             Move move;
 
-            for (Move m: position.GetBoard().GenerateLegalMoves()) {
+            for (Move m: legalMoves) {
                 Position p = Position(position, m);
                 std::uint64_t hash = p.Hash();
                 double eval;
@@ -89,7 +96,7 @@ namespace pen {
             double maxEval = -2.0;
             Move move;
 
-            for (Move m: position.GetBoard().GenerateLegalMoves()) {
+            for (Move m: legalMoves) {
                 Position p = Position(position, m);
                 std::uint64_t hash = p.Hash();
                 double eval;
@@ -124,8 +131,8 @@ namespace pen {
 }
 
 int main(void) {
-    pen::PentagoBoard board = pen::PentagoBoard("w....w/.b..b./....../....../.b..b./w....w");
-    pen::Position starting = pen::Position(board);
+//    pen::PentagoBoard board = pen::PentagoBoard("w....w/.b..b./....../....../.b..b./w....w");
+    pen::Position starting = pen::Position(pen::PentagoBoard());
     pen::PositionHistory history = pen::PositionHistory(starting);
 
     while (history.ComputeGameResult() == pen::GameResult::UNDECIDED) {
