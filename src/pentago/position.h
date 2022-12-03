@@ -1,14 +1,21 @@
 #pragma once
 
 #include <string>
+#include <map>
 
-#include "board.h"
+#include "pentago/board.h"
 
 namespace pen {
 
     enum class GameResult : uint8_t {
         UNDECIDED, BLACK_WON, DRAW, WHITE_WON
     };
+
+    const std::map<GameResult, std::string> resultString {
+            {GameResult::WHITE_WON, "White Win"},
+            {GameResult::BLACK_WON, "Black Win"},
+            {GameResult::DRAW, "Draw"},
+            {GameResult::UNDECIDED, "Undecided"}};
 
     GameResult operator-(const GameResult &res);
 
@@ -41,6 +48,7 @@ namespace pen {
     class PositionHistory {
     public:
         PositionHistory() = default;
+        PositionHistory(Position& starting);
 
         const Position &Starting() const { return positions_.front(); }
 

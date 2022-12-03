@@ -2,8 +2,8 @@
 
 #include <cstdint>
 
-#include "bitboard.h"
-#include "hashcat.h"
+#include "pentago/bitboard.h"
+#include "utils/hashcat.h"
 
 namespace pen {
 
@@ -14,6 +14,12 @@ namespace pen {
     class PentagoBoard {
     public:
         PentagoBoard() = default;
+        // Gaetano Rispoli Notation!
+        PentagoBoard(const std::string& grn) { SetFromGrn(grn); }
+
+        void Clear();
+
+        void SetFromGrn(std::string grn);
 
         std::uint64_t Hash() const {
             return HashCat(our_pieces().as_int(), their_pieces().as_int());

@@ -1,7 +1,8 @@
 #include <iostream>
 
 #include "board.h"
-#include "bitboard.h"
+#include "pentago/bitboard.h"
+#include "utils/exception.h"
 
 
 namespace pen {
@@ -54,6 +55,52 @@ namespace pen {
                 0x00000007C0000000, 0x0000000F80000000, 0x0000000020820820, 0x0000000820820800,
                 0x0000000010204081, 0x0000000810204080, 0x0000000002108420, 0x0000000042108400,
                 0x0000000408102040, 0x0000000020408102, 0x0000000001084210, 0x0000000084210800};
+    }
+
+    void PentagoBoard::Clear() {
+        std::memset(reinterpret_cast<void*>(this), 0, sizeof(PentagoBoard));
+    }
+
+    void PentagoBoard::SetFromGrn(std::string grn) {
+        Clear();
+
+        int whiteNodes = 0;
+        int blackNodes = 0;
+
+        if (grn.size() != 41) {
+            throw Exception("Bad grn string (wrong size): " + grn);
+        }
+
+        int pos = 0;
+
+        for (int i = 0; i < 41; i++) {
+            char c = grn[i];
+
+            if (c == '.') {
+                pos++;
+            } else if (c == 'w') {
+                our_pieces_.set(pos);
+                whiteNodes++;
+                pos++;
+            } else if (c == 'b') {
+                their_pieces_.set(pos);
+                blackNodes++;
+                pos++;
+            } else if (c == '/') {
+                continue;
+            } else {
+                throw Exception("Bad grn string (invalid character): " + grn);
+            }
+        }
+
+        int diff = whiteNodes - blackNodes;
+        if (!(diff == 1 || diff == 0)) {
+            throw Exception("Bad grn string (invalid piece count): " + grn);
+        }
+
+        if (diff == 1) {
+            SwapBitBoards();
+        }
     }
 
     MoveList PentagoBoard::GenerateLegalMoves() const {

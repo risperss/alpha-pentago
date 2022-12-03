@@ -1,5 +1,5 @@
 #include "position.h"
-#include "hashcat.h"
+#include "utils/hashcat.h"
 
 #include <cstdint>
 
@@ -30,9 +30,9 @@ namespace pen {
         } else if (result == BoardResult::DRAW) {
             return GameResult::DRAW;
         } else if (result == BoardResult::WE_WON) {
-            return IsBlackToMove() ? GameResult::WHITE_WON : GameResult::BLACK_WON;
-        } else {
             return IsBlackToMove() ? GameResult::BLACK_WON : GameResult::WHITE_WON;
+        } else {
+            return IsBlackToMove() ? GameResult::WHITE_WON : GameResult::BLACK_WON;
         }
     }
 
@@ -40,6 +40,10 @@ namespace pen {
         return res == GameResult::BLACK_WON ? GameResult::WHITE_WON
                                             : res == GameResult::WHITE_WON ? GameResult::BLACK_WON
                                                                            : res;
+    }
+
+    PositionHistory::PositionHistory(Position& starting) {
+        positions_.emplace_back(starting);
     }
 
     void PositionHistory::Append(Move m) {
