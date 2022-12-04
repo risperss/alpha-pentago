@@ -1,143 +1,143 @@
-#include <iostream>
-#include <chrono>
-#include <unordered_map>
 #include "stdlib.h"
 #include <algorithm>
+#include <chrono>
+#include <iostream>
 #include <random>
+#include <unordered_map>
 
 #include "pentago/position.h"
 #include "utils/bitops.h"
 
 namespace pen {
 
-    std::unordered_map<std::uint64_t, int> lookup;
+std::unordered_map<std::uint64_t, int> lookup;
 
-    /*
-     * For BoardSquare:
-     *   ###
-     *   ###
-     *   ###
-     *
-     * The weights are as follows:
-     *   313
-     *   151
-     *   313
-     */
+/*
+ * For BoardSquare:
+ *   ###
+ *   ###
+ *   ###
+ *
+ * The weights are as follows:
+ *   313
+ *   151
+ *   313
+ */
 
-    std::uint64_t kSidesMask = 0b010010101101010010010010101101010010;
-    std::uint64_t kCornersMask = 0b101101000000101101101101000000101101;
-    std::uint64_t kCentresMask = 0b000000010010000000000000010010000000;
+std::uint64_t kSidesMask = 0b010010101101010010010010101101010010;
+std::uint64_t kCornersMask = 0b101101000000101101101101000000101101;
+std::uint64_t kCentresMask = 0b000000010010000000000000010010000000;
 
-    int heuristic_value(Position position) {
-        std::uint64_t ours = position.GetBoard().our_pieces().as_int();
-        std::uint64_t theirs = position.GetBoard().their_pieces().as_int();
+int heuristic_value(Position position)
+{
+    std::uint64_t ours = position.GetBoard().our_pieces().as_int();
+    std::uint64_t theirs = position.GetBoard().their_pieces().as_int();
 
-        int ourScore = count(ours & kSidesMask) +
-                       3 * count(ours & kCornersMask) +
-                       5 * count(ours & kCentresMask);
+    int ourScore = count(ours & kSidesMask) + 3 * count(ours & kCornersMask) + 5 * count(ours & kCentresMask);
 
-        int theirScore = count(theirs & kSidesMask) +
-                         3 * count(theirs & kCornersMask) +
-                         5 * count(theirs & kCentresMask);
+    int theirScore = count(theirs & kSidesMask) + 3 * count(theirs & kCornersMask) + 5 * count(theirs & kCentresMask);
 
-        int score = ourScore - theirScore;
+    int score = ourScore - theirScore;
 
-        if (position.IsBlackToMove()) {
-            score = -score;
-        }
-
-        return score;
+    if (position.IsBlackToMove()) {
+        score = -score;
     }
 
-    std::pair<Move, int> minimax(Position position, Move prevMove, int depth, int alpha, int beta) {
-        GameResult result = GameResult::UNDECIDED;
+    return score;
+}
 
-        if (position.GetPlyCount() >= 9) {
-            result = position.ComputeGameResult();
-        }
+std::pair<Move, int> minimax(Position position, Move prevMove, int depth, int alpha, int beta)
+{
+    GameResult result = GameResult::UNDECIDED;
 
-        if (depth == 0 || result != GameResult::UNDECIDED) {
-            int value;
+    if (position.GetPlyCount() >= 9) {
+        result = position.ComputeGameResult();
+    }
 
-            if (result == GameResult::WHITE_WON) {
-                value = 1000;
-            } else if (result == GameResult::DRAW) {
-                value = 0;
-            } else if (result == GameResult::BLACK_WON) {
-                value = -1000;
-            } else {
-                value = heuristic_value(position);
-            }
+    if (depth == 0 || result != GameResult::UNDECIDED) {
+        int value;
 
-            return std::pair<Move, int>{prevMove, value};
-        }
-
-        MoveList legalMoves = position.GetBoard().GenerateLegalMoves();
-
-        if (position.IsBlackToMove()) {
-            int minEval = INT32_MAX;
-            Move move;
-
-            for (Move m: legalMoves) {
-                Position p = Position(position, m);
-                std::uint64_t hash = p.Hash();
-                int eval;
-
-                if (lookup.find(hash) != lookup.end()) {
-                    eval = lookup.find(hash)->second;
-                } else {
-                    eval = std::get<int>(minimax(p, m, depth - 1, alpha, beta));
-                    lookup[hash] = eval;
-                }
-
-                if (eval < minEval) {
-                    minEval = eval;
-                    move = m;
-                }
-                beta = std::min(eval, beta);
-
-                if (beta <= alpha) {
-                    break;
-                }
-            }
-            return std::pair<Move, int>(move, minEval);
+        if (result == GameResult::WHITE_WON) {
+            value = 1000;
+        } else if (result == GameResult::DRAW) {
+            value = 0;
+        } else if (result == GameResult::BLACK_WON) {
+            value = -1000;
         } else {
-            int maxEval = -INT32_MAX;
-            Move move;
-
-            for (Move m: legalMoves) {
-                Position p = Position(position, m);
-                std::uint64_t hash = p.Hash();
-                int eval;
-
-                if (lookup.find(hash) != lookup.end()) {
-                    eval = lookup.find(hash)->second;
-                } else {
-                    eval = std::get<int>(minimax(p, m, depth - 1, alpha, beta));
-                    lookup[hash] = eval;
-                }
-
-                if (eval > maxEval) {
-                    maxEval = eval;
-                    move = m;
-                }
-                alpha = std::max(eval, alpha);
-
-                if (beta <= alpha) {
-                    break;
-                }
-            }
-            return std::pair<Move, int>(move, maxEval);
+            value = heuristic_value(position);
         }
+
+        return std::pair<Move, int> { prevMove, value };
     }
 
-    std::pair<Move, int> value(Position position, int depth = 5) {
-        lookup.clear();
-        return minimax(position, Move("d6-4R"), depth, -INT32_MAX, INT32_MAX);
+    MoveList legalMoves = position.GetBoard().GenerateLegalMoves();
+
+    if (position.IsBlackToMove()) {
+        int minEval = INT32_MAX;
+        Move move;
+
+        for (Move m : legalMoves) {
+            Position p = Position(position, m);
+            std::uint64_t hash = p.Hash();
+            int eval;
+
+            if (lookup.find(hash) != lookup.end()) {
+                eval = lookup.find(hash)->second;
+            } else {
+                eval = std::get<int>(minimax(p, m, depth - 1, alpha, beta));
+                lookup[hash] = eval;
+            }
+
+            if (eval < minEval) {
+                minEval = eval;
+                move = m;
+            }
+            beta = std::min(eval, beta);
+
+            if (beta <= alpha) {
+                break;
+            }
+        }
+        return std::pair<Move, int>(move, minEval);
+    } else {
+        int maxEval = -INT32_MAX;
+        Move move;
+
+        for (Move m : legalMoves) {
+            Position p = Position(position, m);
+            std::uint64_t hash = p.Hash();
+            int eval;
+
+            if (lookup.find(hash) != lookup.end()) {
+                eval = lookup.find(hash)->second;
+            } else {
+                eval = std::get<int>(minimax(p, m, depth - 1, alpha, beta));
+                lookup[hash] = eval;
+            }
+
+            if (eval > maxEval) {
+                maxEval = eval;
+                move = m;
+            }
+            alpha = std::max(eval, alpha);
+
+            if (beta <= alpha) {
+                break;
+            }
+        }
+        return std::pair<Move, int>(move, maxEval);
     }
 }
 
-void selfPlay() {
+std::pair<Move, int> value(Position position, int depth = 5)
+{
+    lookup.clear();
+    return minimax(position, Move("d6-4R"), depth, -INT32_MAX, INT32_MAX);
+}
+}
+
+void selfPlay()
+{
     pen::PentagoBoard board = pen::PentagoBoard();
     pen::Position starting = pen::Position(board);
     pen::PositionHistory history = pen::PositionHistory(starting);
@@ -160,7 +160,8 @@ void selfPlay() {
     std::cout << pen::resultString.find(history.ComputeGameResult())->second << std::endl;
 }
 
-void vsHuman() {
+void vsHuman()
+{
     pen::PentagoBoard board = pen::PentagoBoard();
     pen::Position starting = pen::Position(board);
     pen::PositionHistory history = pen::PositionHistory(starting);
@@ -195,12 +196,10 @@ void vsHuman() {
     std::cout << pen::resultString.find(history.ComputeGameResult())->second << std::endl;
 }
 
-int main(void) {
+int main(void)
+{
     selfPlay();
     // vsHuman();
 
     return 0;
 }
-
-
-
