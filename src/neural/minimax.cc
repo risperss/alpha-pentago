@@ -131,15 +131,14 @@ namespace pen {
         }
     }
 
-    std::pair<Move, int> value(Position position, int depth = 4) {
+    std::pair<Move, int> value(Position position, int depth = 5) {
         lookup.clear();
         return minimax(position, Move("d6-4R"), depth, -INT32_MAX, INT32_MAX);
     }
 }
 
-int main(void) {
-    pen::PentagoBoard board = pen::PentagoBoard("w....w/.b..b./....../....../.b..b./w....w");
-//    pen::PentagoBoard board = pen::PentagoBoard();
+void selfPlay() {
+    pen::PentagoBoard board = pen::PentagoBoard();
     pen::Position starting = pen::Position(board);
     pen::PositionHistory history = pen::PositionHistory(starting);
 
@@ -159,6 +158,49 @@ int main(void) {
 
     std::cout << history.Last().DebugString() << std::endl;
     std::cout << pen::resultString.find(history.ComputeGameResult())->second << std::endl;
+}
+
+void vsHuman() {
+    pen::PentagoBoard board = pen::PentagoBoard();
+    pen::Position starting = pen::Position(board);
+    pen::PositionHistory history = pen::PositionHistory(starting);
+
+    bool humanMove = true;
+
+    while (history.ComputeGameResult() == pen::GameResult::UNDECIDED) {
+        pen::Move move;
+
+        if (humanMove) {
+            std::cout << history.Last().DebugString() << std::endl;
+
+            std::string moveString;
+
+            std::cout << "Enter a move: ";
+            std::cin >> moveString;
+
+            move = pen::Move(moveString);
+        } else {
+            std::pair<pen::Move, int> value = pen::value(history.Last());
+
+            move = std::get<pen::Move>(value);
+
+            std::cout << "CPU Played: " << move.as_string() << std::endl;
+        }
+
+        history.Append(move);
+        humanMove = !humanMove;
+    }
+
+    std::cout << history.Last().DebugString() << std::endl;
+    std::cout << pen::resultString.find(history.ComputeGameResult())->second << std::endl;
+}
+
+int main(void) {
+    selfPlay();
+    // vsHuman();
 
     return 0;
 }
+
+
+
