@@ -10,20 +10,36 @@
 
 namespace pen {
 
-std::unordered_map<std::uint64_t, int> lookup;
+const int MAX_POSITION_VALUE = 1000;
+
+std::unordered_map<std::uint64_t, int> *lookup = new std::unordered_map<std::uint64_t, int>;
 
 std::uint64_t kSidesMask = 0b010010101101010010010010101101010010;
 std::uint64_t kCornersMask = 0b101101000000101101101101000000101101;
 std::uint64_t kCentresMask = 0b000000010010000000000000010010000000;
+
+void smartClearLookup()
+{
+    std::unordered_map<std::uint64_t, int> *newLookup = new std::unordered_map<std::uint64_t, int>;
+
+    for (auto& it : *lookup) {
+        if (it.second == MAX_POSITION_VALUE || it.second == -MAX_POSITION_VALUE) {
+            (*newLookup)[it.first] = it.second;
+        }
+    }
+
+    delete lookup;
+    lookup = newLookup;
+}
 
 int heuristic_value(Position position)
 {
     std::uint64_t ours = position.GetBoard().our_pieces().as_int();
     std::uint64_t theirs = position.GetBoard().their_pieces().as_int();
 
-    int ourScore = count(ours & kSidesMask) + 3 * count(ours & kCornersMask) + 5 * count(ours & kCentresMask);
+    int ourScore = 2 * count(ours & kSidesMask) + 3 * count(ours & kCornersMask) + 5 * count(ours & kCentresMask);
 
-    int theirScore = count(theirs & kSidesMask) + 3 * count(theirs & kCornersMask) + 5 * count(theirs & kCentresMask);
+    int theirScore = 2 * count(theirs & kSidesMask) + 3 * count(theirs & kCornersMask) + 5 * count(theirs & kCentresMask);
 
     int score = ourScore - theirScore;
 
@@ -46,11 +62,11 @@ std::pair<Move, int> minimax(Position position, Move prevMove, int depth, int al
         int value;
 
         if (result == GameResult::WHITE_WON) {
-            value = 1000;
+            value = MAX_POSITION_VALUE;
         } else if (result == GameResult::DRAW) {
             value = 0;
         } else if (result == GameResult::BLACK_WON) {
-            value = -1000;
+            value = -MAX_POSITION_VALUE;
         } else {
             value = heuristic_value(position);
         }
@@ -69,11 +85,11 @@ std::pair<Move, int> minimax(Position position, Move prevMove, int depth, int al
             std::uint64_t hash = p.Hash();
             int eval;
 
-            if (lookup.find(hash) != lookup.end()) {
-                eval = lookup.find(hash)->second;
+            if (lookup->find(hash) != lookup->end()) {
+                eval = lookup->find(hash)->second;
             } else {
                 eval = std::get<int>(minimax(p, m, depth - 1, alpha, beta));
-                lookup[hash] = eval;
+                (*lookup)[hash] = eval;
             }
 
             if (eval < minEval) {
@@ -96,11 +112,11 @@ std::pair<Move, int> minimax(Position position, Move prevMove, int depth, int al
             std::uint64_t hash = p.Hash();
             int eval;
 
-            if (lookup.find(hash) != lookup.end()) {
-                eval = lookup.find(hash)->second;
+            if (lookup->find(hash) != lookup->end()) {
+                eval = lookup->find(hash)->second;
             } else {
                 eval = std::get<int>(minimax(p, m, depth - 1, alpha, beta));
-                lookup[hash] = eval;
+                (*lookup)[hash] = eval;
             }
 
             if (eval > maxEval) {
@@ -117,9 +133,9 @@ std::pair<Move, int> minimax(Position position, Move prevMove, int depth, int al
     }
 }
 
-std::pair<Move, int> value(Position position, int depth = 5)
+std::pair<Move, int> value(Position position, int depth = 6)
 {
-    lookup.clear();
+    smartClearLookup();
     return minimax(position, Move("d6-4R"), depth, -INT32_MAX, INT32_MAX);
 }
 }
