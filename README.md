@@ -3,7 +3,7 @@
 - Implement iterative deepening
 - Improve heuristic evaluation
 - Favour longest losing sequence when all moves technically lose
-- Miscelaneous speed optimizations
+- Don't discard mappings for terminal node lookups
 - Formalize Makefile/build structure
 
 ### MOVING FORWARD:
