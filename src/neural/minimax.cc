@@ -12,18 +12,6 @@ namespace pen {
 
 std::unordered_map<std::uint64_t, int> lookup;
 
-/*
- * For BoardSquare:
- *   ###
- *   ###
- *   ###
- *
- * The weights are as follows:
- *   313
- *   151
- *   313
- */
-
 std::uint64_t kSidesMask = 0b010010101101010010010010101101010010;
 std::uint64_t kCornersMask = 0b101101000000101101101101000000101101;
 std::uint64_t kCentresMask = 0b000000010010000000000000010010000000;
