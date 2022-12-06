@@ -1,8 +1,12 @@
-#include <iostream>
+#include <algorithm>
+#include <array>
+#include <random>
+#include <chrono>
 
 #include "board.h"
 #include "pentago/bitboard.h"
 #include "utils/exception.h"
+#include "utils/bitops.h"
 
 namespace pen {
 
@@ -106,10 +110,9 @@ void PentagoBoard::SetFromGrn(std::string grn)
     }
 }
 
-MoveList PentagoBoard::GenerateLegalMoves() const
+MoveList* PentagoBoard::GenerateLegalMoves() const
 {
-    MoveList result;
-    result.reserve(144);
+    MoveList* result = new MoveList;
 
     BitBoard mut_our_pieces = our_pieces();
 
@@ -141,8 +144,8 @@ MoveList PentagoBoard::GenerateLegalMoves() const
 
             if (!(ourSquare.IsSymmetrical() && theirSquare.IsSymmetrical())) {
                 placedNode = true;
-                result.emplace_back(nodeMove);
-                result.emplace_back(Move(kMoveNum[i + j + 1]));
+                result->emplace_back(nodeMove);
+                result->emplace_back(Move(kMoveNum[i + j + 1]));
             } else if (!passMoveRecorded) {
                 passMoveRecorded = true;
                 passMove = nodeMove;
@@ -156,14 +159,23 @@ MoveList PentagoBoard::GenerateLegalMoves() const
         }
 
         if (!placedNode) {
-            result.emplace_back(move);
+            result->emplace_back(move);
         } else if (passMoveRecorded) {
-            result.emplace_back(passMove);
+            result->emplace_back(passMove);
         }
 
         i += 8;
     }
+
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    shuffle(result->begin(), result->end(), std::default_random_engine(seed));
+
     return result;
+}
+
+std::uint64_t PentagoBoard::ReverseHash() const
+{
+    return HashCat(reverse(our_pieces().as_int()), reverse(their_pieces().as_int()));
 }
 
 void PentagoBoard::ApplyMove(Move move)

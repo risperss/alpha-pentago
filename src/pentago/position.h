@@ -34,6 +34,11 @@ public:
         return GetBoard().Hash();
     }
 
+    std::uint64_t ReverseHash() const
+    {
+        return GetBoard().ReverseHash();
+    }
+
     bool IsBlackToMove() const { return ply_count_ % 2 == 1; }
 
     int GetPlyCount() const { return ply_count_; }

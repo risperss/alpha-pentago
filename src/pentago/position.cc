@@ -1,7 +1,4 @@
 #include "position.h"
-#include "utils/hashcat.h"
-
-#include <cstdint>
 
 namespace pen {
 

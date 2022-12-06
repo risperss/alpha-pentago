@@ -1,8 +1,5 @@
-#include "stdlib.h"
 #include <algorithm>
-#include <chrono>
 #include <iostream>
-#include <random>
 #include <unordered_map>
 
 #include "pentago/position.h"
@@ -11,6 +8,7 @@
 namespace pen {
 
 const int MAX_POSITION_VALUE = 1000;
+const int DEPTH = 3;
 
 std::unordered_map<std::uint64_t, int> *lookup = new std::unordered_map<std::uint64_t, int>;
 
@@ -74,13 +72,13 @@ std::pair<Move, int> minimax(Position position, Move prevMove, int depth, int al
         return std::pair<Move, int> { prevMove, value };
     }
 
-    MoveList legalMoves = position.GetBoard().GenerateLegalMoves();
+    MoveList* legalMoves = position.GetBoard().GenerateLegalMoves();
 
     if (position.IsBlackToMove()) {
         int minEval = INT32_MAX;
         Move move;
 
-        for (Move m : legalMoves) {
+        for (Move& m : *legalMoves) {
             Position p = Position(position, m);
             std::uint64_t hash = p.Hash();
             int eval;
@@ -90,6 +88,7 @@ std::pair<Move, int> minimax(Position position, Move prevMove, int depth, int al
             } else {
                 eval = std::get<int>(minimax(p, m, depth - 1, alpha, beta));
                 (*lookup)[hash] = eval;
+                (*lookup)[p.ReverseHash()] = eval;
             }
 
             if (eval < minEval) {
@@ -102,12 +101,13 @@ std::pair<Move, int> minimax(Position position, Move prevMove, int depth, int al
                 break;
             }
         }
+        delete legalMoves;
         return std::pair<Move, int>(move, minEval);
     } else {
         int maxEval = -INT32_MAX;
         Move move;
 
-        for (Move m : legalMoves) {
+        for (Move& m : *legalMoves) {
             Position p = Position(position, m);
             std::uint64_t hash = p.Hash();
             int eval;
@@ -117,6 +117,7 @@ std::pair<Move, int> minimax(Position position, Move prevMove, int depth, int al
             } else {
                 eval = std::get<int>(minimax(p, m, depth - 1, alpha, beta));
                 (*lookup)[hash] = eval;
+                (*lookup)[p.ReverseHash()] = eval;
             }
 
             if (eval > maxEval) {
@@ -129,11 +130,12 @@ std::pair<Move, int> minimax(Position position, Move prevMove, int depth, int al
                 break;
             }
         }
+        delete legalMoves;
         return std::pair<Move, int>(move, maxEval);
     }
 }
 
-std::pair<Move, int> value(Position position, int depth = 6)
+std::pair<Move, int> value(Position position, int depth = DEPTH)
 {
     smartClearLookup();
     return minimax(position, Move("d6-4R"), depth, -INT32_MAX, INT32_MAX);
@@ -152,7 +154,6 @@ void selfPlay()
         std::cout << "Ply Count: " << history.Last().GetPlyCount() << std::endl;
         std::cout << "To Move: " << (history.Last().IsBlackToMove() ? "Black" : "White") << std::endl;
         std::cout << "Value: " << std::get<int>(value) << std::endl;
-        std::cout << "Heuristic Value: " << pen::heuristic_value(history.Last()) << std::endl;
         std::cout << "Move to be made: " << std::get<pen::Move>(value).as_string() << std::endl;
         std::cout << history.Last().DebugString() << std::endl;
         std::cout << "------------------------------" << std::endl;
@@ -162,6 +163,7 @@ void selfPlay()
 
     std::cout << history.Last().DebugString() << std::endl;
     std::cout << pen::resultString.find(history.ComputeGameResult())->second << std::endl;
+    std::cout << "Depth: " << pen::DEPTH << std::endl;
 }
 
 void vsHuman()

@@ -30,17 +30,19 @@ public:
         return HashCat(our_pieces().as_int(), their_pieces().as_int());
     }
 
+    std::uint64_t ReverseHash() const;
+
     void ApplyMove(Move move);
 
     bool IsLegalMove(Move move) const;
 
-    MoveList GenerateLegalMoves() const;
+    MoveList* GenerateLegalMoves() const;
 
     BoardResult ComputeBoardResult() const;
 
     bool full() const
     {
-        return (our_pieces() & their_pieces()) == 0xFFFFFFFFF;
+        return (our_pieces() | their_pieces()) == 0xFFFFFFFFF;
     }
 
     void SwapBitBoards()
