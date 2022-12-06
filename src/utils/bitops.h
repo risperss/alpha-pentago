@@ -42,12 +42,7 @@ static const int count(const std::uint64_t board_)
 
 static const std::uint64_t reverse(const std::uint64_t board)
 {
-    std::uint64_t result = ((BitReverseTable256[board & 0xFF] << 56) |
-            (BitReverseTable256[(board >> 8) & 0xFF] << 48) |
-            (BitReverseTable256[(board >> 16) & 0xFF] << 40) |
-            (BitReverseTable256[(board >> 24) & 0xFF] << 32) |
-            (BitReverseTable256[(board >> 32) & 0xFF] << 24) |
-            (BitReverseTable256[(board >> 40) & 0xFF] << 16)) >> 28;
+    std::uint64_t result = ((BitReverseTable256[board & 0xFF] << 56) | (BitReverseTable256[(board >> 8) & 0xFF] << 48) | (BitReverseTable256[(board >> 16) & 0xFF] << 40) | (BitReverseTable256[(board >> 24) & 0xFF] << 32) | (BitReverseTable256[(board >> 32) & 0xFF] << 24) | (BitReverseTable256[(board >> 40) & 0xFF] << 16)) >> 28;
 
     return result;
 }

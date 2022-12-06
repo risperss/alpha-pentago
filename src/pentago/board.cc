@@ -1,12 +1,12 @@
 #include <algorithm>
 #include <array>
-#include <random>
 #include <chrono>
+#include <random>
 
 #include "board.h"
 #include "pentago/bitboard.h"
-#include "utils/exception.h"
 #include "utils/bitops.h"
+#include "utils/exception.h"
 
 namespace pen {
 
