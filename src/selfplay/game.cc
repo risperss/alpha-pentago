@@ -6,7 +6,8 @@
 #include "pentago/position.h"
 
 namespace pen {
-void smartClearLookup(std::unordered_map<std::uint64_t, int>* lookup) {
+std::unordered_map<std::uint64_t, int>* smartClearedLookup(
+    std::unordered_map<std::uint64_t, int>* lookup) {
   std::unordered_map<std::uint64_t, int>* newLookup =
       new std::unordered_map<std::uint64_t, int>;
 
@@ -17,7 +18,7 @@ void smartClearLookup(std::unordered_map<std::uint64_t, int>* lookup) {
   }
 
   delete lookup;
-  lookup = newLookup;
+  return newLookup;
 }
 
 void selfPlay() {
@@ -41,7 +42,7 @@ void selfPlay() {
     std::cout << history.Last().DebugString() << std::endl;
     std::cout << "------------------------------" << std::endl;
 
-    smartClearLookup(lookup);
+    lookup = smartClearedLookup(lookup);
     history.Append(std::get<pen::Move>(value));
   }
   delete lookup;
@@ -82,7 +83,7 @@ void vsHuman() {
       std::cout << "CPU Played: " << move.as_string() << std::endl;
     }
 
-    smartClearLookup(lookup);
+    lookup = smartClearedLookup(lookup);
     history.Append(move);
     humanMove = !humanMove;
   }
