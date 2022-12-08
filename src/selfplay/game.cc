@@ -10,17 +10,15 @@ void smartClearLookup(std::unordered_map<std::uint64_t, int>* lookup) {
   std::unordered_map<std::uint64_t, int>* newLookup =
       new std::unordered_map<std::uint64_t, int>;
 
-  for (auto& it : *lookup) {
-    if (it.second == MAX_POSITION_VALUE || it.second == -MAX_POSITION_VALUE) {
-      (*newLookup)[it.first] = it.second;
+  for (auto& [hash, eval] : *lookup) {
+    if (eval == MAX_POSITION_VALUE || eval == -MAX_POSITION_VALUE) {
+      (*newLookup)[hash] = eval;
     }
   }
 
   delete lookup;
   lookup = newLookup;
 }
-
-// TODO: a lot of this can be abstracted away
 
 void selfPlay() {
   std::unordered_map<std::uint64_t, int>* lookup =
