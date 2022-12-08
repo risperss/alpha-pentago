@@ -1,6 +1,9 @@
 # Mac OS Rubbish
 .DS_Store
 
+# VSCode Stuff
+.vscode
+
 # Prerequisites
 *.d
 
