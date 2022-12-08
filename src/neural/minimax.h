@@ -18,5 +18,5 @@ std::pair<Move, int> minimax(Position position, Move prevMove, int depth,
                              std::unordered_map<std::uint64_t, int>* lookup);
 
 std::pair<Move, int> minimax(Position position,
-                           std::unordered_map<std::uint64_t, int>* lookup);
+                             std::unordered_map<std::uint64_t, int>* lookup);
 }  // namespace pen
