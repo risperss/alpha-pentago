@@ -30,20 +30,20 @@ void selfPlay() {
   pen::PositionHistory history = pen::PositionHistory(starting);
 
   while (history.ComputeGameResult() == pen::GameResult::UNDECIDED) {
-    std::pair<pen::Move, int> value = pen::value(history.Last(), lookup);
+    std::pair<pen::Move, int> result = pen::minimax(history.Last(), lookup);
 
     std::cout << "Ply Count: " << history.Last().GetPlyCount() << std::endl;
     std::cout << "To Move: "
               << (history.Last().IsBlackToMove() ? "Black" : "White")
               << std::endl;
-    std::cout << "Value: " << std::get<int>(value) << std::endl;
-    std::cout << "Move to be made: " << std::get<pen::Move>(value).as_string()
+    std::cout << "Value: " << std::get<int>(result) << std::endl;
+    std::cout << "Move to be made: " << std::get<pen::Move>(result).as_string()
               << std::endl;
     std::cout << history.Last().DebugString() << std::endl;
     std::cout << "------------------------------" << std::endl;
 
     lookup = smartClearedLookup(lookup);
-    history.Append(std::get<pen::Move>(value));
+    history.Append(std::get<pen::Move>(result));
   }
   delete lookup;
 
@@ -76,9 +76,9 @@ void vsHuman() {
 
       move = pen::Move(moveString);
     } else {
-      std::pair<pen::Move, int> value = pen::value(history.Last(), lookup);
+      std::pair<pen::Move, int> result = pen::minimax(history.Last(), lookup);
 
-      move = std::get<pen::Move>(value);
+      move = std::get<pen::Move>(result);
 
       std::cout << "CPU Played: " << move.as_string() << std::endl;
     }
