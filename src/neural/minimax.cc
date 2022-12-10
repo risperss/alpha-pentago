@@ -9,7 +9,7 @@
 
 namespace pen {
 ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
-                    int beta, PositionLookup* lookup) {
+                    int beta, bool maximizingPlayer, PositionLookup* lookup) {
   GameResult result = GameResult::UNDECIDED;
   int plyCount = position.GetPlyCount();
 
@@ -35,91 +35,93 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
 
   MoveList legalMoves = position.GetBoard().GenerateLegalMoves();
 
-  if (position.IsBlackToMove()) {
-    ReturnValue returnValue;
-    returnValue.value = INT32_MAX;  // minValue
+  if (maximizingPlayer) {
+    ReturnValue currentBest;
+    currentBest.value = -INT32_MAX;  // maxValue
 
     for (Move& m : legalMoves) {
-      ReturnValue result;
+      ReturnValue candidate;
 
       Position p = Position(position, m);
       std::uint64_t hash = p.Hash();
 
       if (lookup->find(hash) != lookup->end()) {
-        result = lookup->find(hash)->second;
+        candidate = lookup->find(hash)->second;
       } else {
-        result = minimax(p, m, depth - 1, alpha, beta, lookup);
-        (*lookup)[hash] = result;
-        (*lookup)[p.ReverseHash()] = result;
+        candidate =
+            minimax(p, m, depth - 1, alpha, beta, !maximizingPlayer, lookup);
+        (*lookup)[hash] = candidate;
+        (*lookup)[p.ReverseHash()] = candidate;
       }
 
-      if (result.value < returnValue.value) {
-        returnValue.value = result.value;
-        returnValue.move = m;
-        returnValue.plyCount = result.plyCount;
-      } else if (result.value == returnValue.value) {
+      if (candidate.value > currentBest.value) {
+        currentBest.value = candidate.value;
+        currentBest.move = m;
+        currentBest.plyCount = candidate.plyCount;
+      } else if (candidate.value == currentBest.value) {
         // Losing, take longest path
-        if (result.value == MAX_POSITION_VALUE &&
-            result.plyCount > returnValue.plyCount) {
-          returnValue = result;
+        if (candidate.value == -MAX_POSITION_VALUE &&
+            candidate.plyCount > currentBest.plyCount) {
+          currentBest = candidate;
           // Winning, take shortest path
-        } else if (result.value == -MAX_POSITION_VALUE &&
-                   result.plyCount < returnValue.plyCount) {
-          returnValue = result;
+        } else if (candidate.value == MAX_POSITION_VALUE &&
+                   candidate.plyCount < currentBest.plyCount) {
+          currentBest = candidate;
         }
       }
-      beta = std::min(result.value, beta);
 
-      if (beta <= alpha) {
+      if (currentBest.value >= beta) {
         break;
       }
+      alpha = std::max(currentBest.value, alpha);
     }
-    return returnValue;
+    return currentBest;
   } else {
-    ReturnValue returnValue;
-    returnValue.value = -INT32_MAX;  // maxValue
+    ReturnValue currentBest;
+    currentBest.value = INT32_MAX;  // minValue
 
     for (Move& m : legalMoves) {
-      ReturnValue result;
+      ReturnValue candidate;
 
       Position p = Position(position, m);
       std::uint64_t hash = p.Hash();
 
       if (lookup->find(hash) != lookup->end()) {
-        result = lookup->find(hash)->second;
+        candidate = lookup->find(hash)->second;
       } else {
-        result = minimax(p, m, depth - 1, alpha, beta, lookup);
-        (*lookup)[hash] = result;
-        (*lookup)[p.ReverseHash()] = result;
+        candidate =
+            minimax(p, m, depth - 1, alpha, beta, !maximizingPlayer, lookup);
+        (*lookup)[hash] = candidate;
+        (*lookup)[p.ReverseHash()] = candidate;
       }
 
-      if (result.value > returnValue.value) {
-        returnValue.value = result.value;
-        returnValue.move = m;
-        returnValue.plyCount = result.plyCount;
-      } else if (result.value == returnValue.value) {
+      if (candidate.value < currentBest.value) {
+        currentBest.value = candidate.value;
+        currentBest.move = m;
+        currentBest.plyCount = candidate.plyCount;
+      } else if (candidate.value == currentBest.value) {
         // Losing, take longest path
-        if (result.value == -MAX_POSITION_VALUE &&
-            result.plyCount > returnValue.plyCount) {
-          returnValue = result;
+        if (candidate.value == MAX_POSITION_VALUE &&
+            candidate.plyCount > currentBest.plyCount) {
+          currentBest = candidate;
           // Winning, take shortest path
-        } else if (result.value == MAX_POSITION_VALUE &&
-                   result.plyCount < returnValue.plyCount) {
-          returnValue = result;
+        } else if (candidate.value == -MAX_POSITION_VALUE &&
+                   candidate.plyCount < currentBest.plyCount) {
+          currentBest = candidate;
         }
       }
-      alpha = std::max(result.value, alpha);
 
-      if (beta <= alpha) {
+      if (currentBest.value <= alpha) {
         break;
       }
+      beta = std::min(currentBest.value, beta);
     }
-    return returnValue;
+    return currentBest;
   }
 }
 
 ReturnValue minimax(Position position, PositionLookup* lookup) {
   return minimax(position, Move(std::uint16_t(0)), DEPTH, -INT32_MAX, INT32_MAX,
-                 lookup);
+                 !position.IsBlackToMove(), lookup);
 }
 }  // namespace pen

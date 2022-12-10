@@ -7,7 +7,7 @@
 
 namespace pen {
 static const int MAX_POSITION_VALUE = 1000;
-static const int DEPTH = 4;
+static const int DEPTH = 3;
 
 struct ReturnValue {
   int value;
@@ -18,7 +18,7 @@ struct ReturnValue {
 using PositionLookup = std::unordered_map<std::uint64_t, ReturnValue>;
 
 ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
-                    int beta, PositionLookup* lookup);
+                    int beta, bool maximizingPlayer, PositionLookup* lookup);
 
 ReturnValue minimax(Position position, PositionLookup* lookup);
 }  // namespace pen
