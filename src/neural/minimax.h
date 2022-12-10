@@ -7,7 +7,7 @@
 
 namespace pen {
 static const int MAX_POSITION_VALUE = 1000;
-static const int DEPTH = 3;
+static const int DEPTH = 4;
 
 struct ReturnValue {
   int value;

@@ -36,14 +36,14 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
   MoveList legalMoves = position.GetBoard().GenerateLegalMoves();
 
   if (position.IsBlackToMove()) {
-    int minEval = INT32_MAX;
-    Move move;
     ReturnValue returnValue;
+    returnValue.value = INT32_MAX;  // minValue
 
     for (Move& m : legalMoves) {
+      ReturnValue result;
+
       Position p = Position(position, m);
       std::uint64_t hash = p.Hash();
-      ReturnValue result;
 
       if (lookup->find(hash) != lookup->end()) {
         result = lookup->find(hash)->second;
@@ -53,20 +53,22 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
         (*lookup)[p.ReverseHash()] = result;
       }
 
-      if (result.value < minEval) {
+      if (result.value < returnValue.value) {
         returnValue.value = result.value;
         returnValue.move = m;
-        minEval = result.value;
-      } else if (returnValue.value == minEval) {
-        if (minEval == MAX_POSITION_VALUE &&
-            result.plyCount < returnValue.plyCount) {
-          result = returnValue;
-        } else if (minEval == -MAX_POSITION_VALUE &&
-                   result.plyCount > returnValue.plyCount) {
-          result = returnValue;
+        returnValue.plyCount = result.plyCount;
+      } else if (result.value == returnValue.value) {
+        // Losing, take longest path
+        if (result.value == MAX_POSITION_VALUE &&
+            result.plyCount > returnValue.plyCount) {
+          returnValue = result;
+          // Winning, take shortest path
+        } else if (result.value == -MAX_POSITION_VALUE &&
+                   result.plyCount < returnValue.plyCount) {
+          returnValue = result;
         }
       }
-      beta = std::min(returnValue.value, beta);
+      beta = std::min(result.value, beta);
 
       if (beta <= alpha) {
         break;
@@ -74,13 +76,14 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
     }
     return returnValue;
   } else {
-    int maxEval = -INT32_MAX;
     ReturnValue returnValue;
+    returnValue.value = -INT32_MAX;  // maxValue
 
     for (Move& m : legalMoves) {
+      ReturnValue result;
+
       Position p = Position(position, m);
       std::uint64_t hash = p.Hash();
-      ReturnValue result;
 
       if (lookup->find(hash) != lookup->end()) {
         result = lookup->find(hash)->second;
@@ -90,17 +93,19 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
         (*lookup)[p.ReverseHash()] = result;
       }
 
-      if (result.value > maxEval) {
+      if (result.value > returnValue.value) {
         returnValue.value = result.value;
         returnValue.move = m;
-        maxEval = result.value;
-      } else if (returnValue.value == maxEval) {
-        if (maxEval == -MAX_POSITION_VALUE &&
+        returnValue.plyCount = result.plyCount;
+      } else if (result.value == returnValue.value) {
+        // Losing, take longest path
+        if (result.value == -MAX_POSITION_VALUE &&
             result.plyCount > returnValue.plyCount) {
-          result = returnValue;
-        } else if (maxEval == MAX_POSITION_VALUE &&
+          returnValue = result;
+          // Winning, take shortest path
+        } else if (result.value == MAX_POSITION_VALUE &&
                    result.plyCount < returnValue.plyCount) {
-          result = returnValue;
+          returnValue = result;
         }
       }
       alpha = std::max(result.value, alpha);
