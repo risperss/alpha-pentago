@@ -8,12 +8,13 @@
 #include "utils/bitops.h"
 
 namespace pen {
-std::pair<Move, int> minimax(Position position, Move prevMove, int depth,
-                             int alpha, int beta,
-                             std::unordered_map<std::uint64_t, int>* lookup) {
+ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
+                    int beta,
+                    std::unordered_map<std::uint64_t, ReturnValue>* lookup) {
   GameResult result = GameResult::UNDECIDED;
+  int plyCount = position.GetPlyCount();
 
-  if (position.GetPlyCount() >= 9) {
+  if (plyCount >= 9) {
     result = position.ComputeGameResult();
   }
 
@@ -30,7 +31,7 @@ std::pair<Move, int> minimax(Position position, Move prevMove, int depth,
       value = heuristic_value(position);
     }
 
-    return std::pair<Move, int>{prevMove, value};
+    return ReturnValue{value, prevMove, plyCount};
   }
 
   MoveList* legalMoves = position.GetBoard().GenerateLegalMoves();
@@ -38,66 +39,85 @@ std::pair<Move, int> minimax(Position position, Move prevMove, int depth,
   if (position.IsBlackToMove()) {
     int minEval = INT32_MAX;
     Move move;
+    ReturnValue returnValue;
 
     for (Move& m : *legalMoves) {
       Position p = Position(position, m);
       std::uint64_t hash = p.Hash();
-      int eval;
+      ReturnValue result;
 
       if (lookup->find(hash) != lookup->end()) {
-        eval = lookup->find(hash)->second;
+        result = lookup->find(hash)->second;
       } else {
-        eval = std::get<int>(minimax(p, m, depth - 1, alpha, beta, lookup));
-        (*lookup)[hash] = eval;
-        (*lookup)[p.ReverseHash()] = eval;
+        result = minimax(p, m, depth - 1, alpha, beta, lookup);
+        (*lookup)[hash] = result;
+        (*lookup)[p.ReverseHash()] = result;
       }
 
-      if (eval < minEval) {
-        minEval = eval;
-        move = m;
+      if (result.value < minEval) {
+        returnValue.value = result.value;
+        returnValue.move = m;
+        minEval = result.value;
+      } else if (returnValue.value == minEval) {
+        if (minEval == MAX_POSITION_VALUE &&
+            result.plyCount < returnValue.plyCount) {
+          result = returnValue;
+        } else if (minEval == -MAX_POSITION_VALUE &&
+                   result.plyCount > returnValue.plyCount) {
+          result = returnValue;
+        }
       }
-      beta = std::min(eval, beta);
+      beta = std::min(returnValue.value, beta);
 
       if (beta <= alpha) {
         break;
       }
     }
     delete legalMoves;
-    return std::pair<Move, int>(move, minEval);
+    return returnValue;
   } else {
     int maxEval = -INT32_MAX;
-    Move move;
+    ReturnValue returnValue;
 
     for (Move& m : *legalMoves) {
       Position p = Position(position, m);
       std::uint64_t hash = p.Hash();
-      int eval;
+      ReturnValue result;
 
       if (lookup->find(hash) != lookup->end()) {
-        eval = lookup->find(hash)->second;
+        result = lookup->find(hash)->second;
       } else {
-        eval = std::get<int>(minimax(p, m, depth - 1, alpha, beta, lookup));
-        (*lookup)[hash] = eval;
-        (*lookup)[p.ReverseHash()] = eval;
+        result = minimax(p, m, depth - 1, alpha, beta, lookup);
+        (*lookup)[hash] = result;
+        (*lookup)[p.ReverseHash()] = result;
       }
 
-      if (eval > maxEval) {
-        maxEval = eval;
-        move = m;
+      if (result.value > maxEval) {
+        returnValue.value = result.value;
+        returnValue.move = m;
+        maxEval = result.value;
+      } else if (returnValue.value == maxEval) {
+        if (maxEval == -MAX_POSITION_VALUE &&
+            result.plyCount > returnValue.plyCount) {
+          result = returnValue;
+        } else if (maxEval == MAX_POSITION_VALUE &&
+                   result.plyCount < returnValue.plyCount) {
+          result = returnValue;
+        }
       }
-      alpha = std::max(eval, alpha);
+      alpha = std::max(result.value, alpha);
 
       if (beta <= alpha) {
         break;
       }
     }
     delete legalMoves;
-    return std::pair<Move, int>(move, maxEval);
+    return returnValue;
   }
 }
 
-std::pair<Move, int> minimax(Position position,
-                             std::unordered_map<std::uint64_t, int>* lookup) {
+ReturnValue minimax(Position position,
+                    std::unordered_map<std::uint64_t, ReturnValue>* lookup) {
   return minimax(position, Move(std::uint16_t(0)), DEPTH, -INT32_MAX, INT32_MAX,
                  lookup);
 }
