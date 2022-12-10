@@ -4,8 +4,7 @@
 #include "neural/minimax.h"
 
 namespace pen {
-using PositionLookup = std::unordered_map<std::uint64_t, ReturnValue>;
-
+PositionLookup* clearedLookup(PositionLookup* lookup, Position position);
 PositionLookup* smartClearedLookup(PositionLookup* lookup);
 
 void selfPlay();

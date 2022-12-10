@@ -6,6 +6,15 @@
 #include "pentago/position.h"
 
 namespace pen {
+PositionLookup* clearedLookup(PositionLookup* lookup, Position position) {
+  if (position.GetPlyCount() + DEPTH >= 9) {
+    return smartClearedLookup(lookup);
+  } else {
+    delete lookup;
+    return new PositionLookup;
+  }
+}
+
 PositionLookup* smartClearedLookup(PositionLookup* lookup) {
   PositionLookup* newLookup = new PositionLookup;
 
@@ -38,7 +47,7 @@ void selfPlay() {
     std::cout << history.Last().DebugString() << "\n";
     std::cout << "------------------------------" << std::endl;
 
-    lookup = smartClearedLookup(lookup);
+    lookup = clearedLookup(lookup, history.Last());
     history.Append(result.move);
   }
   delete lookup;
