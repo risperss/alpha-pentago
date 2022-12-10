@@ -9,8 +9,7 @@
 
 namespace pen {
 ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
-                    int beta,
-                    std::unordered_map<std::uint64_t, ReturnValue>* lookup) {
+                    int beta, PositionLookup* lookup) {
   GameResult result = GameResult::UNDECIDED;
   int plyCount = position.GetPlyCount();
 
@@ -34,14 +33,14 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
     return ReturnValue{value, prevMove, plyCount};
   }
 
-  MoveList* legalMoves = position.GetBoard().GenerateLegalMoves();
+  MoveList legalMoves = position.GetBoard().GenerateLegalMoves();
 
   if (position.IsBlackToMove()) {
     int minEval = INT32_MAX;
     Move move;
     ReturnValue returnValue;
 
-    for (Move& m : *legalMoves) {
+    for (Move& m : legalMoves) {
       Position p = Position(position, m);
       std::uint64_t hash = p.Hash();
       ReturnValue result;
@@ -73,13 +72,12 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
         break;
       }
     }
-    delete legalMoves;
     return returnValue;
   } else {
     int maxEval = -INT32_MAX;
     ReturnValue returnValue;
 
-    for (Move& m : *legalMoves) {
+    for (Move& m : legalMoves) {
       Position p = Position(position, m);
       std::uint64_t hash = p.Hash();
       ReturnValue result;
@@ -111,13 +109,11 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
         break;
       }
     }
-    delete legalMoves;
     return returnValue;
   }
 }
 
-ReturnValue minimax(Position position,
-                    std::unordered_map<std::uint64_t, ReturnValue>* lookup) {
+ReturnValue minimax(Position position, PositionLookup* lookup) {
   return minimax(position, Move(std::uint16_t(0)), DEPTH, -INT32_MAX, INT32_MAX,
                  lookup);
 }

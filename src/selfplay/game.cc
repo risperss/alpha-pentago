@@ -6,10 +6,8 @@
 #include "pentago/position.h"
 
 namespace pen {
-std::unordered_map<std::uint64_t, ReturnValue>* smartClearedLookup(
-    std::unordered_map<std::uint64_t, ReturnValue>* lookup) {
-  std::unordered_map<std::uint64_t, ReturnValue>* newLookup =
-      new std::unordered_map<std::uint64_t, ReturnValue>;
+PositionLookup* smartClearedLookup(PositionLookup* lookup) {
+  PositionLookup* newLookup = new PositionLookup;
 
   for (auto& [hash, returnValue] : *lookup) {
     if (returnValue.value == MAX_POSITION_VALUE ||
@@ -23,8 +21,7 @@ std::unordered_map<std::uint64_t, ReturnValue>* smartClearedLookup(
 }
 
 void selfPlay() {
-  std::unordered_map<std::uint64_t, ReturnValue>* lookup =
-      new std::unordered_map<std::uint64_t, ReturnValue>;
+  PositionLookup* lookup = new PositionLookup;
 
   pen::PentagoBoard board = pen::PentagoBoard();
   pen::Position starting = pen::Position(board);

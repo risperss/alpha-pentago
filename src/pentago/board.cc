@@ -106,8 +106,8 @@ void PentagoBoard::SetFromGrn(std::string grn) {
   }
 }
 
-MoveList* PentagoBoard::GenerateLegalMoves() const {
-  MoveList* result = new MoveList;
+MoveList PentagoBoard::GenerateLegalMoves() const {
+  MoveList result;
 
   BitBoard mut_our_pieces = our_pieces();
 
@@ -141,8 +141,8 @@ MoveList* PentagoBoard::GenerateLegalMoves() const {
 
       if (!(ourSquare.IsSymmetrical() && theirSquare.IsSymmetrical())) {
         placedNode = true;
-        result->emplace_back(nodeMove);
-        result->emplace_back(Move(kMoveNum[i + j + 1]));
+        result.emplace_back(nodeMove);
+        result.emplace_back(Move(kMoveNum[i + j + 1]));
       } else if (!passMoveRecorded) {
         passMoveRecorded = true;
         passMove = nodeMove;
@@ -156,16 +156,16 @@ MoveList* PentagoBoard::GenerateLegalMoves() const {
     }
 
     if (!placedNode) {
-      result->emplace_back(move);
+      result.emplace_back(move);
     } else if (passMoveRecorded) {
-      result->emplace_back(passMove);
+      result.emplace_back(passMove);
     }
 
     i += 8;
   }
 
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-  shuffle(result->begin(), result->end(), std::default_random_engine(seed));
+  shuffle(result.begin(), result.end(), std::default_random_engine(seed));
 
   return result;
 }
