@@ -10,7 +10,7 @@
 - Implement iterative deepening
 - Improve heuristic evaluation
 - Favour longest losing sequence when all moves technically lose
-- Don't discard mappings for terminal node lookups
+- ~~Don't discard mappings for terminal node lookups~~
 - Formalize Makefile/build structure
 
 ### MOVING FORWARD:
