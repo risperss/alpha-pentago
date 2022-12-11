@@ -55,6 +55,7 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
       }
 
       if (candidate.value > currentBest.value) {
+        // TODO: DRY this
         currentBest.value = candidate.value;
         currentBest.move = m;
         currentBest.plyCount = candidate.plyCount;
@@ -62,11 +63,15 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
         // Losing, take longest path
         if (candidate.value == -MAX_POSITION_VALUE &&
             candidate.plyCount > currentBest.plyCount) {
-          currentBest = candidate;
+          currentBest.value = candidate.value;
+          currentBest.move = m;
+          currentBest.plyCount = candidate.plyCount;
           // Winning, take shortest path
         } else if (candidate.value == MAX_POSITION_VALUE &&
                    candidate.plyCount < currentBest.plyCount) {
-          currentBest = candidate;
+          currentBest.value = candidate.value;
+          currentBest.move = m;
+          currentBest.plyCount = candidate.plyCount;
         }
       }
 
@@ -96,6 +101,7 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
       }
 
       if (candidate.value < currentBest.value) {
+        // TODO: DRY this
         currentBest.value = candidate.value;
         currentBest.move = m;
         currentBest.plyCount = candidate.plyCount;
@@ -103,11 +109,15 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
         // Losing, take longest path
         if (candidate.value == MAX_POSITION_VALUE &&
             candidate.plyCount > currentBest.plyCount) {
-          currentBest = candidate;
+          currentBest.value = candidate.value;
+          currentBest.move = m;
+          currentBest.plyCount = candidate.plyCount;
           // Winning, take shortest path
         } else if (candidate.value == -MAX_POSITION_VALUE &&
                    candidate.plyCount < currentBest.plyCount) {
-          currentBest = candidate;
+          currentBest.value = candidate.value;
+          currentBest.move = m;
+          currentBest.plyCount = candidate.plyCount;
         }
       }
 

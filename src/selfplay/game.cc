@@ -45,6 +45,8 @@ void selfPlay() {
     std::cout << "Value: " << result.value << "\n";
     std::cout << "Move to be made: " << result.move.as_string() << "\n";
     std::cout << history.Last().DebugString() << "\n";
+    std::cout << "Lookup size: "
+              << ((lookup->size() * sizeof(ReturnValue)) / 1000000) << " Mb\n";
     std::cout << "------------------------------" << std::endl;
 
     lookup = clearedLookup(lookup, history.Last());
