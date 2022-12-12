@@ -11,9 +11,10 @@
 namespace pen {
 ReturnValue minimax(Position position, Move prevMove, int depth,
                     std::int8_t alpha, std::int8_t beta, bool maximizingPlayer,
-                    PositionLookup* lookup) {
+                    PositionLookup* lookup, int* nodesVisited) {
   GameResult result = GameResult::UNDECIDED;
   std::uint8_t plyCount = std::uint8_t(position.GetPlyCount());
+  (*nodesVisited)++;
 
   if (plyCount >= 9) {
     result = position.ComputeGameResult();
@@ -65,8 +66,9 @@ ReturnValue minimax(Position position, Move prevMove, int depth,
       }
 
       if (!foundMatchingHash) {
-        ReturnValue result = minimax(candidatePosition, m, depth - 1, alpha,
-                                     beta, !maximizingPlayer, lookup);
+        ReturnValue result =
+            minimax(candidatePosition, m, depth - 1, alpha, beta,
+                    !maximizingPlayer, lookup, nodesVisited);
         candidate.value = result.value;
         candidate.plyCount = result.plyCount;
 
@@ -121,8 +123,9 @@ ReturnValue minimax(Position position, Move prevMove, int depth,
       }
 
       if (!foundMatchingHash) {
-        ReturnValue result = minimax(candidatePosition, m, depth - 1, alpha,
-                                     beta, !maximizingPlayer, lookup);
+        ReturnValue result =
+            minimax(candidatePosition, m, depth - 1, alpha, beta,
+                    !maximizingPlayer, lookup, nodesVisited);
         candidate.value = result.value;
         candidate.plyCount = result.plyCount;
 
@@ -154,8 +157,9 @@ ReturnValue minimax(Position position, Move prevMove, int depth,
   }
 }
 
-ReturnValue minimax(Position position, PositionLookup* lookup) {
+ReturnValue minimax(Position position, PositionLookup* lookup,
+                    int* nodesVisited) {
   return minimax(position, Move(std::uint16_t(0)), DEPTH, NEG_INFINITY,
-                 POS_INFINITY, !position.IsBlackToMove(), lookup);
+                 POS_INFINITY, !position.IsBlackToMove(), lookup, nodesVisited);
 }
 }  // namespace pen

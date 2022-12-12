@@ -1,5 +1,6 @@
 #include "game.h"
 
+#include <chrono>
 #include <iostream>
 #include <string>
 
@@ -31,31 +32,46 @@ PositionLookup* smartClearedLookup(PositionLookup* lookup) {
 }
 
 void selfPlay() {
+  using std::chrono::duration;
+  using std::chrono::duration_cast;
+  using std::chrono::high_resolution_clock;
+  using std::chrono::milliseconds;
+
   PositionLookup* lookup = new PositionLookup;
 
   pen::PentagoBoard board = pen::PentagoBoard();
   pen::Position starting = pen::Position(board);
   pen::PositionHistory history = pen::PositionHistory(starting);
 
-  while (history.ComputeGameResult() == pen::GameResult::UNDECIDED) {
-    ReturnValue result = pen::minimax(history.Last(), lookup);
+  unsigned long maxLookupSize = 0;
 
-    std::cout << "Ply Count: " << history.Last().GetPlyCount() << "\n";
-    std::cout << "To Move: "
+  while (history.ComputeGameResult() == pen::GameResult::UNDECIDED) {
+    int nodesVisited = 0;
+
+    auto t1 = high_resolution_clock::now();
+    ReturnValue result = pen::minimax(history.Last(), lookup, &nodesVisited);
+    auto t2 = high_resolution_clock::now();
+    auto ms_int = duration_cast<milliseconds>(t2 - t1);
+
+    unsigned long lookupSize = lookup->size() * sizeof(LookupItem);
+
+    std::cout << "Ply Count:\t" << history.Last().GetPlyCount() << "\n";
+    std::cout << "To Move:\t"
               << (history.Last().IsBlackToMove() ? "Black" : "White") << "\n";
-    std::cout << "Value:\t\t\t\t\t" << static_cast<int>(result.value) << "\n";
-    std::cout << "Move to be made: " << result.move.as_string() << "\n";
+    std::cout << "Value:\t\t" << static_cast<int>(result.value) << "\n";
+    std::cout << "Move:\t\t" << result.move.as_string() << "\n";
+    std::cout << "Nodes visited:\t" << (nodesVisited / 1000) << "k\n";
+    std::cout << "Search time:\t" << ms_int.count() << " ms\n";
+    std::cout << "Lookup size:\t" << (lookupSize >> 10) << " Kb\n";
     std::cout << history.Last().DebugString() << "\n";
-    std::cout << "Hash: " << history.Last().Hash() << "\n";
-    std::cout << "Reverse Hash: " << history.Last().ReverseHash() << "\n";
-    std::cout << "Lookup length: " << lookup->size() << " positions\n";
-    std::cout << "Lookup size: "
-              << ((lookup->size() * sizeof(LookupItem)) / 1000000) << "Mb\n";
+
+    maxLookupSize = std::max(maxLookupSize, lookupSize);
+
     if (result.value == MAX_POSITION_VALUE ||
         result.value == MIN_POSITION_VALUE) {
       std::string color =
           result.value == MAX_POSITION_VALUE ? "White" : "Black";
-      std::cout << color << " to win on ply "
+      std::cout << "Forced:\t" << color << " to win on ply "
                 << static_cast<int>(result.plyCount) << "\n";
     }
     std::cout << "------------------------------" << std::endl;
@@ -65,11 +81,13 @@ void selfPlay() {
   }
   delete lookup;
 
-  std::cout << "Ply Count: " << history.Last().GetPlyCount() << "\n";
-  std::cout << history.Last().DebugString() << "\n";
-  std::cout << pen::resultString.find(history.ComputeGameResult())->second
+  std::cout << "Ply Count:\t" << history.Last().GetPlyCount() << "\n";
+  std::cout << "Result:\t\t"
+            << pen::resultString.find(history.ComputeGameResult())->second
             << "\n";
-  std::cout << "Depth: " << pen::DEPTH << std::endl;
+  std::cout << "Max RAM:\t" << (maxLookupSize >> 20) << "Mb\n";
+  std::cout << "Search Depth:\t" << pen::DEPTH << std::endl;
+  std::cout << history.Last().DebugString() << "\n";
 }
 
 // void vsHuman() {
