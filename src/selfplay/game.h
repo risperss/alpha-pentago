@@ -8,5 +8,4 @@ PositionLookup* clearedLookup(PositionLookup* lookup, Position position);
 PositionLookup* smartClearedLookup(PositionLookup* lookup);
 
 void selfPlay();
-void vsHuman();
 }  // namespace pen

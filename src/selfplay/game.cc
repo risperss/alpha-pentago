@@ -89,46 +89,4 @@ void selfPlay() {
   std::cout << "Search Depth:\t" << pen::DEPTH << std::endl;
   std::cout << history.Last().DebugString() << "\n";
 }
-
-// void vsHuman() {
-//   std::unordered_map<std::uint64_t, int>* lookup =
-//       new std::unordered_map<std::uint64_t, int>;
-
-//   pen::PentagoBoard board = pen::PentagoBoard();
-//   pen::Position starting = pen::Position(board);
-//   pen::PositionHistory history = pen::PositionHistory(starting);
-
-//   bool humanMove = true;
-
-//   while (history.ComputeGameResult() == pen::GameResult::UNDECIDED) {
-//     pen::Move move;
-
-//     if (humanMove) {
-//       std::cout << history.Last().DebugString() << std::endl;
-
-//       std::string moveString;
-
-//       std::cout << "Enter a move: ";
-//       std::cin >> moveString;
-
-//       move = pen::Move(moveString);
-//     } else {
-//       std::pair<pen::Move, int> result = pen::minimax(history.Last(),
-//       lookup);
-
-//       move = std::get<pen::Move>(result);
-
-//       std::cout << "CPU Played: " << move.as_string() << std::endl;
-//     }
-
-//     lookup = smartClearedLookup(lookup);
-//     history.Append(move);
-//     humanMove = !humanMove;
-//   }
-
-//   std::cout << history.Last().DebugString() << std::endl;
-//   std::cout << pen::resultString.find(history.ComputeGameResult())->second
-//             << std::endl;
-// }
-
 }  // namespace pen
