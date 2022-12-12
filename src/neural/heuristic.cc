@@ -6,7 +6,7 @@
 #include "utils/bitops.h"
 
 namespace pen {
-int heuristic_value(Position position) {
+std::int8_t heuristic_value(Position position) {
   std::uint64_t ours = position.GetBoard().our_pieces().as_int();
   std::uint64_t theirs = position.GetBoard().their_pieces().as_int();
 
@@ -23,6 +23,6 @@ int heuristic_value(Position position) {
     score = -score;
   }
 
-  return score;
+  return static_cast<std::int8_t>(score);
 }
 }  // namespace pen

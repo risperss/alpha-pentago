@@ -48,8 +48,9 @@ ReturnValue minimax(Position position, Move prevMove, int depth,
       ReturnValue candidate;
       candidate.move = m;
 
-      Position p = Position(position, m);
-      std::uint64_t hashes[] = {p.Hash(), p.ReverseHash()};
+      Position candidatePosition = Position(position, m);
+      std::uint64_t hashes[] = {candidatePosition.Hash(),
+                                candidatePosition.ReverseHash()};
       bool foundMatchingHash = false;
 
       for (std::uint64_t& hash : hashes) {
@@ -64,8 +65,8 @@ ReturnValue minimax(Position position, Move prevMove, int depth,
       }
 
       if (!foundMatchingHash) {
-        ReturnValue result =
-            minimax(p, m, depth - 1, alpha, beta, !maximizingPlayer, lookup);
+        ReturnValue result = minimax(candidatePosition, m, depth - 1, alpha,
+                                     beta, !maximizingPlayer, lookup);
         candidate.value = result.value;
         candidate.plyCount = result.plyCount;
 
@@ -103,8 +104,9 @@ ReturnValue minimax(Position position, Move prevMove, int depth,
       ReturnValue candidate;
       candidate.move = m;
 
-      Position p = Position(position, m);
-      std::uint64_t hashes[] = {p.Hash(), p.ReverseHash()};
+      Position candidatePosition = Position(position, m);
+      std::uint64_t hashes[] = {candidatePosition.Hash(),
+                                candidatePosition.ReverseHash()};
       bool foundMatchingHash = false;
 
       for (std::uint64_t& hash : hashes) {
@@ -119,8 +121,8 @@ ReturnValue minimax(Position position, Move prevMove, int depth,
       }
 
       if (!foundMatchingHash) {
-        ReturnValue result =
-            minimax(p, m, depth - 1, alpha, beta, !maximizingPlayer, lookup);
+        ReturnValue result = minimax(candidatePosition, m, depth - 1, alpha,
+                                     beta, !maximizingPlayer, lookup);
         candidate.value = result.value;
         candidate.plyCount = result.plyCount;
 

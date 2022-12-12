@@ -10,6 +10,6 @@ static const std::uint64_t kCornersMask =
 static const std::uint64_t kCentresMask =
     0b000000010010000000000000010010000000;
 
-int heuristic_value(Position position);
+std::int8_t heuristic_value(Position position);
 
 }  // namespace pen
