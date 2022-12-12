@@ -10,7 +10,7 @@ inline uint64_t Hash(uint64_t val) {
 }
 
 inline uint64_t HashCat(uint64_t x, uint64_t y) {
-  int64_t hash = Hash(x);
+  uint64_t hash = Hash(x);
   hash ^= 0x299799adf0d95defULL + Hash(y) + (hash << 6) + (hash >> 2);
   return hash;
 }

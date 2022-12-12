@@ -6,19 +6,29 @@
 #pragma once
 
 namespace pen {
-static const int MAX_POSITION_VALUE = 1000;
-static const int DEPTH = 6;
+static const std::int8_t POS_INFINITY = INT8_MAX;
+static const std::int8_t NEG_INFINITY = INT8_MIN;
+static const std::int8_t MAX_POSITION_VALUE = 100;
+static const std::int8_t MIN_POSITION_VALUE = -100;
+static const int DEPTH = 3;
 
 struct ReturnValue {
-  int value;
+  std::int8_t value;
   Move move;
-  int plyCount;
+  std::uint8_t plyCount;
 };
 
-using PositionLookup = std::unordered_map<std::uint64_t, ReturnValue>;
+// To reduce size of lookup table
+struct LookupItem {
+  std::int8_t value;
+  std::uint8_t plyCount;
+};
 
-ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
-                    int beta, bool maximizingPlayer, PositionLookup* lookup);
+using PositionLookup = std::unordered_map<std::uint64_t, LookupItem>;
+
+ReturnValue minimax(Position position, Move prevMove, int depth,
+                    std::int8_t alpha, std::int8_t beta, bool maximizingPlayer,
+                    PositionLookup* lookup);
 
 ReturnValue minimax(Position position, PositionLookup* lookup);
 }  // namespace pen

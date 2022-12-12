@@ -1,6 +1,7 @@
 #include "game.h"
 
 #include <iostream>
+#include <string>
 
 #include "neural/minimax.h"
 #include "pentago/position.h"
@@ -18,10 +19,10 @@ PositionLookup* clearedLookup(PositionLookup* lookup, Position position) {
 PositionLookup* smartClearedLookup(PositionLookup* lookup) {
   PositionLookup* newLookup = new PositionLookup;
 
-  for (auto& [hash, returnValue] : *lookup) {
-    if (returnValue.value == MAX_POSITION_VALUE ||
-        returnValue.value == -MAX_POSITION_VALUE) {
-      (*newLookup)[hash] = returnValue;
+  for (auto& [hash, lookupItem] : *lookup) {
+    if (lookupItem.value == MAX_POSITION_VALUE ||
+        lookupItem.value == MIN_POSITION_VALUE) {
+      (*newLookup)[hash] = lookupItem;
     }
   }
 
@@ -42,11 +43,21 @@ void selfPlay() {
     std::cout << "Ply Count: " << history.Last().GetPlyCount() << "\n";
     std::cout << "To Move: "
               << (history.Last().IsBlackToMove() ? "Black" : "White") << "\n";
-    std::cout << "Value: " << result.value << "\n";
+    std::cout << "Value:\t\t\t\t\t" << static_cast<int>(result.value) << "\n";
     std::cout << "Move to be made: " << result.move.as_string() << "\n";
     std::cout << history.Last().DebugString() << "\n";
+    std::cout << "Hash: " << history.Last().Hash() << "\n";
+    std::cout << "Reverse Hash: " << history.Last().ReverseHash() << "\n";
+    std::cout << "Lookup length: " << lookup->size() << " positions\n";
     std::cout << "Lookup size: "
-              << ((lookup->size() * sizeof(ReturnValue)) / 1000000) << " Mb\n";
+              << ((lookup->size() * sizeof(LookupItem)) / 1000000) << "Mb\n";
+    if (result.value == MAX_POSITION_VALUE ||
+        result.value == MIN_POSITION_VALUE) {
+      std::string color =
+          result.value == MAX_POSITION_VALUE ? "White" : "Black";
+      std::cout << color << " to win on ply "
+                << static_cast<int>(result.plyCount) << "\n";
+    }
     std::cout << "------------------------------" << std::endl;
 
     lookup = clearedLookup(lookup, history.Last());
@@ -54,6 +65,7 @@ void selfPlay() {
   }
   delete lookup;
 
+  std::cout << "Ply Count: " << history.Last().GetPlyCount() << "\n";
   std::cout << history.Last().DebugString() << "\n";
   std::cout << pen::resultString.find(history.ComputeGameResult())->second
             << "\n";
