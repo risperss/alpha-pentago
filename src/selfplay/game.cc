@@ -63,7 +63,8 @@ PositionHistory selfPlay() {
     std::cout << "To Move:\t"
               << (history.Last().IsBlackToMove() ? "Black" : "White") << "\n";
     std::cout << "Value:\t\t" << result.value << "\n";
-    std::cout << "Heuristic:\t" << heuristic_value(history.Last()) << std::endl;
+    std::cout << "Heuristic:\t"
+              << defaultHeuristicEvaluator.value(history.Last()) << std::endl;
     std::cout << "Move:\t\t" << result.move.as_string() << "\n";
     std::cout << "Nodes visited:\t" << (nodesVisited >> 10) << "k\n";
     std::cout << "Search time:\t" << ms_int.count() << " ms\n";

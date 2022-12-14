@@ -1,6 +1,9 @@
+#include <array>
 #include <cstdint>
 
 #include "pentago/position.h"
+
+#pragma once
 
 namespace pentago {
 
@@ -17,13 +20,24 @@ static const std::uint64_t kWinningMasks[] = {
     0x0000000042108400, 0x0000000408102040, 0x0000000020408102,
     0x0000000001084210, 0x0000000084210800};
 
-int heuristic_value(Position position);
+static const int kNumWeights = 8;
 
-int goodSquaresScore(const std::uint64_t board_);
+class HeuristicEvaluator {
+ public:
+  HeuristicEvaluator() = default;
+  HeuristicEvaluator(std::array<int, kNumWeights> weights);
 
-int centralityScore(const std::uint64_t board_);
+  int value(Position position) const;
 
-int fourOfFiveScore(const std::uint64_t our_board_,
-                    const std::uint64_t their_board_);
+  int goodSquaresScore(const std::uint64_t board_) const;
+
+  int centralityScore(const std::uint64_t board_) const;
+
+  int fourOfFiveScore(const std::uint64_t our_board_,
+                      const std::uint64_t their_board_) const;
+
+ private:
+  std::array<int, kNumWeights> weights_;
+};
 
 }  // namespace pentago

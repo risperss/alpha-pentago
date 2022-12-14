@@ -1,5 +1,7 @@
+#include <array>
 #include <unordered_map>
 
+#include "neural/heuristic.h"
 #include "pentago/bitboard.h"
 #include "pentago/position.h"
 
@@ -11,6 +13,9 @@ static const int kNegativeInfinity = INT_MIN;
 static const int kMaxPositionValue = 10000;
 static const int kMinPositionValue = -10000;
 static const int kMaxSearchDepth = 3;
+
+static const HeuristicEvaluator defaultHeuristicEvaluator =
+    HeuristicEvaluator({2, 3, 5, -1, 8, 15, 100, 50});
 
 struct ReturnValue {
   int value;
@@ -28,8 +33,8 @@ using PositionLookup = std::unordered_map<std::uint64_t, LookupItem>;
 
 ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
                     int beta, bool maximizingPlayer, PositionLookup* lookup,
-                    int* nodesVisited, bool infiniteSearch);
+                    int* nodesVisited, const bool infiniteSearch);
 
 ReturnValue minimax(Position position, PositionLookup* lookup,
-                    int* nodesVisited, bool infiniteSearch);
+                    int* nodesVisited, const bool infiniteSearch);
 }  // namespace pentago
