@@ -30,6 +30,8 @@ class PentagoBoard {
 
   bool IsLegalMove(Move move) const;
 
+  MoveList SmartGenerateLegalMoves() const;
+
   MoveList GenerateLegalMoves() const;
 
   BoardResult ComputeBoardResult() const;

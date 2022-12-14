@@ -8,8 +8,8 @@
 namespace pentago {
 static const int kPositiveInfinity = INT_MAX;
 static const int kNegativeInfinity = INT_MIN;
-static const int kMaxPositionValue = 100000;
-static const int kMinPositionValue = -100000;
+static const int kMaxPositionValue = 10000;
+static const int kMinPositionValue = -10000;
 static const int kMaxSearchDepth = 3;
 
 struct ReturnValue {
@@ -28,8 +28,8 @@ using PositionLookup = std::unordered_map<std::uint64_t, LookupItem>;
 
 ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
                     int beta, bool maximizingPlayer, PositionLookup* lookup,
-                    int* nodesVisited);
+                    int* nodesVisited, bool infiniteSearch);
 
 ReturnValue minimax(Position position, PositionLookup* lookup,
-                    int* nodesVisited);
+                    int* nodesVisited, bool infiniteSearch);
 }  // namespace pentago

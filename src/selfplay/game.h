@@ -7,5 +7,6 @@ namespace pentago {
 PositionLookup* clearedLookup(PositionLookup* lookup, Position position);
 PositionLookup* smartClearedLookup(PositionLookup* lookup);
 
-void selfPlay();
+PositionHistory selfPlay();
+PositionHistory randomSelfPlay();
 }  // namespace pentago

@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <iostream>
+#include <random>
 #include <string>
 
 #include "neural/heuristic.h"
@@ -32,7 +33,7 @@ PositionLookup* smartClearedLookup(PositionLookup* lookup) {
   return newLookup;
 }
 
-void selfPlay() {
+PositionHistory selfPlay() {
   using std::chrono::duration;
   using std::chrono::duration_cast;
   using std::chrono::high_resolution_clock;
@@ -52,7 +53,7 @@ void selfPlay() {
     int nodesVisited = 0;
 
     auto t1 = high_resolution_clock::now();
-    ReturnValue result = minimax(history.Last(), lookup, &nodesVisited);
+    ReturnValue result = minimax(history.Last(), lookup, &nodesVisited, false);
     auto t2 = high_resolution_clock::now();
     auto ms_int = duration_cast<milliseconds>(t2 - t1);
 
@@ -98,5 +99,7 @@ void selfPlay() {
   std::cout << "AVG NPS:\t" << (totalNodesVisited / totalTimeTaken)
             << " kN/s\n";
   std::cout << history.Last().DebugString() << "\n";
+
+  return history;
 }
 }  // namespace pentago

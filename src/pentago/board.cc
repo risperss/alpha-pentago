@@ -1,10 +1,5 @@
 #include "board.h"
 
-#include <algorithm>
-#include <array>
-#include <chrono>
-#include <random>
-
 #include "neural/heuristic.h"
 #include "pentago/bitboard.h"
 #include "utils/bitops.h"
@@ -94,7 +89,7 @@ void PentagoBoard::SetFromGrn(std::string grn) {
   }
 }
 
-MoveList PentagoBoard::GenerateLegalMoves() const {
+MoveList PentagoBoard::SmartGenerateLegalMoves() const {
   MoveList result;
 
   BitBoard mut_our_pieces = our_pieces();
@@ -152,10 +147,24 @@ MoveList PentagoBoard::GenerateLegalMoves() const {
     i += 8;
   }
 
-  unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-  shuffle(result.begin(), result.end(), std::default_random_engine(seed));
-
   return result;
+}
+
+MoveList PentagoBoard::GenerateLegalMoves() const {
+  MoveList legalMoves;
+
+  for (int i = 0; i < 288; i += 8) {
+    Move move = Move(kMoveNum[i]);
+
+    if (!our_pieces().get(move.node()) && !their_pieces().get(move.node())) {
+      legalMoves.emplace_back(move);
+      for (int j = 1; j < 8; j++) {
+        legalMoves.emplace_back(Move(kMoveNum[i + j]));
+      }
+    }
+  }
+
+  return legalMoves;
 }
 
 std::uint64_t PentagoBoard::ReverseHash() const {
