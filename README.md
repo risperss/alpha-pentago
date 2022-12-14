@@ -10,7 +10,7 @@
 - Implement iterative deepening
 - Improve heuristic evaluation
 - Implement CMA-ES
-- Favour longest losing sequence when all moves technically lose
+- ~~Favour longest losing sequence when all moves lose~~
 - ~~Don't discard mappings for terminal node lookups~~
 - ~~Formalize Makefile/build structure~~
 
