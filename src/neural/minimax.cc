@@ -60,6 +60,7 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
           candidate.value = item.value;
           candidate.plyCount = item.plyCount;
 
+          (*nodesVisited)++;
           foundMatchingHash = true;
           break;
         }
@@ -117,6 +118,7 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
           candidate.value = item.value;
           candidate.plyCount = item.plyCount;
 
+          (*nodesVisited)++;
           foundMatchingHash = true;
           break;
         }

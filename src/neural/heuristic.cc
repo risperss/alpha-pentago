@@ -6,24 +6,6 @@
 #include "utils/bitops.h"
 
 namespace pen {
-namespace {
-// TODO: see if it's better to make longer list of all possible masks rather
-// than using count
-// Also, reference variable from board.cc, don't ctrl-C ctrl-V lol.
-std::uint64_t kWinningMasks[] = {
-    0x000000000000001F, 0x000000000000003E, 0x0000000001041041,
-    0x0000000041041040, 0x00000000000007C0, 0x0000000000000F80,
-    0x0000000002082082, 0x0000000082082080, 0x000000000001F000,
-    0x000000000003E000, 0x0000000004104104, 0x0000000104104100,
-    0x00000000007C0000, 0x0000000000F80000, 0x0000000008208208,
-    0x0000000208208200, 0x000000001F000000, 0x000000003E000000,
-    0x0000000010410410, 0x0000000410410400, 0x00000007C0000000,
-    0x0000000F80000000, 0x0000000020820820, 0x0000000820820800,
-    0x0000000010204081, 0x0000000810204080, 0x0000000002108420,
-    0x0000000042108400, 0x0000000408102040, 0x0000000020408102,
-    0x0000000001084210, 0x0000000084210800};
-}  // namespace
-
 int heuristic_value(Position position) {
   const std::uint64_t our_board = position.GetBoard().our_pieces().as_int();
   const std::uint64_t their_board = position.GetBoard().their_pieces().as_int();
@@ -69,7 +51,7 @@ int fourOfFiveScore(const std::uint64_t our_board_,
                     const std::uint64_t their_board_) {
   int score = 0;
 
-  for (std::uint64_t& mask : kWinningMasks) {
+  for (std::uint64_t mask : pen::kWinningMasks) {
     if (count_few(our_board_ & mask) == 4) {
       if ((their_board_ & mask) == 0) {
         score += 100;
