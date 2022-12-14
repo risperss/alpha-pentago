@@ -45,7 +45,7 @@ void selfPlay() {
   pen::PositionHistory history = pen::PositionHistory(starting);
 
   unsigned long maxLookupSize = 0;
-  long totalNodesVisited = 0;
+  unsigned long long totalNodesVisited = 0;
   long totalTimeTaken = 0;
 
   while (history.ComputeGameResult() == pen::GameResult::UNDECIDED) {
@@ -64,7 +64,7 @@ void selfPlay() {
     std::cout << "Value:\t\t" << result.value << "\n";
     std::cout << "Heuristic:\t" << heuristic_value(history.Last()) << std::endl;
     std::cout << "Move:\t\t" << result.move.as_string() << "\n";
-    std::cout << "Nodes visited:\t" << (nodesVisited / 1000) << "k\n";
+    std::cout << "Nodes visited:\t" << (nodesVisited >> 10) << "k\n";
     std::cout << "Search time:\t" << ms_int.count() << " ms\n";
     std::cout << "Lookup size:\t" << (lookupSize >> 20) << " Mb\n";
     if (ms_int.count() != 0) {
@@ -95,7 +95,7 @@ void selfPlay() {
   std::cout << "Result:\t\t"
             << pen::resultString.find(history.ComputeGameResult())->second
             << "\n";
-  std::cout << "Max RAM:\t" << (maxLookupSize >> 20) << "Mb\n";
+  std::cout << "Max RAM:\t" << (maxLookupSize >> 20) << " Mb\n";
   std::cout << "Search Depth:\t" << pen::DEPTH << std::endl;
   std::cout << "AVG NPS:\t" << (totalNodesVisited / totalTimeTaken)
             << " kN/s\n";

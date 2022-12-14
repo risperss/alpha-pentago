@@ -10,7 +10,7 @@ static const int POS_INFINITY = INT_MAX;
 static const int NEG_INFINITY = INT_MIN;
 static const int MAX_POSITION_VALUE = 100000;
 static const int MIN_POSITION_VALUE = -100000;
-static const int DEPTH = 3;
+static const int DEPTH = 4;
 
 struct ReturnValue {
   int value;
