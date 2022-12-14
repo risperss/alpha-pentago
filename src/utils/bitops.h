@@ -44,6 +44,20 @@ static const int count(const std::uint64_t board_) {
 #endif
 }
 
+static const int count_few(const std::uint64_t board_) {
+#if defined(NO_POPCNT)
+  std::uint64_t x = board_;
+  int count;
+  for (count = 0; x != 0; ++count) {
+    // Clear the rightmost set bit.
+    x &= x - 1;
+  }
+  return count;
+#else
+  return count(board_);
+#endif
+}
+
 static const std::uint64_t reverse(const std::uint64_t board) {
   std::uint64_t result = ((BitReverseTable256[board & 0xFF] << 56) |
                           (BitReverseTable256[(board >> 8) & 0xFF] << 48) |

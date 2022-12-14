@@ -4,12 +4,13 @@
 
 namespace pen {
 
-static const std::uint64_t kSidesMask = 0b010010101101010010010010101101010010;
-static const std::uint64_t kCornersMask =
-    0b101101000000101101101101000000101101;
-static const std::uint64_t kCentresMask =
-    0b000000010010000000000000010010000000;
+int heuristic_value(Position position);
 
-std::int8_t heuristic_value(Position position);
+int goodSquaresScore(const std::uint64_t board_);
+
+int centralityScore(const std::uint64_t board_);
+
+int fourOfFiveScore(const std::uint64_t our_board_,
+                    const std::uint64_t their_board_);
 
 }  // namespace pen

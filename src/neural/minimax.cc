@@ -9,9 +9,9 @@
 #include "utils/bitops.h"
 
 namespace pen {
-ReturnValue minimax(Position position, Move prevMove, int depth,
-                    std::int8_t alpha, std::int8_t beta, bool maximizingPlayer,
-                    PositionLookup* lookup, int* nodesVisited) {
+ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
+                    int beta, bool maximizingPlayer, PositionLookup* lookup,
+                    int* nodesVisited) {
   GameResult result = GameResult::UNDECIDED;
   std::uint8_t plyCount = std::uint8_t(position.GetPlyCount());
   (*nodesVisited)++;
@@ -22,7 +22,7 @@ ReturnValue minimax(Position position, Move prevMove, int depth,
 
   // Value function
   if (depth == 0 || result != GameResult::UNDECIDED) {
-    std::int8_t value;
+    int value;
 
     if (result == GameResult::WHITE_WON) {
       value = MAX_POSITION_VALUE;

@@ -44,6 +44,8 @@ void selfPlay() {
   pen::PositionHistory history = pen::PositionHistory(starting);
 
   unsigned long maxLookupSize = 0;
+  long totalNodesVisited = 0;
+  long totalTimeTaken = 0;
 
   while (history.ComputeGameResult() == pen::GameResult::UNDECIDED) {
     int nodesVisited = 0;
@@ -58,11 +60,14 @@ void selfPlay() {
     std::cout << "Ply Count:\t" << history.Last().GetPlyCount() << "\n";
     std::cout << "To Move:\t"
               << (history.Last().IsBlackToMove() ? "Black" : "White") << "\n";
-    std::cout << "Value:\t\t" << static_cast<int>(result.value) << "\n";
+    std::cout << "Value:\t\t" << result.value << "\n";
     std::cout << "Move:\t\t" << result.move.as_string() << "\n";
     std::cout << "Nodes visited:\t" << (nodesVisited / 1000) << "k\n";
     std::cout << "Search time:\t" << ms_int.count() << " ms\n";
-    std::cout << "Lookup size:\t" << (lookupSize >> 10) << " Kb\n";
+    std::cout << "Lookup size:\t" << (lookupSize >> 20) << " Mb\n";
+    if (ms_int.count() != 0) {
+      std::cout << "NPS:\t\t" << (nodesVisited / ms_int.count()) << " kN/s\n";
+    }
     std::cout << history.Last().DebugString() << "\n";
 
     maxLookupSize = std::max(maxLookupSize, lookupSize);
@@ -76,6 +81,9 @@ void selfPlay() {
     }
     std::cout << "------------------------------" << std::endl;
 
+    totalNodesVisited += nodesVisited;
+    totalTimeTaken += ms_int.count();
+
     lookup = clearedLookup(lookup, history.Last());
     history.Append(result.move);
   }
@@ -87,6 +95,8 @@ void selfPlay() {
             << "\n";
   std::cout << "Max RAM:\t" << (maxLookupSize >> 20) << "Mb\n";
   std::cout << "Search Depth:\t" << pen::DEPTH << std::endl;
+  std::cout << "AVG NPS:\t" << (totalNodesVisited / totalTimeTaken)
+            << " kN/s\n";
   std::cout << history.Last().DebugString() << "\n";
 }
 }  // namespace pen
