@@ -9,6 +9,7 @@
 - Store lookups for 8 variations of each position
 - Implement iterative deepening
 - Improve heuristic evaluation
+- Implement CMA-ES
 - Favour longest losing sequence when all moves technically lose
 - ~~Don't discard mappings for terminal node lookups~~
 - Formalize Makefile/build structure
