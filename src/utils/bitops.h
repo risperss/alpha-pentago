@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace pen {
+namespace pentago {
 
 static const std::uint64_t BitReverseTable256[] = {
     0x00, 0x80, 0x40, 0xC0, 0x20, 0xA0, 0x60, 0xE0, 0x10, 0x90, 0x50, 0xD0,
@@ -70,4 +70,4 @@ static const std::uint64_t reverse(const std::uint64_t board) {
   return result;
 }
 
-}  // namespace pen
+}  // namespace pentago

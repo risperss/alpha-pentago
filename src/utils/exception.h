@@ -3,7 +3,7 @@
 #include <iostream>
 #include <stdexcept>
 
-namespace pen {
+namespace pentago {
 
 class Exception : public std::runtime_error {
  public:
@@ -11,4 +11,4 @@ class Exception : public std::runtime_error {
     std::cout << "Exception: " << what << std::endl;
   }
 };
-}  // namespace pen
+}  // namespace pentago

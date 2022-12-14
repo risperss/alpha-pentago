@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace pen {
+namespace pentago {
 
 class BoardNode {
  public:
@@ -367,4 +367,4 @@ class Move {
 
 using MoveList = std::vector<Move>;
 
-}  // namespace pen
+}  // namespace pentago

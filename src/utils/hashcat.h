@@ -2,7 +2,7 @@
 #include <initializer_list>
 
 #pragma once
-namespace pen {
+namespace pentago {
 
 inline uint64_t Hash(uint64_t val) {
   return 0xfad0d7f2fbb059f1ULL * (val + 0xbaad41cdcb839961ULL) +
@@ -15,4 +15,4 @@ inline uint64_t HashCat(uint64_t x, uint64_t y) {
   return hash;
 }
 
-}  // namespace pen
+}  // namespace pentago

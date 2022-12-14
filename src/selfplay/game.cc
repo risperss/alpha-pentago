@@ -8,9 +8,9 @@
 #include "neural/minimax.h"
 #include "pentago/position.h"
 
-namespace pen {
+namespace pentago {
 PositionLookup* clearedLookup(PositionLookup* lookup, Position position) {
-  if (position.GetPlyCount() + DEPTH >= 9) {
+  if (position.GetPlyCount() + kMaxSearchDepth >= 9) {
     return smartClearedLookup(lookup);
   } else {
     delete lookup;
@@ -22,8 +22,8 @@ PositionLookup* smartClearedLookup(PositionLookup* lookup) {
   PositionLookup* newLookup = new PositionLookup;
 
   for (auto& [hash, lookupItem] : *lookup) {
-    if (lookupItem.value == MAX_POSITION_VALUE ||
-        lookupItem.value == MIN_POSITION_VALUE) {
+    if (lookupItem.value == kMaxPositionValue ||
+        lookupItem.value == kMinPositionValue) {
       (*newLookup)[hash] = lookupItem;
     }
   }
@@ -40,19 +40,19 @@ void selfPlay() {
 
   PositionLookup* lookup = new PositionLookup;
 
-  pen::PentagoBoard board = pen::PentagoBoard();
-  pen::Position starting = pen::Position(board);
-  pen::PositionHistory history = pen::PositionHistory(starting);
+  PentagoBoard board = PentagoBoard();
+  Position starting = Position(board);
+  PositionHistory history = PositionHistory(starting);
 
   unsigned long maxLookupSize = 0;
   unsigned long long totalNodesVisited = 0;
   long totalTimeTaken = 0;
 
-  while (history.ComputeGameResult() == pen::GameResult::UNDECIDED) {
+  while (history.ComputeGameResult() == GameResult::UNDECIDED) {
     int nodesVisited = 0;
 
     auto t1 = high_resolution_clock::now();
-    ReturnValue result = pen::minimax(history.Last(), lookup, &nodesVisited);
+    ReturnValue result = minimax(history.Last(), lookup, &nodesVisited);
     auto t2 = high_resolution_clock::now();
     auto ms_int = duration_cast<milliseconds>(t2 - t1);
 
@@ -74,10 +74,9 @@ void selfPlay() {
 
     maxLookupSize = std::max(maxLookupSize, lookupSize);
 
-    if (result.value == MAX_POSITION_VALUE ||
-        result.value == MIN_POSITION_VALUE) {
-      std::string color =
-          result.value == MAX_POSITION_VALUE ? "White" : "Black";
+    if (result.value == kMaxPositionValue ||
+        result.value == kMinPositionValue) {
+      std::string color = result.value == kMaxPositionValue ? "White" : "Black";
       std::cout << "Forced:\t" << color << " to win on ply "
                 << static_cast<int>(result.plyCount) << "\n";
     }
@@ -93,12 +92,11 @@ void selfPlay() {
 
   std::cout << "Ply Count:\t" << history.Last().GetPlyCount() << "\n";
   std::cout << "Result:\t\t"
-            << pen::resultString.find(history.ComputeGameResult())->second
-            << "\n";
+            << resultString.find(history.ComputeGameResult())->second << "\n";
   std::cout << "Max RAM:\t" << (maxLookupSize >> 20) << " Mb\n";
-  std::cout << "Search Depth:\t" << pen::DEPTH << std::endl;
+  std::cout << "Search Depth:\t" << kMaxSearchDepth << std::endl;
   std::cout << "AVG NPS:\t" << (totalNodesVisited / totalTimeTaken)
             << " kN/s\n";
   std::cout << history.Last().DebugString() << "\n";
 }
-}  // namespace pen
+}  // namespace pentago

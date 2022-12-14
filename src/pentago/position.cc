@@ -1,6 +1,6 @@
 #include "position.h"
 
-namespace pen {
+namespace pentago {
 
 Position::Position(const Position& parent, Move m)
     : ply_count_(parent.ply_count_ + 1) {
@@ -49,4 +49,4 @@ void PositionHistory::Append(Move m) {
   positions_.emplace_back(Position(Last(), m));
 }
 
-}  // namespace pen
+}  // namespace pentago

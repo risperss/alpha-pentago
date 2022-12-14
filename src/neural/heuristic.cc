@@ -5,7 +5,7 @@
 #include "pentago/position.h"
 #include "utils/bitops.h"
 
-namespace pen {
+namespace pentago {
 int heuristic_value(Position position) {
   const std::uint64_t our_board = position.GetBoard().our_pieces().as_int();
   const std::uint64_t their_board = position.GetBoard().their_pieces().as_int();
@@ -14,7 +14,8 @@ int heuristic_value(Position position) {
 
   value += goodSquaresScore(our_board) - goodSquaresScore(their_board);
   value += centralityScore(our_board) - centralityScore(their_board);
-  value += fourOfFiveScore(our_board, their_board);
+  value += fourOfFiveScore(our_board, their_board) -
+           fourOfFiveScore(their_board, our_board);
 
   if (position.IsBlackToMove()) {
     value = -value;
@@ -51,22 +52,16 @@ int fourOfFiveScore(const std::uint64_t our_board_,
                     const std::uint64_t their_board_) {
   int score = 0;
 
-  for (std::uint64_t mask : pen::kWinningMasks) {
+  for (std::uint64_t mask : pentago::kWinningMasks) {
     if (count_few(our_board_ & mask) == 4) {
       if ((their_board_ & mask) == 0) {
         score += 100;
       } else {
         score += 50;
       }
-    } else if (count_few(their_board_ & mask) == 4) {
-      if ((our_board_ & mask) == 0) {
-        score -= 100;
-      } else {
-        score -= 50;
-      }
     }
   }
 
   return score;
 }
-}  // namespace pen
+}  // namespace pentago

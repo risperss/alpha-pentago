@@ -10,7 +10,7 @@
 #include "utils/bitops.h"
 #include "utils/exception.h"
 
-namespace pen {
+namespace pentago {
 
 namespace {
 std::uint16_t kMoveNum[] = {
@@ -248,4 +248,4 @@ std::string PentagoBoard::DebugString(bool blackToMove) const {
   return res;
 }
 
-}  // namespace pen
+}  // namespace pentago

@@ -5,7 +5,7 @@
 
 #include "pentago/board.h"
 
-namespace pen {
+namespace pentago {
 
 enum class GameResult : uint8_t { UNDECIDED, BLACK_WON, DRAW, WHITE_WON };
 
@@ -73,4 +73,4 @@ class PositionHistory {
   std::vector<Position> positions_;
 };
 
-}  // namespace pen
+}  // namespace pentago

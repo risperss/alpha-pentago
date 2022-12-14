@@ -3,9 +3,9 @@
 
 #include "neural/minimax.h"
 
-namespace pen {
+namespace pentago {
 PositionLookup* clearedLookup(PositionLookup* lookup, Position position);
 PositionLookup* smartClearedLookup(PositionLookup* lookup);
 
 void selfPlay();
-}  // namespace pen
+}  // namespace pentago

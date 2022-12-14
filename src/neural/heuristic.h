@@ -2,7 +2,7 @@
 
 #include "pentago/position.h"
 
-namespace pen {
+namespace pentago {
 
 static const std::uint64_t kWinningMasks[] = {
     0x000000000000001F, 0x000000000000003E, 0x0000000001041041,
@@ -26,4 +26,4 @@ int centralityScore(const std::uint64_t board_);
 int fourOfFiveScore(const std::uint64_t our_board_,
                     const std::uint64_t their_board_);
 
-}  // namespace pen
+}  // namespace pentago

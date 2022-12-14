@@ -5,7 +5,7 @@
 #include "pentago/bitboard.h"
 #include "utils/hashcat.h"
 
-namespace pen {
+namespace pentago {
 
 enum class BoardResult : uint8_t { UNDECIDED, THEY_WON, DRAW, WE_WON };
 
@@ -49,4 +49,4 @@ class PentagoBoard {
   BitBoard their_pieces_;
 };
 
-}  // namespace pen
+}  // namespace pentago

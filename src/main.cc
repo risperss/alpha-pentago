@@ -1,7 +1,7 @@
 #include "selfplay/game.h"
 
 int main(void) {
-  pen::selfPlay();
+  pentago::selfPlay();
 
   return 0;
 }

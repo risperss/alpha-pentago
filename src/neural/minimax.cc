@@ -8,7 +8,7 @@
 #include "pentago/position.h"
 #include "utils/bitops.h"
 
-namespace pen {
+namespace pentago {
 ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
                     int beta, bool maximizingPlayer, PositionLookup* lookup,
                     int* nodesVisited) {
@@ -25,11 +25,11 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
     int value;
 
     if (result == GameResult::WHITE_WON) {
-      value = MAX_POSITION_VALUE;
+      value = kMaxPositionValue;
     } else if (result == GameResult::DRAW) {
       value = 0;
     } else if (result == GameResult::BLACK_WON) {
-      value = MIN_POSITION_VALUE;
+      value = kMinPositionValue;
     } else {
       value = heuristic_value(position);
     }
@@ -42,7 +42,7 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
   // Search function
   if (maximizingPlayer) {
     ReturnValue currentBest;
-    currentBest.value = NEG_INFINITY;  // maxValue
+    currentBest.value = kNegativeInfinity;  // maxValue
 
     for (Move& m : legalMoves) {
       // SAME ABOVE AS BELOW
@@ -82,11 +82,11 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
         currentBest = candidate;
       } else if (candidate.value == currentBest.value) {
         // Losing, take longest path
-        if (candidate.value == MIN_POSITION_VALUE &&
+        if (candidate.value == kMinPositionValue &&
             candidate.plyCount > currentBest.plyCount) {
           currentBest = candidate;
           // Winning, take shortest path
-        } else if (candidate.value == MAX_POSITION_VALUE &&
+        } else if (candidate.value == kMaxPositionValue &&
                    candidate.plyCount < currentBest.plyCount) {
           currentBest = candidate;
         }
@@ -100,7 +100,7 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
     return currentBest;
   } else {
     ReturnValue currentBest;
-    currentBest.value = POS_INFINITY;  // minValue
+    currentBest.value = kPositiveInfinity;  // minValue
 
     for (Move& m : legalMoves) {
       // SAME ABOVE AS BELOW
@@ -140,11 +140,11 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
         currentBest = candidate;
       } else if (candidate.value == currentBest.value) {
         // Losing, take longest path
-        if (candidate.value == MAX_POSITION_VALUE &&
+        if (candidate.value == kMaxPositionValue &&
             candidate.plyCount > currentBest.plyCount) {
           currentBest = candidate;
           // Winning, take shortest path
-        } else if (candidate.value == MIN_POSITION_VALUE &&
+        } else if (candidate.value == kMinPositionValue &&
                    candidate.plyCount < currentBest.plyCount) {
           currentBest = candidate;
         }
@@ -161,7 +161,8 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
 
 ReturnValue minimax(Position position, PositionLookup* lookup,
                     int* nodesVisited) {
-  return minimax(position, Move(std::uint16_t(0)), DEPTH, NEG_INFINITY,
-                 POS_INFINITY, !position.IsBlackToMove(), lookup, nodesVisited);
+  return minimax(position, Move(std::uint16_t(0)), kMaxSearchDepth,
+                 kNegativeInfinity, kPositiveInfinity,
+                 !position.IsBlackToMove(), lookup, nodesVisited);
 }
-}  // namespace pen
+}  // namespace pentago
