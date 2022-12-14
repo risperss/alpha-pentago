@@ -12,7 +12,7 @@
 - Implement CMA-ES
 - Favour longest losing sequence when all moves technically lose
 - ~~Don't discard mappings for terminal node lookups~~
-- Formalize Makefile/build structure
+- ~~Formalize Makefile/build structure~~
 
 ### MOVING FORWARD:
 - Once traditional game engine can beat me consistently, implement neural network
