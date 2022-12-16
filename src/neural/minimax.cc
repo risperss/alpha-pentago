@@ -12,9 +12,9 @@
 #include "utils/bitops.h"
 
 namespace pentago {
-ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
-                    int beta, bool maximizingPlayer, PositionLookup* lookup,
-                    int* nodesVisited, const bool infiniteSearch) {
+ReturnValue minimax(Position position, Move prevMove, int depth, float alpha,
+                    float beta, bool maximizingPlayer, PositionLookup* lookup,
+                    int* nodesVisited, HeuristicEvaluator* evaluator) {
   GameResult result = GameResult::UNDECIDED;
   std::uint8_t plyCount = std::uint8_t(position.GetPlyCount());
   (*nodesVisited)++;
@@ -24,8 +24,8 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
   }
 
   // Value function
-  if ((depth == 0 && !infiniteSearch) || result != GameResult::UNDECIDED) {
-    int value;
+  if (depth == 0 || result != GameResult::UNDECIDED) {
+    float value;
 
     if (result == GameResult::WHITE_WON) {
       value = kMaxPositionValue;
@@ -34,7 +34,7 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
     } else if (result == GameResult::BLACK_WON) {
       value = kMinPositionValue;
     } else {
-      value = defaultHeuristicEvaluator.value(position);
+      value = evaluator->value(position);
     }
 
     return ReturnValue{value, prevMove, plyCount};
@@ -77,7 +77,7 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
       if (!foundMatchingHash) {
         ReturnValue result =
             minimax(candidatePosition, m, depth - 1, alpha, beta,
-                    !maximizingPlayer, lookup, nodesVisited, infiniteSearch);
+                    !maximizingPlayer, lookup, nodesVisited, evaluator);
         candidate.value = result.value;
         candidate.plyCount = result.plyCount;
 
@@ -135,7 +135,7 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
       if (!foundMatchingHash) {
         ReturnValue result =
             minimax(candidatePosition, m, depth - 1, alpha, beta,
-                    !maximizingPlayer, lookup, nodesVisited, infiniteSearch);
+                    !maximizingPlayer, lookup, nodesVisited, evaluator);
         candidate.value = result.value;
         candidate.plyCount = result.plyCount;
 
@@ -167,11 +167,10 @@ ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
   }
 }
 
-ReturnValue minimax(Position position, PositionLookup* lookup,
-                    int* nodesVisited, const bool infiniteSearch) {
-  return minimax(position, Move(std::uint16_t(0)), kMaxSearchDepth,
-                 kNegativeInfinity, kPositiveInfinity,
-                 !position.IsBlackToMove(), lookup, nodesVisited,
-                 infiniteSearch);
+ReturnValue minimax(Position position, int depth, PositionLookup* lookup,
+                    int* nodesVisited, HeuristicEvaluator* evaluator) {
+  return minimax(position, Move(std::uint16_t(0)), depth, kNegativeInfinity,
+                 kPositiveInfinity, !position.IsBlackToMove(), lookup,
+                 nodesVisited, evaluator);
 }
 }  // namespace pentago

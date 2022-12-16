@@ -40,6 +40,7 @@ PositionHistory selfPlay() {
   using std::chrono::milliseconds;
 
   PositionLookup* lookup = new PositionLookup;
+  HeuristicEvaluator* evaluator = new HeuristicEvaluator(kDefaultWeights);
 
   PentagoBoard board = PentagoBoard();
   Position starting = Position(board);
@@ -53,7 +54,8 @@ PositionHistory selfPlay() {
     int nodesVisited = 0;
 
     auto t1 = high_resolution_clock::now();
-    ReturnValue result = minimax(history.Last(), lookup, &nodesVisited, false);
+    ReturnValue result = minimax(history.Last(), kMaxSearchDepth, lookup,
+                                 &nodesVisited, evaluator);
     auto t2 = high_resolution_clock::now();
     auto ms_int = duration_cast<milliseconds>(t2 - t1);
 
@@ -63,8 +65,8 @@ PositionHistory selfPlay() {
     std::cout << "To Move:\t"
               << (history.Last().IsBlackToMove() ? "Black" : "White") << "\n";
     std::cout << "Value:\t\t" << result.value << "\n";
-    std::cout << "Heuristic:\t"
-              << defaultHeuristicEvaluator.value(history.Last()) << std::endl;
+    std::cout << "Heuristic:\t" << evaluator->value(history.Last())
+              << std::endl;
     std::cout << "Move:\t\t" << result.move.as_string() << "\n";
     std::cout << "Nodes visited:\t" << (nodesVisited >> 10) << "k\n";
     std::cout << "Search time:\t" << ms_int.count() << " ms\n";
@@ -91,6 +93,7 @@ PositionHistory selfPlay() {
     history.Append(result.move);
   }
   delete lookup;
+  delete evaluator;
 
   std::cout << "Ply Count:\t" << history.Last().GetPlyCount() << "\n";
   std::cout << "Result:\t\t"

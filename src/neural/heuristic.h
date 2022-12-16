@@ -25,19 +25,19 @@ static const int kNumWeights = 8;
 class HeuristicEvaluator {
  public:
   HeuristicEvaluator() = default;
-  HeuristicEvaluator(std::array<int, kNumWeights> weights);
+  HeuristicEvaluator(std::array<float, kNumWeights> weights);
 
-  int value(Position position) const;
+  float value(Position position) const;
 
-  int goodSquaresScore(const std::uint64_t board_) const;
+  float goodSquaresScore(const std::uint64_t board_) const;
 
-  int centralityScore(const std::uint64_t board_) const;
+  float centralityScore(const std::uint64_t board_) const;
 
-  int fourOfFiveScore(const std::uint64_t our_board_,
-                      const std::uint64_t their_board_) const;
+  float fourOfFiveScore(const std::uint64_t our_board_,
+                        const std::uint64_t their_board_) const;
 
  private:
-  std::array<int, kNumWeights> weights_;
+  std::array<float, kNumWeights> weights_;
 };
 
 }  // namespace pentago

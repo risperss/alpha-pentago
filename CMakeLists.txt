@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 include_directories(src)
 
 add_executable(alpha_pentago
+    src/neural/cmaes.h
+    src/neural/cmaes.cc
     src/neural/heuristic.h
     src/neural/heuristic.cc
     src/neural/minimax.h

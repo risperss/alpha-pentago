@@ -7,14 +7,14 @@
 #include "utils/bitops.h"
 
 namespace pentago {
-HeuristicEvaluator::HeuristicEvaluator(std::array<int, kNumWeights> weights) {
+HeuristicEvaluator::HeuristicEvaluator(std::array<float, kNumWeights> weights) {
   weights_ = weights;
 }
-int HeuristicEvaluator::value(Position position) const {
+float HeuristicEvaluator::value(Position position) const {
   const std::uint64_t our_board = position.GetBoard().our_pieces().as_int();
   const std::uint64_t their_board = position.GetBoard().their_pieces().as_int();
 
-  int value = 0;
+  float value = 0;
 
   value += goodSquaresScore(our_board) - goodSquaresScore(their_board);
   value += centralityScore(our_board) - centralityScore(their_board);
@@ -28,7 +28,7 @@ int HeuristicEvaluator::value(Position position) const {
   return value;
 }
 
-int HeuristicEvaluator::goodSquaresScore(const std::uint64_t board_) const {
+float HeuristicEvaluator::goodSquaresScore(const std::uint64_t board_) const {
   const std::uint64_t kSidesMask = 0b010010101101010010010010101101010010;
   const std::uint64_t kCornersMask = 0b101101000000101101101101000000101101;
   const std::uint64_t kCentresMask = 0b000000010010000000000000010010000000;
@@ -40,7 +40,7 @@ int HeuristicEvaluator::goodSquaresScore(const std::uint64_t board_) const {
   return score;
 }
 
-int HeuristicEvaluator::centralityScore(const std::uint64_t board_) const {
+float HeuristicEvaluator::centralityScore(const std::uint64_t board_) const {
   std::uint64_t outermostRing = 0b111111100001100001100001100001111111;
   std::uint64_t middleRing = 0b000000011110010010010010011110000000;
   std::uint64_t innermostRing = 0b000000000000001100001100000000000000;
@@ -52,7 +52,7 @@ int HeuristicEvaluator::centralityScore(const std::uint64_t board_) const {
   return score;
 }
 
-int HeuristicEvaluator::fourOfFiveScore(
+float HeuristicEvaluator::fourOfFiveScore(
     const std::uint64_t our_board_, const std::uint64_t their_board_) const {
   int score = 0;
 
