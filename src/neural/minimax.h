@@ -16,7 +16,7 @@ static const int kMinPositionValue = -1000.0;
 static const int kMaxSearchDepth = 3;
 
 static const std::array<float, kNumWeights> kDefaultWeights = {
-    -1.0, -2.0, -3.0, 10.0, -40.0, -80.0, -60.0, -200.0};
+    1.1, 2.5, 3.4, 10.0, 40.0, 80.0, 60.0, 200.0};
 
 struct ReturnValue {
   float value;
@@ -32,8 +32,8 @@ struct LookupItem {
 
 using PositionLookup = std::unordered_map<std::uint64_t, LookupItem>;
 
-ReturnValue minimax(Position position, Move prevMove, int depth, int alpha,
-                    int beta, bool maximizingPlayer, PositionLookup* lookup,
+ReturnValue minimax(Position position, Move prevMove, int depth, float alpha,
+                    float beta, bool maximizingPlayer, PositionLookup* lookup,
                     int* nodesVisited, HeuristicEvaluator* evaluator);
 
 ReturnValue minimax(Position position, int depth, PositionLookup* lookup,

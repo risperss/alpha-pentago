@@ -33,9 +33,9 @@ float HeuristicEvaluator::goodSquaresScore(const std::uint64_t board_) const {
   const std::uint64_t kCornersMask = 0b101101000000101101101101000000101101;
   const std::uint64_t kCentresMask = 0b000000010010000000000000010010000000;
 
-  int score = weights_.at(0) * count(board_ & kSidesMask) +
-              weights_.at(1) * count(board_ & kCornersMask) +
-              weights_.at(2) * count(board_ & kCentresMask);
+  float score = weights_.at(0) * count(board_ & kSidesMask) +
+                weights_.at(1) * count(board_ & kCornersMask) +
+                weights_.at(2) * count(board_ & kCentresMask);
 
   return score;
 }
@@ -45,16 +45,16 @@ float HeuristicEvaluator::centralityScore(const std::uint64_t board_) const {
   std::uint64_t middleRing = 0b000000011110010010010010011110000000;
   std::uint64_t innermostRing = 0b000000000000001100001100000000000000;
 
-  int score = weights_.at(3) * count(board_ & outermostRing) +
-              weights_.at(4) * count(board_ & middleRing) +
-              weights_.at(5) * count(board_ & innermostRing);
+  float score = weights_.at(3) * count(board_ & outermostRing) +
+                weights_.at(4) * count(board_ & middleRing) +
+                weights_.at(5) * count(board_ & innermostRing);
 
   return score;
 }
 
 float HeuristicEvaluator::fourOfFiveScore(
     const std::uint64_t our_board_, const std::uint64_t their_board_) const {
-  int score = 0;
+  float score = 0;
 
   for (std::uint64_t mask : pentago::kWinningMasks) {
     if (count_few(our_board_ & mask) == 4) {
