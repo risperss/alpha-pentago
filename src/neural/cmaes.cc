@@ -39,11 +39,6 @@ float regret(HeuristicEvaluator* evaluator, Position position) {
       minimax(position, INT_MAX, &lookup, &nodesVisited, evaluator);
   float regret = std::abs(returnValue.value - heuristicValue);
 
-  std::cout << "Heuristic: " << heuristicValue << std::endl;
-  std::cout << "Value: " << returnValue.value << std::endl;
-  std::cout << "Regret: " << regret << std::endl;
-  std::cout << "---------------------------" << std::endl;
-
   return regret;
 }
 
@@ -65,8 +60,6 @@ float fitness(std::array<float, kNumWeights> weights) {
   delete evaluator;
 
   float averageRegret = sumRegret / sampleCount;
-
-  std::cout << "Average Regret: " << averageRegret << std::endl;
 
   return averageRegret;
 }

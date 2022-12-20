@@ -27,7 +27,7 @@ add_executable(alpha_pentago
     src/main.cc
 )
 
-pybind11_add_module(pentago
+pybind11_add_module(pentagolib
     src/neural/cmaes.h
     src/neural/cmaes.cc
     src/neural/heuristic.h
