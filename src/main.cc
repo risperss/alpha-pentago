@@ -1,11 +1,7 @@
-#include <iostream>
-
-#include "neural/cmaes.h"
 #include "selfplay/game.h"
 
 int main(void) {
-  // pentago::selfPlay();
-  pentago::fitness(pentago::kDefaultWeights);
+  pentago::selfPlay();
 
   return 0;
 }

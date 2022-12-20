@@ -11,12 +11,12 @@
 namespace pentago {
 static const float kPositiveInfinity = FLT_MAX;
 static const float kNegativeInfinity = -FLT_MAX;
-static const int kMaxPositionValue = 1000.0;
-static const int kMinPositionValue = -1000.0;
+static const float kMaxPositionValue = 1000.0;
+static const float kMinPositionValue = -1000.0;
 static const int kMaxSearchDepth = 3;
 
 static const std::array<float, kNumWeights> kDefaultWeights = {
-    1.1, 2.5, 3.4, 10.0, 40.0, 80.0, 60.0, 200.0};
+    1.0, 2.5, 3.25, -1.0, 4.0, 8.0, 50.0, 100.0};
 
 struct ReturnValue {
   float value;
