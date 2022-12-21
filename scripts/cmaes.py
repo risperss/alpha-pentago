@@ -7,8 +7,8 @@ import random
 def purecmaes():
     # User defined input parameters (need to be edited)
     N = pentagolib.NUM_WEIGHTS  # number of objective variables/problem dimension
-    xmean = np.random.rand(N) * 100 # objective variables initial point
-    sigma = 30  # coordinate wise standard deviation (step size)
+    xmean = np.random.rand(N) * 10 # objective variables initial point
+    sigma = 3  # coordinate wise standard deviation (step size)
     stopfitness = 1e-14  # stop if fitness < stopfitness (minimization)
     stopeval = int(1e3 * N**2)  # stop after stopeval number of function evaluations
 
@@ -47,7 +47,6 @@ def purecmaes():
     counteval = 0  # the next 40 lines contain the 20 lines of interesting code
 
     while counteval < stopeval:
-        print("Count Eval: ", counteval) # TEMP: Gaetano
         # Generate and evaluate lambda offspring
         arx = np.zeros((N, lambda_))
         arfitness = np.zeros(lambda_)
@@ -97,7 +96,7 @@ def purecmaes():
         if arfitness[0] <= stopfitness or np.max(D) > 1e7 * np.min(D):
             break
 
-        print("Current Best Weights: ", arx[:, arindex[0]]) ### TEMP: Gaetano
+        print(["{:.2f}".format(x) for x in arx[:, arindex[0]]]) ### TEMP: Gaetano
 
     # Return best point of last iteration.
     # Notice that xmean is expected to be even better.
