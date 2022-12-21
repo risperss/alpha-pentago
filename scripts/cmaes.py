@@ -6,11 +6,10 @@ import random
 
 def purecmaes():
     # User defined input parameters (need to be edited)
-    fitness = pentagolib.fitness  # name of objective/fitness function
     N = pentagolib.NUM_WEIGHTS  # number of objective variables/problem dimension
     xmean = np.random.rand(N) * 100 # objective variables initial point
     sigma = 0.3  # coordinate wise standard deviation (step size)
-    stopfitness = 1e2  # stop if fitness < stopfitness (minimization)
+    stopfitness = 1e-14  # stop if fitness < stopfitness (minimization)
     stopeval = int(1e3 * N**2)  # stop after stopeval number of function evaluations
 
     # Strategy parameter setting: Selection
@@ -56,8 +55,9 @@ def purecmaes():
             arx[:, k] = xmean + sigma * B @ (
                 D * np.random.randn(N)
             )  # m + sig * Normal(0,C)
-            arfitness[k] = fitness(arx[:, k])  # objective function call
             counteval += 1
+
+        arfitness = pentagolib.fitnesses(arx.transpose().tolist())
 
         # Sort by fitness and compute weighted mean into xmean
         arfitness = np.sort(arfitness)  # minimization
@@ -97,12 +97,11 @@ def purecmaes():
         if arfitness[0] <= stopfitness or np.max(D) > 1e7 * np.min(D):
             break
 
-        print(arx[:, arindex[0]]) ### TEMP: Gaetano
-        print("Fitness: ", arfitness[0])
+        print("Current Best Weights: ", arx[:, arindex[0]]) ### TEMP: Gaetano
 
     # Return best point of last iteration.
     # Notice that xmean is expected to be even better.
     xmin = arx[:, arindex[0]]
     return xmin
 
-print(purecmaes())
+purecmaes()

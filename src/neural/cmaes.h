@@ -4,7 +4,10 @@
 #include "pentago/position.h"
 
 namespace pentago {
-PositionHistory randomSelfPlay();
-float regret(HeuristicEvaluator* evaluator, PositionHistory history);
-float fitness(std::array<float, kNumWeights> weights);
+using Chromosome = std::array<float, kNumWeights>;
+
+int versus_game(Chromosome white, Chromosome black, int search_depth);
+std::pair<int, int> match(Chromosome greece, Chromosome persia, int num_games,
+                          int search_depth);
+std::vector<float> fitnesses(std::vector<Chromosome> generation);
 }  // namespace pentago

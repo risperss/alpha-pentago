@@ -27,14 +27,10 @@ ReturnValue minimax(Position position, Move prevMove, int depth, float alpha,
   if (depth == 0 || result != GameResult::UNDECIDED) {
     float value;
 
-    if (result == GameResult::WHITE_WON) {
-      value = kMaxPositionValue;
-    } else if (result == GameResult::DRAW) {
-      value = 0;
-    } else if (result == GameResult::BLACK_WON) {
-      value = kMinPositionValue;
-    } else {
+    if (depth == 0) {
       value = evaluator->value(position);
+    } else {
+      value = terminalResultValue.find(result)->second;
     }
 
     return ReturnValue{value, prevMove, plyCount};

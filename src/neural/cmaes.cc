@@ -11,56 +11,97 @@
 
 namespace pentago {
 
-PositionHistory randomSelfPlay() {
+int versus_game(Chromosome white, Chromosome black, int search_depth) {
+  HeuristicEvaluator* evaluator;
+  HeuristicEvaluator white_evaluator = HeuristicEvaluator(white);
+  HeuristicEvaluator black_evaluator = HeuristicEvaluator(black);
+
+  PositionLookup* lookup = new PositionLookup;
+
   PentagoBoard board = PentagoBoard();
   Position starting = Position(board);
   PositionHistory history = PositionHistory(starting);
 
-  while (history.ComputeGameResult() == GameResult::UNDECIDED) {
-    MoveList legalMoves = history.Last().GetBoard().GenerateLegalMoves();
+  int black_to_move = false;
+  GameResult game_result = GameResult::UNDECIDED;
 
-    // randomize
-    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    shuffle(legalMoves.begin(), legalMoves.end(),
-            std::default_random_engine(seed));
+  while (game_result == GameResult::UNDECIDED) {
+    int nodesVisited = 0;
+    ReturnValue result;
 
-    history.Append(legalMoves.front());
+    evaluator = black_to_move ? &black_evaluator : &white_evaluator;
+
+    result =
+        minimax(history.Last(), search_depth, lookup, &nodesVisited, evaluator);
+
+    black_to_move = !black_to_move;
+    history.Append(result.move);
+    game_result = history.ComputeGameResult();
+
+    delete lookup;
+    lookup = new PositionLookup;
+  }
+  delete lookup;
+
+  return terminalResultValue.find(game_result)->second;
+}
+
+std::pair<int, int> match(Chromosome greece, Chromosome persia,
+                          int games_per_match, int search_depth) {
+  int greece_wins = 0;
+  int persia_wins = 0;
+
+  bool greece_is_white = true;
+
+  // TODO: cleanup this garbage
+  for (int i = 1; i <= games_per_match; i++) {
+    if (greece_is_white) {
+      int result = versus_game(greece, persia, search_depth);
+      if (result == 1) {
+        greece_wins += 1;
+      } else if (result == -1) {
+        persia_wins += 1;
+      }
+    } else {
+      int result = versus_game(persia, greece, search_depth);
+      if (result == 1) {
+        persia_wins += 1;
+      } else if (result == -1) {
+        greece_wins += 1;
+      }
+    }
+    greece_is_white = !greece_is_white;
   }
 
-  return history;
+  return std::pair<int, int>{greece_wins, persia_wins};
 }
 
-float regret(HeuristicEvaluator* evaluator, Position position) {
-  PositionLookup lookup;
-  int nodesVisited = 0;
+std::vector<float> fitnesses(std::vector<Chromosome> generation) {
+  int games_per_match = 3;
+  int lambda = generation.size();
+  int games_played_per_genome = (lambda - 1) * games_per_match;
+  int search_depth = 2;
 
-  float heuristicValue = evaluator->value(position);
-  ReturnValue returnValue =
-      minimax(position, INT_MAX, &lookup, &nodesVisited, evaluator);
-  float regret = std::abs(returnValue.value - heuristicValue);
+  // will store loss percentage for each Chromosome
+  std::vector<float> fitnesses = std::vector<float>(lambda, 0.0);
 
-  return regret;
-}
+  for (int i = 0; i < lambda - 1; i++) {
+    Chromosome greece = generation[i];
+    for (int j = i + 1; j < lambda; j++) {
+      Chromosome persia = generation[j];
 
-float fitness(std::array<float, kNumWeights> weights) {
-  HeuristicEvaluator* evaluator = new HeuristicEvaluator(weights);
-  float sumRegret = 0.0;
-  int sampleCount = 5;
+      std::pair<int, int> wins =
+          match(greece, persia, games_per_match, search_depth);
 
-  int i = 1;
-  while (i <= sampleCount) {
-    PositionHistory history = randomSelfPlay();
-
-    if (history.Last().GetPlyCount() >= 33) {
-      sumRegret +=
-          regret(evaluator, history.GetPositionAt(history.GetLength() - 4));
-      i++;
+      fitnesses[i] += wins.first;
+      fitnesses[j] += wins.second;
     }
   }
-  delete evaluator;
 
-  float averageRegret = sumRegret / sampleCount;
+  for (int i = 0; i < lambda; i++) {
+    fitnesses[i] = 1.0 / fitnesses[i];
+  }
 
-  return averageRegret;
+  return fitnesses;
 }
 }  // namespace pentago

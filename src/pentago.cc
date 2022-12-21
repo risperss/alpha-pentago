@@ -7,6 +7,6 @@ namespace py = pybind11;
 PYBIND11_MODULE(pentagolib, m) {
   m.doc() = "Alpha Pentago Python Library";
 
-  m.def("fitness", &pentago::fitness);
+  m.def("fitnesses", &pentago::fitnesses);
   m.attr("NUM_WEIGHTS") = pentago::kNumWeights;
 }

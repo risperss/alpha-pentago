@@ -15,6 +15,14 @@ const std::map<GameResult, std::string> resultString{
     {GameResult::DRAW, "Draw"},
     {GameResult::UNDECIDED, "Undecided"}};
 
+static const float kMaxPositionValue = 1000.0;
+static const float kMinPositionValue = -1000.0;
+
+const std::map<GameResult, float> terminalResultValue{
+    {GameResult::WHITE_WON, kMaxPositionValue},
+    {GameResult::BLACK_WON, kMinPositionValue},
+    {GameResult::DRAW, 0}};
+
 GameResult operator-(const GameResult& res);
 
 class Position {
