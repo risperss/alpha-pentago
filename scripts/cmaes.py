@@ -8,7 +8,7 @@ def purecmaes():
     # User defined input parameters (need to be edited)
     N = pentagolib.NUM_WEIGHTS  # number of objective variables/problem dimension
     xmean = np.random.rand(N) * 100 # objective variables initial point
-    sigma = 0.3  # coordinate wise standard deviation (step size)
+    sigma = 30  # coordinate wise standard deviation (step size)
     stopfitness = 1e-14  # stop if fitness < stopfitness (minimization)
     stopeval = int(1e3 * N**2)  # stop after stopeval number of function evaluations
 
