@@ -1,14 +1,13 @@
-import pentagolib
+import alpha_pentago
 
 import numpy as np
-import random
 
 
 def purecmaes():
     # User defined input parameters (need to be edited)
-    N = pentagolib.NUM_WEIGHTS  # number of objective variables/problem dimension
-    xmean = np.random.rand(N) * 10 # objective variables initial point
-    sigma = 3  # coordinate wise standard deviation (step size)
+    N = alpha_pentago.NUM_WEIGHTS  # number of objective variables/problem dimension
+    xmean = np.random.rand(N) # objective variables initial point
+    sigma = 0.3  # coordinate wise standard deviation (step size)
     stopfitness = 1e-14  # stop if fitness < stopfitness (minimization)
     stopeval = int(1e3 * N**2)  # stop after stopeval number of function evaluations
 
@@ -56,7 +55,7 @@ def purecmaes():
             )  # m + sig * Normal(0,C)
             counteval += 1
 
-        arfitness = pentagolib.fitnesses(arx.transpose().tolist())
+        arfitness = alpha_pentago.fitnesses(arx.transpose().tolist())
 
         # Sort by fitness and compute weighted mean into xmean
         arfitness = np.sort(arfitness)  # minimization
@@ -103,4 +102,5 @@ def purecmaes():
     xmin = arx[:, arindex[0]]
     return xmin
 
+alpha_pentago.self_play()
 purecmaes()

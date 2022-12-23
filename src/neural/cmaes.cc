@@ -8,13 +8,15 @@
 #include "neural/heuristic.h"
 #include "neural/minimax.h"
 #include "pentago/position.h"
+#include "utils/lookup.h"
 
 namespace pentago {
 
-int versus_game(Chromosome white, Chromosome black, int search_depth) {
+GameResult versus_game(Chromosome white_chromosome, Chromosome black_chromosome,
+                       int search_depth) {
   HeuristicEvaluator* evaluator;
-  HeuristicEvaluator white_evaluator = HeuristicEvaluator(white);
-  HeuristicEvaluator black_evaluator = HeuristicEvaluator(black);
+  HeuristicEvaluator white_evaluator = HeuristicEvaluator(white_chromosome);
+  HeuristicEvaluator black_evaluator = HeuristicEvaluator(black_chromosome);
 
   PositionLookup* lookup = new PositionLookup;
 
@@ -34,52 +36,53 @@ int versus_game(Chromosome white, Chromosome black, int search_depth) {
     result =
         minimax(history.Last(), search_depth, lookup, &nodesVisited, evaluator);
 
-    black_to_move = !black_to_move;
     history.Append(result.move);
+
+    black_to_move = !black_to_move;
     game_result = history.ComputeGameResult();
 
-    delete lookup;
-    lookup = new PositionLookup;
+    lookup = clearedLookup(lookup, history.Last());
   }
   delete lookup;
 
-  return terminalResultValue.find(game_result)->second;
+  return game_result;
 }
 
 std::pair<int, int> match(Chromosome greece, Chromosome persia,
-                          int games_per_match, int search_depth) {
-  int greece_wins = 0;
-  int persia_wins = 0;
+                          int games_per_side_per_match, int search_depth) {
+  int greece_score = 0;
+  int persia_score = 0;
 
-  bool greece_is_white = true;
+  int* white_score = &greece_score;
+  int* black_score = &persia_score;
 
-  // TODO: cleanup this garbage
-  for (int i = 1; i <= games_per_match; i++) {
-    if (greece_is_white) {
-      int result = versus_game(greece, persia, search_depth);
-      if (result == 1) {
-        greece_wins += 1;
-      } else if (result == -1) {
-        persia_wins += 1;
-      }
+  Chromosome* white_chromosome = &greece;
+  Chromosome* black_chromosome = &persia;
+
+  for (int i = 1; i <= 2 * games_per_side_per_match; i++) {
+    GameResult game_result =
+        versus_game(*white_chromosome, *black_chromosome, search_depth);
+
+    if (game_result == GameResult::WHITE_WON) {
+      *white_score += 3;
+    } else if (game_result == GameResult::BLACK_WON) {
+      *black_score += 3;
     } else {
-      int result = versus_game(persia, greece, search_depth);
-      if (result == 1) {
-        persia_wins += 1;
-      } else if (result == -1) {
-        greece_wins += 1;
-      }
+      *white_score += 1;
+      *black_score += 1;
     }
-    greece_is_white = !greece_is_white;
+
+    std::swap(white_score, black_score);
+    std::swap(white_chromosome, black_chromosome);
   }
 
-  return std::pair<int, int>{greece_wins, persia_wins};
+  return std::pair<int, int>{greece_score, persia_score};
 }
 
 std::vector<float> fitnesses(std::vector<Chromosome> generation) {
-  int games_per_match = 3;
+  int games_per_side_per_match = 1;
   int lambda = generation.size();
-  int games_played_per_genome = (lambda - 1) * games_per_match;
+  int games_played_per_genome = (lambda - 1) * 2 * games_per_side_per_match;
   int search_depth = 2;
 
   // will store loss percentage for each Chromosome
@@ -90,11 +93,11 @@ std::vector<float> fitnesses(std::vector<Chromosome> generation) {
     for (int j = i + 1; j < lambda; j++) {
       Chromosome persia = generation[j];
 
-      std::pair<int, int> wins =
-          match(greece, persia, games_per_match, search_depth);
+      std::pair<int, int> scores =
+          match(greece, persia, games_per_side_per_match, search_depth);
 
-      fitnesses[i] += wins.first;
-      fitnesses[j] += wins.second;
+      fitnesses[i] += scores.first;
+      fitnesses[j] += scores.second;
     }
   }
 

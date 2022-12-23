@@ -8,32 +8,10 @@
 #include "neural/heuristic.h"
 #include "neural/minimax.h"
 #include "pentago/position.h"
+#include "utils/lookup.h"
 
 namespace pentago {
-PositionLookup* clearedLookup(PositionLookup* lookup, Position position) {
-  if (position.GetPlyCount() + kMaxSearchDepth >= 9) {
-    return smartClearedLookup(lookup);
-  } else {
-    delete lookup;
-    return new PositionLookup;
-  }
-}
-
-PositionLookup* smartClearedLookup(PositionLookup* lookup) {
-  PositionLookup* newLookup = new PositionLookup;
-
-  for (auto& [hash, lookupItem] : *lookup) {
-    if (lookupItem.value == kMaxPositionValue ||
-        lookupItem.value == kMinPositionValue) {
-      (*newLookup)[hash] = lookupItem;
-    }
-  }
-
-  delete lookup;
-  return newLookup;
-}
-
-PositionHistory selfPlay() {
+void selfPlay() {
   using std::chrono::duration;
   using std::chrono::duration_cast;
   using std::chrono::high_resolution_clock;
@@ -103,7 +81,5 @@ PositionHistory selfPlay() {
   std::cout << "AVG NPS:\t" << (totalNodesVisited / totalTimeTaken)
             << " kN/s\n";
   std::cout << history.Last().DebugString() << "\n";
-
-  return history;
 }
 }  // namespace pentago

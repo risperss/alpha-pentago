@@ -14,7 +14,7 @@ static const float kNegativeInfinity = -FLT_MAX;
 static const int kMaxSearchDepth = 3;
 
 static const std::array<float, kNumWeights> kDefaultWeights = {
-    -6.56, -9.38, -31.95, -38.70, -56.84, -27.59, -38.12, -16.69};
+    -290.39, -258.93, -254.83, -263.00, -253.64, -249.61, -252.08, -271.19};
 
 struct ReturnValue {
   float value;
