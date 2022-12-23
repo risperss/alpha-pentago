@@ -4,5 +4,5 @@
 #include "neural/minimax.h"
 
 namespace pentago {
-void selfPlay();
+void selfPlay(int depth);
 }  // namespace pentago

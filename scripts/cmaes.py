@@ -102,5 +102,4 @@ def purecmaes():
     xmin = arx[:, arindex[0]]
     return xmin
 
-alpha_pentago.self_play()
 purecmaes()

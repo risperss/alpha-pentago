@@ -11,7 +11,7 @@
 #include "utils/lookup.h"
 
 namespace pentago {
-void selfPlay() {
+void selfPlay(int depth) {
   using std::chrono::duration;
   using std::chrono::duration_cast;
   using std::chrono::high_resolution_clock;
@@ -32,8 +32,8 @@ void selfPlay() {
     int nodesVisited = 0;
 
     auto t1 = high_resolution_clock::now();
-    ReturnValue result = minimax(history.Last(), kMaxSearchDepth, lookup,
-                                 &nodesVisited, evaluator);
+    ReturnValue result =
+        minimax(history.Last(), depth, lookup, &nodesVisited, evaluator);
     auto t2 = high_resolution_clock::now();
     auto ms_int = duration_cast<milliseconds>(t2 - t1);
 
@@ -77,7 +77,7 @@ void selfPlay() {
   std::cout << "Result:\t\t"
             << resultString.find(history.ComputeGameResult())->second << "\n";
   std::cout << "Max RAM:\t" << (maxLookupSize >> 20) << " Mb\n";
-  std::cout << "Search Depth:\t" << kMaxSearchDepth << std::endl;
+  std::cout << "Search Depth:\t" << depth << std::endl;
   std::cout << "AVG NPS:\t" << (totalNodesVisited / totalTimeTaken)
             << " kN/s\n";
   std::cout << history.Last().DebugString() << "\n";
