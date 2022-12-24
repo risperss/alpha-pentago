@@ -1,3 +1,4 @@
+#include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -18,7 +19,9 @@ PYBIND11_MODULE(alpha_pentago, m) {
 
   py::class_<pentago::Move>(m, "Move")
       .def(py::init<const std::string&>())
-      .def("__str__", &pentago::Move::as_string);
+      .def("__str__", &pentago::Move::as_string)
+      .def(py::self == py::self)
+      .def(py::self != py::self);
 
   py::enum_<pentago::GameResult>(m, "GameResult")
       .value("WHITE_WON", pentago::GameResult::WHITE_WON)

@@ -351,6 +351,14 @@ class Move {
            std::string(1, clockwise() ? 'R' : 'L');
   }
 
+  friend bool operator==(const Move& a, const Move& b) {
+    return a.data_ == b.data_;
+  }
+
+  friend bool operator!=(const Move& a, const Move& b) {
+    return a.data_ != b.data_;
+  }
+
  private:
   std::uint16_t data_ = 0;
   // Move, using the following encoding:

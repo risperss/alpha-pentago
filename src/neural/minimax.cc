@@ -36,7 +36,7 @@ ReturnValue minimax(Position position, Move prevMove, int depth, float alpha,
     return ReturnValue{value, prevMove, plyCount};
   }
 
-  MoveList legalMoves = position.GetBoard().GenerateLegalMoves();
+  MoveList legalMoves = position.GetBoard().SmartGenerateLegalMoves();
 
   // Randomize moves
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
