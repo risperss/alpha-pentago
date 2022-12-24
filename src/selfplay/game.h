@@ -2,6 +2,7 @@
 #include <unordered_map>
 
 #include "neural/minimax.h"
+#include "pentago/position.h"
 
 namespace pentago {
 void selfPlay(int depth);
@@ -27,5 +28,5 @@ class Game {
   GameResult ComputeResult();
 
   Move BestMove();
-}
+};
 }  // namespace pentago

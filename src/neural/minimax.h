@@ -33,8 +33,8 @@ using PositionLookup = std::unordered_map<std::uint64_t, LookupItem>;
 
 ReturnValue minimax(Position position, Move prevMove, int depth, float alpha,
                     float beta, bool maximizingPlayer, PositionLookup* lookup,
-                    int* nodesVisited, HeuristicEvaluator* evaluator);
+                    int* nodesVisited, HeuristicEvaluator evaluator);
 
 ReturnValue minimax(Position position, int depth, PositionLookup* lookup,
-                    int* nodesVisited, HeuristicEvaluator* evaluator);
+                    int* nodesVisited, HeuristicEvaluator evaluator);
 }  // namespace pentago

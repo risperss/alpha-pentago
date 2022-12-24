@@ -1,3 +1,6 @@
-import alpha_pentago
+from alpha_pentago import Game, Move
 
-alpha_pentago.self_play(3)
+game = Game()
+move = Move("a5-1R")
+game.compute_result()
+print(move)

@@ -33,8 +33,8 @@ GameResult versus_game(Chromosome white_chromosome, Chromosome black_chromosome,
 
     evaluator = black_to_move ? &black_evaluator : &white_evaluator;
 
-    result =
-        minimax(history.Last(), search_depth, lookup, &nodesVisited, evaluator);
+    result = minimax(history.Last(), search_depth, lookup, &nodesVisited,
+                     *evaluator);
 
     history.Append(result.move);
 

@@ -15,7 +15,8 @@ static PositionLookup* smartClearedLookup(PositionLookup* lookup) {
   return newLookup;
 }
 
-static PositionLookup clearedLookup(PositionLookup* lookup, Position position) {
+static PositionLookup* clearedLookup(PositionLookup* lookup,
+                                     Position position) {
   if (position.GetPlyCount() + kMaxSearchDepth >= 9) {
     return smartClearedLookup(lookup);
   } else {

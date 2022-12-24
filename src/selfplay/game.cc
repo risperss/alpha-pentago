@@ -18,7 +18,7 @@ void selfPlay(int depth) {
   using std::chrono::milliseconds;
 
   PositionLookup* lookup = new PositionLookup;
-  HeuristicEvaluator* evaluator = new HeuristicEvaluator(kDefaultWeights);
+  HeuristicEvaluator evaluator = HeuristicEvaluator(kDefaultWeights);
 
   PentagoBoard board = PentagoBoard();
   Position starting = Position(board);
@@ -43,8 +43,7 @@ void selfPlay(int depth) {
     std::cout << "To Move:\t"
               << (history.Last().IsBlackToMove() ? "Black" : "White") << "\n";
     std::cout << "Value:\t\t" << result.value << "\n";
-    std::cout << "Heuristic:\t" << evaluator->value(history.Last())
-              << std::endl;
+    std::cout << "Heuristic:\t" << evaluator.value(history.Last()) << std::endl;
     std::cout << "Move:\t\t" << result.move.as_string() << "\n";
     std::cout << "Nodes visited:\t" << (nodesVisited >> 10) << "k\n";
     std::cout << "Search time:\t" << ms_int.count() << " ms\n";
@@ -71,7 +70,6 @@ void selfPlay(int depth) {
     history.Append(result.move);
   }
   delete lookup;
-  delete evaluator;
 
   std::cout << "Ply Count:\t" << history.Last().GetPlyCount() << "\n";
   std::cout << "Result:\t\t"
@@ -86,16 +84,17 @@ void selfPlay(int depth) {
 // Game class to be exposed via pybind11
 
 Game::Game() {
-  position_lookup = new PositoinLookup();
-  position_history = PosiitonHistory();
+  PentagoBoard starting_board = PentagoBoard();
+  Position starting_position = Position(starting_board);
+  position_history = PositionHistory(starting_position);
+
+  position_lookup = new PositionLookup();
   heuristic_evaluator = HeuristicEvaluator(kDefaultWeights);
 }
 
 Game::~Game() { delete position_lookup; }
 
-void Game::SetMaxSearchDepth(int max_search_depth) {
-  this->max_search_depth = max_search_depth;
-}
+void Game::SetMaxSearchDepth(int depth) { max_search_depth = depth; }
 
 MoveList Game::LegalMoves() {
   return position_history.Last().GetBoard().GenerateLegalMoves();
@@ -114,6 +113,7 @@ Move Game::BestMove() {
   ReturnValue return_value =
       minimax(position_history.Last(), max_search_depth, position_lookup,
               &nodes_visited, heuristic_evaluator);
+  position_lookup = clearedLookup(position_lookup, position_history.Last());
 
   return return_value.move;
 }

@@ -14,7 +14,7 @@
 namespace pentago {
 ReturnValue minimax(Position position, Move prevMove, int depth, float alpha,
                     float beta, bool maximizingPlayer, PositionLookup* lookup,
-                    int* nodesVisited, HeuristicEvaluator* evaluator) {
+                    int* nodesVisited, HeuristicEvaluator evaluator) {
   GameResult result = GameResult::UNDECIDED;
   std::uint8_t plyCount = std::uint8_t(position.GetPlyCount());
   (*nodesVisited)++;
@@ -28,7 +28,7 @@ ReturnValue minimax(Position position, Move prevMove, int depth, float alpha,
     float value;
 
     if (depth == 0) {
-      value = evaluator->value(position);
+      value = evaluator.value(position);
     } else {
       value = terminalResultValue.find(result)->second;
     }
@@ -178,7 +178,7 @@ ReturnValue minimax(Position position, Move prevMove, int depth, float alpha,
 }
 
 ReturnValue minimax(Position position, int depth, PositionLookup* lookup,
-                    int* nodesVisited, HeuristicEvaluator* evaluator) {
+                    int* nodesVisited, HeuristicEvaluator evaluator) {
   return minimax(position, Move(std::uint16_t(0)), depth, kNegativeInfinity,
                  kPositiveInfinity, !position.IsBlackToMove(), lookup,
                  nodesVisited, evaluator);
