@@ -60,8 +60,7 @@ ReturnValue minimax(Position position, Move prevMove, int depth, float alpha,
       std::uint64_t their_pieces =
           candidatePosition.GetBoard().their_pieces().as_int();
 
-      std::array<std::uint64_t, 2> hashes =
-          PositionHashes(our_pieces, their_pieces);
+      HashList hashes = PositionHashes(our_pieces, their_pieces);
 
       bool foundMatchingHash = false;
 
@@ -125,8 +124,7 @@ ReturnValue minimax(Position position, Move prevMove, int depth, float alpha,
       std::uint64_t their_pieces =
           candidatePosition.GetBoard().their_pieces().as_int();
 
-      std::array<std::uint64_t, 2> hashes =
-          PositionHashes(our_pieces, their_pieces);
+      HashList hashes = PositionHashes(our_pieces, their_pieces);
 
       bool foundMatchingHash = false;
 

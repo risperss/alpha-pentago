@@ -3,10 +3,10 @@ import re
 from alpha_pentago import Game, Move, GameResult
 
 game = Game()
-game.set_max_search_depth(2)
+game.set_max_search_depth(4)
 computer_to_play = False
 
-human_game = True
+human_game = False
 
 while game.compute_result() == GameResult.UNDECIDED:
     print(game)

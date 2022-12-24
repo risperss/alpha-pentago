@@ -58,14 +58,24 @@ static const int count_few(const std::uint64_t board_) {
 #endif
 }
 
-static const std::uint64_t reverse(const std::uint64_t board) {
-  std::uint64_t result = ((BitReverseTable256[board & 0xFF] << 56) |
-                          (BitReverseTable256[(board >> 8) & 0xFF] << 48) |
-                          (BitReverseTable256[(board >> 16) & 0xFF] << 40) |
-                          (BitReverseTable256[(board >> 24) & 0xFF] << 32) |
-                          (BitReverseTable256[(board >> 32) & 0xFF] << 24) |
-                          (BitReverseTable256[(board >> 40) & 0xFF] << 16)) >>
+static const std::uint64_t reverse(const std::uint64_t board_) {
+  std::uint64_t result = ((BitReverseTable256[board_ & 0xFF] << 56) |
+                          (BitReverseTable256[(board_ >> 8) & 0xFF] << 48) |
+                          (BitReverseTable256[(board_ >> 16) & 0xFF] << 40) |
+                          (BitReverseTable256[(board_ >> 24) & 0xFF] << 32) |
+                          (BitReverseTable256[(board_ >> 32) & 0xFF] << 24) |
+                          (BitReverseTable256[(board_ >> 40) & 0xFF] << 16)) >>
                          28;
+
+  return result;
+}
+
+static const std::uint64_t mirror(const std::uint64_t board_) {
+  const std::uint64_t kRowMask = 0b111111;
+  std::uint64_t result =
+      ((board_ & kRowMask) << 30) | ((board_ & (kRowMask << 6)) << 18) |
+      ((board_ & (kRowMask << 12)) << 6) | ((board_ & (kRowMask << 18)) >> 6) |
+      ((board_ & (kRowMask << 24)) >> 18) | ((board_ & (kRowMask << 30)) >> 30);
 
   return result;
 }

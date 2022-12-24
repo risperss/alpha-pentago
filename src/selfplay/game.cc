@@ -8,6 +8,7 @@
 #include "neural/heuristic.h"
 #include "neural/minimax.h"
 #include "pentago/position.h"
+#include "utils/bitops.h"
 #include "utils/lookup.h"
 
 namespace pentago {
@@ -52,6 +53,12 @@ void selfPlay(int depth) {
       std::cout << "NPS:\t\t" << (nodesVisited / ms_int.count()) << " kN/s\n";
     }
     std::cout << history.Last().DebugString() << "\n";
+    BitBoard foo = BitBoard(
+        reverse(mirror(history.Last().GetBoard().our_pieces().as_int())));
+    BitBoard bar = BitBoard(
+        mirror(reverse(history.Last().GetBoard().our_pieces().as_int())));
+    std::cout << foo.DebugString() << "\n";
+    std::cout << bar.DebugString() << "\n";
 
     maxLookupSize = std::max(maxLookupSize, lookupSize);
 

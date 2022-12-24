@@ -17,6 +17,9 @@ PYBIND11_MODULE(alpha_pentago, m) {
   m.attr("NUM_WEIGHTS") = pentago::kNumWeights;
   m.def("fitnesses", &pentago::fitnesses);
 
+  // used for debugging
+  m.def("self_play", &pentago::selfPlay);
+
   py::class_<pentago::Move>(m, "Move")
       .def(py::init<const std::string&>())
       .def("__str__", &pentago::Move::as_string)
