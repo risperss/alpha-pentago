@@ -1,7 +1,7 @@
 #include "neural/minimax.h"
 
 namespace pentago {
-static PositionLookup* smartClearedLookup(PositionLookup* lookup) {
+static PositionLookup* smartClearedLookup(PositionLookup* lookup) { // to show a merge conflict
   PositionLookup* newLookup = new PositionLookup;
 
   for (auto& [hash, lookupItem] : *lookup) {
