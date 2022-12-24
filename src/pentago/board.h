@@ -3,7 +3,6 @@
 #include <cstdint>
 
 #include "pentago/bitboard.h"
-#include "utils/hashcat.h"
 
 namespace pentago {
 
@@ -19,12 +18,6 @@ class PentagoBoard {
   void Clear();
 
   void SetFromGrn(std::string grn);
-
-  std::uint64_t Hash() const {
-    return HashCat(our_pieces().as_int(), their_pieces().as_int());
-  }
-
-  std::uint64_t ReverseHash() const;
 
   void ApplyMove(Move move);
 

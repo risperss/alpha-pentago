@@ -9,7 +9,7 @@
 
 #include "neural/heuristic.h"
 #include "pentago/position.h"
-#include "utils/bitops.h"
+#include "utils/hashcat.h"
 
 namespace pentago {
 ReturnValue minimax(Position position, Move prevMove, int depth, float alpha,
@@ -54,8 +54,15 @@ ReturnValue minimax(Position position, Move prevMove, int depth, float alpha,
       candidate.move = m;
 
       Position candidatePosition = Position(position, m);
-      std::uint64_t hashes[] = {candidatePosition.Hash(),
-                                candidatePosition.ReverseHash()};
+
+      std::uint64_t our_pieces =
+          candidatePosition.GetBoard().our_pieces().as_int();
+      std::uint64_t their_pieces =
+          candidatePosition.GetBoard().their_pieces().as_int();
+
+      std::array<std::uint64_t, 2> hashes =
+          PositionHashes(our_pieces, their_pieces);
+
       bool foundMatchingHash = false;
 
       for (std::uint64_t& hash : hashes) {
@@ -112,8 +119,15 @@ ReturnValue minimax(Position position, Move prevMove, int depth, float alpha,
       candidate.move = m;
 
       Position candidatePosition = Position(position, m);
-      std::uint64_t hashes[] = {candidatePosition.Hash(),
-                                candidatePosition.ReverseHash()};
+
+      std::uint64_t our_pieces =
+          candidatePosition.GetBoard().our_pieces().as_int();
+      std::uint64_t their_pieces =
+          candidatePosition.GetBoard().their_pieces().as_int();
+
+      std::array<std::uint64_t, 2> hashes =
+          PositionHashes(our_pieces, their_pieces);
+
       bool foundMatchingHash = false;
 
       for (std::uint64_t& hash : hashes) {

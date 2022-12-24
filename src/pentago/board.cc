@@ -2,7 +2,6 @@
 
 #include "neural/heuristic.h"
 #include "pentago/bitboard.h"
-#include "utils/bitops.h"
 #include "utils/exception.h"
 
 namespace pentago {
@@ -165,11 +164,6 @@ MoveList PentagoBoard::GenerateLegalMoves() const {
   }
 
   return legalMoves;
-}
-
-std::uint64_t PentagoBoard::ReverseHash() const {
-  return HashCat(reverse(our_pieces().as_int()),
-                 reverse(their_pieces().as_int()));
 }
 
 void PentagoBoard::ApplyMove(Move move) {
