@@ -82,4 +82,40 @@ void selfPlay(int depth) {
             << " kN/s\n";
   std::cout << history.Last().DebugString() << "\n";
 }
+
+// Game class to be exposed via pybind11
+
+Game::Game() {
+  position_lookup = new PositoinLookup();
+  position_history = PosiitonHistory();
+  heuristic_evaluator = HeuristicEvaluator(kDefaultWeights);
+}
+
+Game::~Game() { delete position_lookup; }
+
+void Game::SetMaxSearchDepth(int max_search_depth) {
+  this->max_search_depth = max_search_depth;
+}
+
+MoveList Game::LegalMoves() {
+  return position_history.Last().GetBoard().GenerateLegalMoves();
+}
+
+void Game::MakeMove(Move move) { position_history.Append(move); }
+
+void Game::UnmakeMove() { position_history.Pop(); }
+
+GameResult Game::ComputeResult() {
+  return position_history.Last().ComputeGameResult();
+}
+
+Move Game::BestMove() {
+  int nodes_visited = 0;
+  ReturnValue return_value =
+      minimax(position_history.Last(), max_search_depth, position_lookup,
+              &nodes_visited, heuristic_evaluator);
+
+  return return_value.move;
+}
+
 }  // namespace pentago
