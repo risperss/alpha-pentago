@@ -34,5 +34,6 @@ PYBIND11_MODULE(alpha_pentago, m) {
       .def("push", &pentago::Game::MakeMove)
       .def("pop", &pentago::Game::UnmakeMove)
       .def("compute_result", &pentago::Game::ComputeResult)
-      .def("best_move", &pentago::Game::BestMove);
+      .def("best_move", &pentago::Game::BestMove)
+      .def("__str__", &pentago::Game::DebugString);
 }

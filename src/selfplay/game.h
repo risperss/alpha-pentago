@@ -28,5 +28,7 @@ class Game {
   GameResult ComputeResult();
 
   Move BestMove();
+
+  std::string DebugString();
 };
 }  // namespace pentago

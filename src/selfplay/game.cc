@@ -118,4 +118,8 @@ Move Game::BestMove() {
   return return_value.move;
 }
 
+std::string Game::DebugString() {
+  return position_history.Last().DebugString();
+}
+
 }  // namespace pentago
