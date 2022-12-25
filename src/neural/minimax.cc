@@ -37,25 +37,27 @@ ReturnValue minimax(Position position, Move prev_move, int depth, float alpha,
     return ReturnValue{value, prev_move, plyCount};
   }
 
-  MoveList legalMoves = position.GetBoard().SmartGenerateLegalMoves();
+  MoveList legal_moves = position.GetBoard().SmartGenerateLegalMoves();
 
   // Randomize moves
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-  shuffle(legalMoves.begin(), legalMoves.end(),
+  shuffle(legal_moves.begin(), legal_moves.end(),
           std::default_random_engine(seed));
 
   // Search function
   if (maximizingPlayer) {
     ReturnValue current_best;
     current_best.value = kNegativeInfinity;  // maxValue
+    bool at_least_one = false;
 
-    for (Move& move : legalMoves) {
+    for (Move& move : legal_moves) {
       ReturnValue candidate;
       candidate.move = move;
 
       Position candidate_position = Position(position, move);
 
-      if (willLose(candidate_position)) {
+      if (at_least_one && willLose(candidate_position)) {
+        // TODO: is this issue if all moves willLose ?
         continue;
       }
 
@@ -79,19 +81,21 @@ ReturnValue minimax(Position position, Move prev_move, int depth, float alpha,
         break;
       }
       alpha = std::max(current_best.value, alpha);
+      at_least_one = true;
     }
     return current_best;
   } else {
     ReturnValue current_best;
     current_best.value = kPositiveInfinity;  // minValue
+    bool at_least_one = false;
 
-    for (Move& move : legalMoves) {
+    for (Move& move : legal_moves) {
       ReturnValue candidate;
       candidate.move = move;
 
       Position candidate_position = Position(position, move);
 
-      if (willLose(candidate_position)) {
+      if (at_least_one && willLose(candidate_position)) {
         continue;
       }
 
@@ -115,6 +119,7 @@ ReturnValue minimax(Position position, Move prev_move, int depth, float alpha,
         break;
       }
       beta = std::min(current_best.value, beta);
+      at_least_one = true;
     }
     return current_best;
   }
@@ -198,10 +203,13 @@ void setReturnValueFromLookupItem(ReturnValue& return_value,
 }
 
 bool willLose(Position position) {
-  std::uint64_t their_board = position.GetBoard().their_pieces().as_int();
+  // Position after we have made move... their pieces now our pieces
+  std::uint64_t our_pieces = position.GetBoard().our_pieces().as_int();
+  std::uint64_t their_pieces = position.GetBoard().their_pieces().as_int();
 
   for (std::uint64_t mask : kWinningMasks) {
-    if (count_few(their_board & mask) == 4) {
+    if (count_few(our_pieces & mask) == 4 &&
+        count_few(their_pieces & mask) == 0) {
       return true;
     }
   }

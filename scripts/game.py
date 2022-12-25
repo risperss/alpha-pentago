@@ -2,8 +2,10 @@ import re
 
 from alpha_pentago import Game, Move, GameResult
 
+MAX_SEARCH_DEPTH = 4
+
 game = Game()
-game.set_max_search_depth(3)
+game.set_max_search_depth(MAX_SEARCH_DEPTH)
 computer_to_play = False
 
 human_game = False

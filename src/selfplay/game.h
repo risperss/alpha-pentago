@@ -5,8 +5,6 @@
 #include "pentago/position.h"
 
 namespace pentago {
-void selfPlay(int depth);
-
 class Game {
  private:
   int max_search_depth = 4;

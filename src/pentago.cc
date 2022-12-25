@@ -6,6 +6,7 @@
 
 #include "neural/cmaes.h"
 #include "pentago/position.h"
+#include "selfplay/debug.h"
 #include "selfplay/game.h"
 
 namespace py = pybind11;
