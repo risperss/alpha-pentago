@@ -3,7 +3,7 @@ import re
 from alpha_pentago import Game, Move, GameResult
 
 game = Game()
-game.set_max_search_depth(4)
+game.set_max_search_depth(3)
 computer_to_play = False
 
 human_game = False

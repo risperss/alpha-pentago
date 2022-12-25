@@ -18,7 +18,7 @@ GameResult versus_game(Chromosome white_chromosome, Chromosome black_chromosome,
   HeuristicEvaluator white_evaluator = HeuristicEvaluator(white_chromosome);
   HeuristicEvaluator black_evaluator = HeuristicEvaluator(black_chromosome);
 
-  PositionLookup* lookup = new PositionLookup;
+  PositionLookup* position_lookup = new PositionLookup;
 
   PentagoBoard board = PentagoBoard();
   Position starting = Position(board);
@@ -33,17 +33,17 @@ GameResult versus_game(Chromosome white_chromosome, Chromosome black_chromosome,
 
     evaluator = black_to_move ? &black_evaluator : &white_evaluator;
 
-    result = minimax(history.Last(), search_depth, lookup, &nodesVisited,
-                     *evaluator);
+    result = minimax(history.Last(), search_depth, position_lookup,
+                     &nodesVisited, *evaluator);
 
     history.Append(result.move);
 
     black_to_move = !black_to_move;
     game_result = history.ComputeGameResult();
 
-    lookup = clearedLookup(lookup, history.Last());
+    position_lookup = clearedLookup(position_lookup, history.Last());
   }
-  delete lookup;
+  delete position_lookup;
 
   return game_result;
 }
@@ -83,7 +83,7 @@ std::vector<float> fitnesses(std::vector<Chromosome> generation) {
   int games_per_side_per_match = 1;
   int lambda = generation.size();
   int games_played_per_genome = (lambda - 1) * 2 * games_per_side_per_match;
-  int search_depth = 2;
+  int search_depth = 3;
 
   // will store loss percentage for each Chromosome
   std::vector<float> fitnesses = std::vector<float>(lambda, 0.0);

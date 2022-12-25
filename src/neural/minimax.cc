@@ -12,9 +12,10 @@
 #include "utils/hashcat.h"
 
 namespace pentago {
-ReturnValue minimax(Position position, Move prevMove, int depth, float alpha,
-                    float beta, bool maximizingPlayer, PositionLookup* lookup,
-                    int* nodesVisited, HeuristicEvaluator evaluator) {
+ReturnValue minimax(Position position, Move prev_move, int depth, float alpha,
+                    float beta, bool maximizingPlayer,
+                    PositionLookup* position_lookup, int* nodesVisited,
+                    HeuristicEvaluator evaluator) {
   GameResult result = GameResult::UNDECIDED;
   std::uint8_t plyCount = std::uint8_t(position.GetPlyCount());
   (*nodesVisited)++;
@@ -27,13 +28,13 @@ ReturnValue minimax(Position position, Move prevMove, int depth, float alpha,
   if (depth == 0 || result != GameResult::UNDECIDED) {
     float value;
 
-    if (depth == 0) {
-      value = evaluator.value(position);
+    if (result != GameResult::UNDECIDED) {
+      value = kTerminalResultValue.find(result)->second;
     } else {
-      value = terminalResultValue.find(result)->second;
+      value = evaluator.value(position);
     }
 
-    return ReturnValue{value, prevMove, plyCount};
+    return ReturnValue{value, prev_move, plyCount};
   }
 
   MoveList legalMoves = position.GetBoard().SmartGenerateLegalMoves();
@@ -45,140 +46,166 @@ ReturnValue minimax(Position position, Move prevMove, int depth, float alpha,
 
   // Search function
   if (maximizingPlayer) {
-    ReturnValue currentBest;
-    currentBest.value = kNegativeInfinity;  // maxValue
+    ReturnValue current_best;
+    current_best.value = kNegativeInfinity;  // maxValue
 
-    for (Move& m : legalMoves) {
-      // SAME ABOVE AS BELOW
+    for (Move& move : legalMoves) {
       ReturnValue candidate;
-      candidate.move = m;
+      candidate.move = move;
 
-      Position candidatePosition = Position(position, m);
+      Position candidate_position = Position(position, move);
 
-      std::uint64_t our_pieces =
-          candidatePosition.GetBoard().our_pieces().as_int();
-      std::uint64_t their_pieces =
-          candidatePosition.GetBoard().their_pieces().as_int();
-
-      HashList hashes = PositionHashes(our_pieces, their_pieces);
-
-      bool foundMatchingHash = false;
-
-      for (std::uint64_t& hash : hashes) {
-        if (lookup->find(hash) != lookup->end()) {
-          LookupItem item = lookup->find(hash)->second;
-          candidate.value = item.value;
-          candidate.plyCount = item.plyCount;
-
-          (*nodesVisited)++;
-          foundMatchingHash = true;
-          break;
-        }
+      if (willLose(candidate_position)) {
+        continue;
       }
 
-      if (!foundMatchingHash) {
-        ReturnValue result =
-            minimax(candidatePosition, m, depth - 1, alpha, beta,
-                    !maximizingPlayer, lookup, nodesVisited, evaluator);
+      std::pair<LookupItem, bool> looked_up_position =
+          lookupPosition(candidate_position, position_lookup);
+
+      if (looked_up_position.second) {
+        setReturnValueFromLookupItem(candidate, looked_up_position.first);
+      } else {
+        ReturnValue result = minimax(candidate_position, move, depth - 1, alpha,
+                                     beta, !maximizingPlayer, position_lookup,
+                                     nodesVisited, evaluator);
         candidate.value = result.value;
         candidate.plyCount = result.plyCount;
 
-        LookupItem item = LookupItem{candidate.value, candidate.plyCount};
-        (*lookup)[hashes[0]] = item;
+        addPositionToLookup(candidate_position, result, position_lookup);
       }
-      /////////////////////
+      maybeSetCurrentBest(current_best, candidate, maximizingPlayer);
 
-      if (candidate.value > currentBest.value) {
-        currentBest = candidate;
-      } else if (candidate.value == currentBest.value) {
-        // Losing, take longest path
-        if (candidate.value == kMinPositionValue &&
-            candidate.plyCount > currentBest.plyCount) {
-          currentBest = candidate;
-          // Winning, take shortest path
-        } else if (candidate.value == kMaxPositionValue &&
-                   candidate.plyCount < currentBest.plyCount) {
-          currentBest = candidate;
-        }
-      }
-
-      if (currentBest.value >= beta) {
+      if (current_best.value >= beta) {
         break;
       }
-      alpha = std::max(currentBest.value, alpha);
+      alpha = std::max(current_best.value, alpha);
     }
-    return currentBest;
+    return current_best;
   } else {
-    ReturnValue currentBest;
-    currentBest.value = kPositiveInfinity;  // minValue
+    ReturnValue current_best;
+    current_best.value = kPositiveInfinity;  // minValue
 
-    for (Move& m : legalMoves) {
-      // SAME ABOVE AS BELOW
+    for (Move& move : legalMoves) {
       ReturnValue candidate;
-      candidate.move = m;
+      candidate.move = move;
 
-      Position candidatePosition = Position(position, m);
+      Position candidate_position = Position(position, move);
 
-      std::uint64_t our_pieces =
-          candidatePosition.GetBoard().our_pieces().as_int();
-      std::uint64_t their_pieces =
-          candidatePosition.GetBoard().their_pieces().as_int();
-
-      HashList hashes = PositionHashes(our_pieces, their_pieces);
-
-      bool foundMatchingHash = false;
-
-      for (std::uint64_t& hash : hashes) {
-        if (lookup->find(hash) != lookup->end()) {
-          LookupItem item = lookup->find(hash)->second;
-          candidate.value = item.value;
-          candidate.plyCount = item.plyCount;
-
-          (*nodesVisited)++;
-          foundMatchingHash = true;
-          break;
-        }
+      if (willLose(candidate_position)) {
+        continue;
       }
 
-      if (!foundMatchingHash) {
-        ReturnValue result =
-            minimax(candidatePosition, m, depth - 1, alpha, beta,
-                    !maximizingPlayer, lookup, nodesVisited, evaluator);
+      std::pair<LookupItem, bool> looked_up_position =
+          lookupPosition(candidate_position, position_lookup);
+
+      if (looked_up_position.second) {
+        setReturnValueFromLookupItem(candidate, looked_up_position.first);
+      } else {
+        ReturnValue result = minimax(candidate_position, move, depth - 1, alpha,
+                                     beta, !maximizingPlayer, position_lookup,
+                                     nodesVisited, evaluator);
         candidate.value = result.value;
         candidate.plyCount = result.plyCount;
 
-        LookupItem item = LookupItem{candidate.value, candidate.plyCount};
-        (*lookup)[hashes[0]] = item;
+        addPositionToLookup(candidate_position, result, position_lookup);
       }
-      /////////////////////
+      maybeSetCurrentBest(current_best, candidate, maximizingPlayer);
 
-      if (candidate.value < currentBest.value) {
-        currentBest = candidate;
-      } else if (candidate.value == currentBest.value) {
-        // Losing, take longest path
-        if (candidate.value == kMaxPositionValue &&
-            candidate.plyCount > currentBest.plyCount) {
-          currentBest = candidate;
-          // Winning, take shortest path
-        } else if (candidate.value == kMinPositionValue &&
-                   candidate.plyCount < currentBest.plyCount) {
-          currentBest = candidate;
-        }
-      }
-
-      if (currentBest.value <= alpha) {
+      if (current_best.value <= alpha) {
         break;
       }
-      beta = std::min(currentBest.value, beta);
+      beta = std::min(current_best.value, beta);
     }
-    return currentBest;
+    return current_best;
   }
 }
 
-ReturnValue minimax(Position position, int depth, PositionLookup* lookup,
-                    int* nodesVisited, HeuristicEvaluator evaluator) {
+ReturnValue minimax(Position position, int depth,
+                    PositionLookup* position_lookup, int* nodesVisited,
+                    HeuristicEvaluator evaluator) {
   return minimax(position, Move(std::uint16_t(0)), depth, kNegativeInfinity,
-                 kPositiveInfinity, !position.IsBlackToMove(), lookup,
+                 kPositiveInfinity, !position.IsBlackToMove(), position_lookup,
                  nodesVisited, evaluator);
+}
+
+std::pair<LookupItem, bool> lookupPosition(Position position,
+                                           PositionLookup* position_lookup) {
+  LookupItem lookup_item;
+
+  std::uint64_t our_pieces = position.GetBoard().our_pieces().as_int();
+  std::uint64_t their_pieces = position.GetBoard().their_pieces().as_int();
+
+  HashList hashes = PositionHashes(our_pieces, their_pieces);
+
+  bool found_position = false;
+
+  for (std::uint64_t& hash : hashes) {
+    if (position_lookup->find(hash) != position_lookup->end()) {
+      lookup_item = position_lookup->find(hash)->second;
+      found_position = true;
+      break;
+    }
+  }
+
+  return {lookup_item, found_position};
+}
+
+void addPositionToLookup(Position position, ReturnValue candidate,
+                         PositionLookup* position_lookup) {
+  LookupItem item = LookupItem{candidate.value, candidate.plyCount};
+  (*position_lookup)[HashCat(position.GetBoard().our_pieces().as_int(),
+                             position.GetBoard().their_pieces().as_int())] =
+      item;
+}
+
+void maybeSetCurrentBest(ReturnValue& current_best, ReturnValue& candidate,
+                         bool maximizingPlayer) {
+  if (maximizingPlayer) {
+    if (candidate.value > current_best.value) {
+      current_best = candidate;
+    } else if (candidate.value == current_best.value) {
+      // Losing, take longest path
+      if (candidate.value == kMinPositionValue &&
+          candidate.plyCount > current_best.plyCount) {
+        current_best = candidate;
+        // Winning, take shortest path
+      } else if (candidate.value == kMaxPositionValue &&
+                 candidate.plyCount < current_best.plyCount) {
+        current_best = candidate;
+      }
+    }
+  } else {
+    if (candidate.value < current_best.value) {
+      current_best = candidate;
+    } else if (candidate.value == current_best.value) {
+      // Losing, take longest path
+      if (candidate.value == kMaxPositionValue &&
+          candidate.plyCount > current_best.plyCount) {
+        current_best = candidate;
+        // Winning, take shortest path
+      } else if (candidate.value == kMinPositionValue &&
+                 candidate.plyCount < current_best.plyCount) {
+        current_best = candidate;
+      }
+    }
+  }
+}
+
+void setReturnValueFromLookupItem(ReturnValue& return_value,
+                                  LookupItem lookup_item) {
+  return_value.value = lookup_item.value;
+  return_value.plyCount = lookup_item.plyCount;
+}
+
+bool willLose(Position position) {
+  std::uint64_t their_board = position.GetBoard().their_pieces().as_int();
+
+  for (std::uint64_t mask : kWinningMasks) {
+    if (count_few(their_board & mask) == 4) {
+      return true;
+    }
+  }
+
+  return false;
 }
 }  // namespace pentago

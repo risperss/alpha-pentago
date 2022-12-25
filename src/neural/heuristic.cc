@@ -56,7 +56,7 @@ float HeuristicEvaluator::fourOfFiveScore(
     const std::uint64_t our_board_, const std::uint64_t their_board_) const {
   float score = 0;
 
-  for (std::uint64_t mask : pentago::kWinningMasks) {
+  for (std::uint64_t mask : kWinningMasks) {
     if (count_few(our_board_ & mask) == 4) {
       if ((their_board_ & mask) == 0) {
         score += weights_.at(6);

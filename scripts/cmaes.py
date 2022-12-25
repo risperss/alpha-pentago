@@ -3,6 +3,17 @@ import alpha_pentago
 import numpy as np
 
 
+def niceprint(x):
+    s = ""
+    for (index, item) in enumerate(x):
+        s += f"\t{item:0.1f} "
+
+        if index % 6 == 5:
+            s += "\n"
+
+    print(s)
+
+
 def purecmaes():
     # User defined input parameters (need to be edited)
     N = alpha_pentago.NUM_WEIGHTS  # number of objective variables/problem dimension
@@ -95,11 +106,13 @@ def purecmaes():
         if arfitness[0] <= stopfitness or np.max(D) > 1e7 * np.min(D):
             break
 
-        print(["{:.2f}".format(x) for x in arx[:, arindex[0]]]) ### TEMP: Gaetano
+        niceprint(arx[:, arindex[0]])
 
     # Return best point of last iteration.
     # Notice that xmean is expected to be even better.
     xmin = arx[:, arindex[0]]
     return xmin
 
-purecmaes()
+x = purecmaes()
+
+print(x)

@@ -18,7 +18,7 @@ void selfPlay(int depth) {
   using std::chrono::high_resolution_clock;
   using std::chrono::milliseconds;
 
-  PositionLookup* lookup = new PositionLookup;
+  PositionLookup* position_lookup = new PositionLookup;
   HeuristicEvaluator evaluator = HeuristicEvaluator(kDefaultWeights);
 
   PentagoBoard board = PentagoBoard();
@@ -33,12 +33,12 @@ void selfPlay(int depth) {
     int nodesVisited = 0;
 
     auto t1 = high_resolution_clock::now();
-    ReturnValue result =
-        minimax(history.Last(), depth, lookup, &nodesVisited, evaluator);
+    ReturnValue result = minimax(history.Last(), depth, position_lookup,
+                                 &nodesVisited, evaluator);
     auto t2 = high_resolution_clock::now();
     auto ms_int = duration_cast<milliseconds>(t2 - t1);
 
-    unsigned long lookupSize = lookup->size() * sizeof(LookupItem);
+    unsigned long lookupSize = position_lookup->size() * sizeof(LookupItem);
 
     std::cout << "Ply Count:\t" << history.Last().GetPlyCount() << "\n";
     std::cout << "To Move:\t"
@@ -73,10 +73,10 @@ void selfPlay(int depth) {
     totalNodesVisited += nodesVisited;
     totalTimeTaken += ms_int.count();
 
-    lookup = clearedLookup(lookup, history.Last());
+    position_lookup = clearedLookup(position_lookup, history.Last());
     history.Append(result.move);
   }
-  delete lookup;
+  delete position_lookup;
 
   std::cout << "Ply Count:\t" << history.Last().GetPlyCount() << "\n";
   std::cout << "Result:\t\t"
