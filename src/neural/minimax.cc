@@ -17,7 +17,7 @@ ReturnValue minimax(Position position, Move prev_move, int depth, float alpha,
                     PositionLookup* position_lookup, int* nodesVisited,
                     HeuristicEvaluator evaluator) {
   GameResult result = GameResult::UNDECIDED;
-  std::uint8_t plyCount = std::uint8_t(position.GetPlyCount());
+  const std::uint8_t plyCount = std::uint8_t(position.GetPlyCount());
   (*nodesVisited)++;
 
   if (plyCount >= 9) {
@@ -56,7 +56,7 @@ ReturnValue minimax(Position position, Move prev_move, int depth, float alpha,
 
       Position candidate_position = Position(position, move);
 
-      if (at_least_one && willLose(candidate_position)) {
+      if (plyCount >= 8 && at_least_one && willLose(candidate_position)) {
         continue;
       }
 
@@ -94,7 +94,7 @@ ReturnValue minimax(Position position, Move prev_move, int depth, float alpha,
 
       Position candidate_position = Position(position, move);
 
-      if (at_least_one && willLose(candidate_position)) {
+      if (plyCount >= 8 && at_least_one && willLose(candidate_position)) {
         continue;
       }
 
