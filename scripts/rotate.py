@@ -69,11 +69,19 @@ rows = [
 
 assert len(rows) == 64
 
+def rotate90(row):
+    z = "00000"
+    return row[5] + z + row[4] + z + row[3] + z + row[2] + z + row[1] + z + row[0]
+
+def rotate270(row):
+    z = "00000"
+    return row[0] + z + row[1] + z + row[2] + z + row[3] + z + row[4] + z + row[5]
+
 for i, row in enumerate(rows):
     assert int(row, 2) == i
 
-    z = "00000"
-    rotated_row = row[5] + z + row[4] + z + row[3] + z + row[2] + z + row[1] + z + row[0]
+    # rotated_row = rotate90(row)
+    rotated_row = rotate270(row)
 
     assert len(rotated_row) == 31
 

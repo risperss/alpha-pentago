@@ -43,6 +43,22 @@ static const std::uint64_t RotateRow90Table[] = {
     0x41040041ULL, 0x00001041ULL, 0x40001041ULL, 0x01001041ULL, 0x41001041ULL,
     0x00041041ULL, 0x40041041ULL, 0x01041041ULL, 0x41041041ULL};
 
+static const std::uint64_t RotateRow270Table[] = {
+    0x00000000ULL, 0x00000001ULL, 0x00000040ULL, 0x00000041ULL, 0x00001000ULL,
+    0x00001001ULL, 0x00001040ULL, 0x00001041ULL, 0x00040000ULL, 0x00040001ULL,
+    0x00040040ULL, 0x00040041ULL, 0x00041000ULL, 0x00041001ULL, 0x00041040ULL,
+    0x00041041ULL, 0x01000000ULL, 0x01000001ULL, 0x01000040ULL, 0x01000041ULL,
+    0x01001000ULL, 0x01001001ULL, 0x01001040ULL, 0x01001041ULL, 0x01040000ULL,
+    0x01040001ULL, 0x01040040ULL, 0x01040041ULL, 0x01041000ULL, 0x01041001ULL,
+    0x01041040ULL, 0x01041041ULL, 0x40000000ULL, 0x40000001ULL, 0x40000040ULL,
+    0x40000041ULL, 0x40001000ULL, 0x40001001ULL, 0x40001040ULL, 0x40001041ULL,
+    0x40040000ULL, 0x40040001ULL, 0x40040040ULL, 0x40040041ULL, 0x40041000ULL,
+    0x40041001ULL, 0x40041040ULL, 0x40041041ULL, 0x41000000ULL, 0x41000001ULL,
+    0x41000040ULL, 0x41000041ULL, 0x41001000ULL, 0x41001001ULL, 0x41001040ULL,
+    0x41001041ULL, 0x41040000ULL, 0x41040001ULL, 0x41040040ULL, 0x41040041ULL,
+    0x41041000ULL, 0x41041001ULL, 0x41041040ULL, 0x41041041ULL,
+};
+
 static const int count(const std::uint64_t board_) {
 #if defined(NO_POPCNT)
   std::uint64_t x = board_;
@@ -92,6 +108,17 @@ static const std::uint64_t rotate180(const std::uint64_t board_) {
           (BitReverseTable256[(board_ >> 32) & 0xFF] << 24) |
           (BitReverseTable256[(board_ >> 40) & 0xFF] << 16)) >>
          28;
+}
+
+static const std::uint64_t rotate270(const std::uint64_t board_) {
+  const std::uint64_t kRowMask = 0b111111;
+
+  return ((RotateRow270Table[(board_ & kRowMask)] << 5) |
+          (RotateRow270Table[((board_ >> 6) & kRowMask)] << 4) |
+          (RotateRow270Table[((board_ >> 12) & kRowMask)] << 3) |
+          (RotateRow270Table[((board_ >> 18) & kRowMask)] << 2) |
+          (RotateRow270Table[((board_ >> 24) & kRowMask)] << 1) |
+          RotateRow270Table[((board_ >> 30) & kRowMask)]);
 }
 
 static const std::uint64_t mirror(const std::uint64_t board_) {

@@ -57,7 +57,6 @@ ReturnValue minimax(Position position, Move prev_move, int depth, float alpha,
       Position candidate_position = Position(position, move);
 
       if (at_least_one && willLose(candidate_position)) {
-        // TODO: is this issue if all moves willLose ?
         continue;
       }
 

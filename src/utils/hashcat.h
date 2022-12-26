@@ -6,7 +6,7 @@
 #pragma once
 namespace pentago {
 
-using HashList = std::array<uint64_t, 7>;
+using HashList = std::array<uint64_t, 8>;
 
 static uint64_t Hash(uint64_t val) {
   return 0xfad0d7f2fbb059f1ULL * (val + 0xbaad41cdcb839961ULL) +
@@ -25,10 +25,12 @@ static HashList PositionHashes(uint64_t x, uint64_t y) {
   return {HashPosition(x, y),
           HashPosition(rotate90(x), rotate90(y)),
           HashPosition(rotate180(x), rotate180(y)),
+          HashPosition(rotate270(x), rotate270(y)),
 
           HashPosition(mirror(x), mirror(y)),
           HashPosition(mirror(rotate90(x)), mirror(rotate90(y))),
-          HashPosition(mirror(rotate180(x)), mirror(rotate180(y)))};
+          HashPosition(mirror(rotate180(x)), mirror(rotate180(y))),
+          HashPosition(mirror(rotate270(x)), mirror(rotate270(y)))};
 }
 
 }  // namespace pentago
