@@ -28,6 +28,21 @@ static const std::uint64_t BitReverseTable256[] = {
     0x0F, 0x8F, 0x4F, 0xCF, 0x2F, 0xAF, 0x6F, 0xEF, 0x1F, 0x9F, 0x5F, 0xDF,
     0x3F, 0xBF, 0x7F, 0xFF};
 
+static const std::uint64_t RotateRow90Table[] = {
+    0x00000000ULL, 0x40000000ULL, 0x01000000ULL, 0x41000000ULL, 0x00040000ULL,
+    0x40040000ULL, 0x01040000ULL, 0x41040000ULL, 0x00001000ULL, 0x40001000ULL,
+    0x01001000ULL, 0x41001000ULL, 0x00041000ULL, 0x40041000ULL, 0x01041000ULL,
+    0x41041000ULL, 0x00000040ULL, 0x40000040ULL, 0x01000040ULL, 0x41000040ULL,
+    0x00040040ULL, 0x40040040ULL, 0x01040040ULL, 0x41040040ULL, 0x00001040ULL,
+    0x40001040ULL, 0x01001040ULL, 0x41001040ULL, 0x00041040ULL, 0x40041040ULL,
+    0x01041040ULL, 0x41041040ULL, 0x00000001ULL, 0x40000001ULL, 0x01000001ULL,
+    0x41000001ULL, 0x00040001ULL, 0x40040001ULL, 0x01040001ULL, 0x41040001ULL,
+    0x00001001ULL, 0x40001001ULL, 0x01001001ULL, 0x41001001ULL, 0x00041001ULL,
+    0x40041001ULL, 0x01041001ULL, 0x41041001ULL, 0x00000041ULL, 0x40000041ULL,
+    0x01000041ULL, 0x41000041ULL, 0x00040041ULL, 0x40040041ULL, 0x01040041ULL,
+    0x41040041ULL, 0x00001041ULL, 0x40001041ULL, 0x01001041ULL, 0x41001041ULL,
+    0x00041041ULL, 0x40041041ULL, 0x01041041ULL, 0x41041041ULL};
+
 static const int count(const std::uint64_t board_) {
 #if defined(NO_POPCNT)
   std::uint64_t x = board_;
@@ -58,26 +73,35 @@ static const int count_few(const std::uint64_t board_) {
 #endif
 }
 
-static const std::uint64_t reverse(const std::uint64_t board_) {
-  std::uint64_t result = ((BitReverseTable256[board_ & 0xFF] << 56) |
-                          (BitReverseTable256[(board_ >> 8) & 0xFF] << 48) |
-                          (BitReverseTable256[(board_ >> 16) & 0xFF] << 40) |
-                          (BitReverseTable256[(board_ >> 24) & 0xFF] << 32) |
-                          (BitReverseTable256[(board_ >> 32) & 0xFF] << 24) |
-                          (BitReverseTable256[(board_ >> 40) & 0xFF] << 16)) >>
-                         28;
+static const std::uint64_t rotate90(const std::uint64_t board_) {
+  const std::uint64_t kRowMask = 0b111111;
 
-  return result;
+  return (RotateRow90Table[(board_ & kRowMask)] |
+          (RotateRow90Table[((board_ >> 6) & kRowMask)] << 1) |
+          (RotateRow90Table[((board_ >> 12) & kRowMask)] << 2) |
+          (RotateRow90Table[((board_ >> 18) & kRowMask)] << 3) |
+          (RotateRow90Table[((board_ >> 24) & kRowMask)] << 4) |
+          (RotateRow90Table[((board_ >> 30) & kRowMask)] << 5));
+}
+
+static const std::uint64_t rotate180(const std::uint64_t board_) {
+  return ((BitReverseTable256[board_ & 0xFF] << 56) |
+          (BitReverseTable256[(board_ >> 8) & 0xFF] << 48) |
+          (BitReverseTable256[(board_ >> 16) & 0xFF] << 40) |
+          (BitReverseTable256[(board_ >> 24) & 0xFF] << 32) |
+          (BitReverseTable256[(board_ >> 32) & 0xFF] << 24) |
+          (BitReverseTable256[(board_ >> 40) & 0xFF] << 16)) >>
+         28;
 }
 
 static const std::uint64_t mirror(const std::uint64_t board_) {
   const std::uint64_t kRowMask = 0b111111;
-  std::uint64_t result =
-      ((board_ & kRowMask) << 30) | ((board_ & (kRowMask << 6)) << 18) |
-      ((board_ & (kRowMask << 12)) << 6) | ((board_ & (kRowMask << 18)) >> 6) |
-      ((board_ & (kRowMask << 24)) >> 18) | ((board_ & (kRowMask << 30)) >> 30);
 
-  return result;
+  return ((board_ & kRowMask) << 30) | ((board_ & (kRowMask << 6)) << 18) |
+         ((board_ & (kRowMask << 12)) << 6) |
+         ((board_ & (kRowMask << 18)) >> 6) |
+         ((board_ & (kRowMask << 24)) >> 18) |
+         ((board_ & (kRowMask << 30)) >> 30);
 }
 
 }  // namespace pentago

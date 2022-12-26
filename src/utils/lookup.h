@@ -1,6 +1,7 @@
 #include "neural/minimax.h"
 
 namespace pentago {
+namespace {
 static PositionLookup* smartClearedLookup(PositionLookup* position_lookup) {
   PositionLookup* newLookup = new PositionLookup;
 
@@ -14,6 +15,7 @@ static PositionLookup* smartClearedLookup(PositionLookup* position_lookup) {
   delete position_lookup;
   return newLookup;
 }
+}  // namespace
 
 static PositionLookup* clearedLookup(PositionLookup* position_lookup,
                                      Position position) {
