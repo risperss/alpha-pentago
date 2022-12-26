@@ -55,12 +55,6 @@ void selfPlay(int depth) {
     }
     std::cout << history.Last().DebugString() << "\n";
 
-    BitBoard x = history.Last().GetBoard().our_pieces();
-    BitBoard xboard =
-        BitBoard(rotate270(history.Last().GetBoard().our_pieces().as_int()));
-
-    std::cout << x.DebugString() << "\n" << xboard.DebugString() << "\n";
-
     maxLookupSize = std::max(maxLookupSize, lookupSize);
 
     if (result.value == kMaxPositionValue ||

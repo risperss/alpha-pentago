@@ -1,12 +1,10 @@
 ### BUILDING:
 1. Install `cmake`
-2. `mkdir build; cd build`
-3. `cmake ..`
-4. `make`
-5. `./alpha_pentago`
+2. Install `pybind11`
+3. Run `./build.sh`
 
 ### TODO:
-- Store lookups for 8 variations of each position
+- ~~Store lookups for 8 variations of each position~~
 - Implement iterative deepening
 - ~~Improve heuristic evaluation~~
 - ~~Implement CMA-ES~~
