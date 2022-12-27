@@ -2,17 +2,18 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include <string>
-
 #include "neural/cmaes.h"
 #include "pentago/position.h"
 #include "selfplay/debug.h"
 #include "selfplay/game.h"
 
+#define STRINGIFY(x) #x
+#define MACRO_STRINGIFY(x) STRINGIFY(x)
+
 namespace py = pybind11;
 
-PYBIND11_MODULE(alpha_pentago, m) {
-  m.doc() = "Alpha Pentago Python Library";
+PYBIND11_MODULE(pentago, m) {
+  m.doc() = "Pentago Game and Engine";
 
   // used for cmaes
   m.attr("NUM_WEIGHTS") = pentago::kNumWeights;
@@ -43,4 +44,10 @@ PYBIND11_MODULE(alpha_pentago, m) {
       .def("compute_result", &pentago::Game::ComputeResult)
       .def("best_move", &pentago::Game::BestMove)
       .def("__str__", &pentago::Game::DebugString);
+
+#ifdef VERSION_INFO
+  m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
+#else
+  m.attr("__version__") = "dev";
+#endif
 }

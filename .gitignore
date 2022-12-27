@@ -3,6 +3,7 @@
 .vscode
 build/
 venv
+*.egg-info
 
 
 # Prerequisites
