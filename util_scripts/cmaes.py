@@ -1,4 +1,4 @@
-import alpha_pentago
+import pentago
 
 import numpy as np
 
@@ -16,7 +16,7 @@ def niceprint(x):
 
 def purecmaes():
     # User defined input parameters (need to be edited)
-    N = alpha_pentago.NUM_WEIGHTS  # number of objective variables/problem dimension
+    N = pentago.NUM_WEIGHTS  # number of objective variables/problem dimension
     xmean = np.random.rand(N) # objective variables initial point
     sigma = 0.3  # coordinate wise standard deviation (step size)
     stopfitness = 1e-14  # stop if fitness < stopfitness (minimization)
@@ -66,7 +66,7 @@ def purecmaes():
             )  # m + sig * Normal(0,C)
             counteval += 1
 
-        arfitness = alpha_pentago.fitnesses(arx.transpose().tolist())
+        arfitness = pentago.fitnesses(arx.transpose().tolist())
 
         # Sort by fitness and compute weighted mean into xmean
         arfitness = np.sort(arfitness)  # minimization

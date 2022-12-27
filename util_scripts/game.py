@@ -1,6 +1,6 @@
 import re
 
-from alpha_pentago import Game, Move, GameResult
+from pentago import Game, Move, GameResult
 
 MAX_SEARCH_DEPTH = 4
 

@@ -1,7 +1,7 @@
-### BUILDING:
-1. Install `cmake`
-2. Install `pybind11`
-3. Run `./build.sh`
+### INSTALLING:
+1. Clone repo
+2. To install package: `pip install .`
+3. To debug: `./build.sh; ./build/alpha_pentago`
 
 ### TODO:
 - ~~Store lookups for 8 variations of each position~~
