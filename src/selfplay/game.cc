@@ -39,12 +39,11 @@ GameResult Game::ComputeResult() {
 
 Move Game::BestMove() {
   int nodes_visited = 0;
-  ReturnValue return_value =
-      minimax(position_history.Last(), max_search_depth, position_lookup,
-              &nodes_visited, heuristic_evaluator);
+  Policy policy = minimax(position_history.Last(), max_search_depth,
+                          position_lookup, &nodes_visited, heuristic_evaluator);
   position_lookup = clearedLookup(position_lookup, position_history.Last());
 
-  return return_value.move;
+  return policy.move;
 }
 
 std::string Game::DebugString() {

@@ -34,12 +34,12 @@ void selfPlay(int depth) {
     int nodesVisited = 0;
 
     auto t1 = high_resolution_clock::now();
-    ReturnValue result = minimax(history.Last(), depth, position_lookup,
-                                 &nodesVisited, evaluator);
+    Policy result = minimax(history.Last(), depth, position_lookup,
+                            &nodesVisited, evaluator);
     auto t2 = high_resolution_clock::now();
     auto ms_int = duration_cast<milliseconds>(t2 - t1);
 
-    unsigned long lookupSize = position_lookup->size() * sizeof(LookupItem);
+    unsigned long lookupSize = position_lookup->size() * sizeof(Value);
 
     std::cout << "Ply Count:\t" << history.Last().GetPlyCount() << "\n";
     std::cout << "To Move:\t"
@@ -60,8 +60,8 @@ void selfPlay(int depth) {
     if (result.value == kMaxPositionValue ||
         result.value == kMinPositionValue) {
       std::string color = result.value == kMaxPositionValue ? "White" : "Black";
-      std::cout << "Forced:\t" << color << " to win on ply "
-                << static_cast<int>(result.plyCount) << "\n";
+      std::cout << "Forced:\t" << color << " to win on ply " << result.ply_count
+                << "\n";
     }
     std::cout << "------------------------------" << std::endl;
 

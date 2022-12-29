@@ -29,14 +29,14 @@ GameResult versus_game(Chromosome white_chromosome, Chromosome black_chromosome,
 
   while (game_result == GameResult::UNDECIDED) {
     int nodesVisited = 0;
-    ReturnValue result;
+    Policy policy;
 
     evaluator = black_to_move ? &black_evaluator : &white_evaluator;
 
-    result = minimax(history.Last(), search_depth, position_lookup,
+    policy = minimax(history.Last(), search_depth, position_lookup,
                      &nodesVisited, *evaluator);
 
-    history.Append(result.move);
+    history.Append(policy.move);
 
     black_to_move = !black_to_move;
     game_result = history.ComputeGameResult();
