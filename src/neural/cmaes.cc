@@ -83,7 +83,7 @@ std::vector<float> fitnesses(std::vector<Chromosome> generation) {
   int games_per_side_per_match = 1;
   int lambda = generation.size();
   int games_played_per_genome = (lambda - 1) * 2 * games_per_side_per_match;
-  int search_depth = 3;
+  int search_depth = 2;
 
   // will store loss percentage for each Chromosome
   std::vector<float> fitnesses = std::vector<float>(lambda, 0.0);

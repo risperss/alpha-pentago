@@ -18,7 +18,7 @@ def purecmaes():
     # User defined input parameters (need to be edited)
     N = pentago.NUM_WEIGHTS  # number of objective variables/problem dimension
     xmean = np.random.rand(N) # objective variables initial point
-    sigma = 0.3  # coordinate wise standard deviation (step size)
+    sigma = 0.05  # coordinate wise standard deviation (step size)
     stopfitness = 1e-14  # stop if fitness < stopfitness (minimization)
     stopeval = int(1e3 * N**2)  # stop after stopeval number of function evaluations
 
@@ -106,7 +106,7 @@ def purecmaes():
         if arfitness[0] <= stopfitness or np.max(D) > 1e7 * np.min(D):
             break
 
-        niceprint(arx[:, arindex[0]])
+        print(arx[:, arindex[0]])
 
     # Return best point of last iteration.
     # Notice that xmean is expected to be even better.

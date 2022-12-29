@@ -7,10 +7,13 @@ from setuptools import setup
 
 __version__ = "0.0.1"
 
+source_files = glob("src/**/*.cc")
+source_files.append("src/pentago.cc")
+
 ext_modules = [
     Pybind11Extension(
         "pentago",
-        sorted(glob("src/**/*.cc", recursive=True)),
+        source_files,
         include_dirs=["src"],
         define_macros=[('VERSION_INFO', __version__)],
     ),
