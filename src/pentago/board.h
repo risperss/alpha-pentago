@@ -1,12 +1,21 @@
 #pragma once
 
 #include <cstdint>
+#include <map>
 
 #include "pentago/bitboard.h"
 
 namespace pentago {
 
 enum class BoardResult : uint8_t { UNDECIDED, THEY_WON, DRAW, WE_WON };
+
+static const float kMaxPositionValue = 999999.0;
+static const float kMinPositionValue = -999999.0;
+
+const std::map<BoardResult, float> kBoardResultValue{
+    {BoardResult::WE_WON, kMaxPositionValue},
+    {BoardResult::THEY_WON, kMinPositionValue},
+    {BoardResult::DRAW, 0}};
 
 class PentagoBoard {
  public:

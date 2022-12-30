@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "selfplay/debug.h"
 
-int main(void) { pentago::selfPlay(3); }
+int main(void) { pentago::testNegamax(3); }

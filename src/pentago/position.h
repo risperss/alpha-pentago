@@ -15,9 +15,6 @@ const std::map<GameResult, std::string> resultString{
     {GameResult::DRAW, "Draw"},
     {GameResult::UNDECIDED, "Undecided"}};
 
-static const float kMaxPositionValue = 999999.0;
-static const float kMinPositionValue = -999999.0;
-
 const std::map<GameResult, float> kTerminalResultValue{
     {GameResult::WHITE_WON, kMaxPositionValue},
     {GameResult::BLACK_WON, kMinPositionValue},

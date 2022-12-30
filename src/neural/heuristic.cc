@@ -10,6 +10,7 @@ namespace pentago {
 HeuristicEvaluator::HeuristicEvaluator(std::array<float, kNumWeights> weights) {
   weights_ = weights;
 }
+
 float HeuristicEvaluator::value(Position position) const {
   const std::uint64_t our_board = position.GetBoard().our_pieces().as_int();
   const std::uint64_t their_board = position.GetBoard().their_pieces().as_int();
@@ -20,10 +21,6 @@ float HeuristicEvaluator::value(Position position) const {
   value += centralityScore(our_board) - centralityScore(their_board);
   value += fourOfFiveScore(our_board, their_board) -
            fourOfFiveScore(their_board, our_board);
-
-  if (position.IsBlackToMove()) {
-    value = -value;
-  }
 
   return value;
 }

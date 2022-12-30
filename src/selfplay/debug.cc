@@ -7,6 +7,7 @@
 
 #include "neural/heuristic.h"
 #include "neural/minimax.h"
+#include "neural/negamax.h"
 #include "pentago/position.h"
 #include "utils/bitops.h"
 #include "utils/hashcat.h"
@@ -81,5 +82,18 @@ void selfPlay(int depth) {
   std::cout << "AVG NPS:\t" << (totalNodesVisited / totalTimeTaken)
             << " kN/s\n";
   std::cout << history.Last().DebugString() << "\n";
+}
+
+void testNegamax(int depth) {
+  HeuristicEvaluator evaluator = HeuristicEvaluator(kDefaultWeights);
+  Negamax negamax = Negamax(evaluator);
+
+  PentagoBoard starting_board = PentagoBoard();
+  Position starting_position = Position(starting_board);
+  PositionHistory history = PositionHistory(starting_position);
+
+  std::cout << "Value: " << negamax.negamax(starting_position, depth, 1)
+            << "\n";
+  std::cout << "Nodes Visited: " << negamax.getNodesVisited() / 1000 << "k \n";
 }
 }  // namespace pentago

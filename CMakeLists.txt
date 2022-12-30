@@ -12,6 +12,8 @@ add_executable(alpha_pentago
     src/neural/heuristic.cc
     src/neural/minimax.h
     src/neural/minimax.cc
+    src/neural/negamax.h
+    src/neural/negamax.cc
     src/pentago/bitboard.h
     src/pentago/board.h
     src/pentago/board.cc
