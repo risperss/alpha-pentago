@@ -19,18 +19,26 @@ static uint64_t HashCat(uint64_t x, uint64_t y) {
   return hash;
 }
 
-static uint64_t HashPosition(uint64_t x, uint64_t y) { return HashCat(x, y); }
+static uint64_t Hash(Position position) {
+  return HashCat(position.GetBoard().our_pieces().as_int(),
+                 position.GetBoard().their_pieces().as_int());
+}
 
 static HashList PositionHashes(uint64_t x, uint64_t y) {
-  return {HashPosition(x, y),
-          HashPosition(rotate90(x), rotate90(y)),
-          HashPosition(rotate180(x), rotate180(y)),
-          HashPosition(rotate270(x), rotate270(y)),
+  return {HashCat(x, y),
+          HashCat(rotate90(x), rotate90(y)),
+          HashCat(rotate180(x), rotate180(y)),
+          HashCat(rotate270(x), rotate270(y)),
 
-          HashPosition(mirror(x), mirror(y)),
-          HashPosition(mirror(rotate90(x)), mirror(rotate90(y))),
-          HashPosition(mirror(rotate180(x)), mirror(rotate180(y))),
-          HashPosition(mirror(rotate270(x)), mirror(rotate270(y)))};
+          HashCat(mirror(x), mirror(y)),
+          HashCat(mirror(rotate90(x)), mirror(rotate90(y))),
+          HashCat(mirror(rotate180(x)), mirror(rotate180(y))),
+          HashCat(mirror(rotate270(x)), mirror(rotate270(y)))};
+}
+
+static HashList PositionHashes(Position position) {
+  return PositionHashes(position.GetBoard().our_pieces().as_int(),
+                        position.GetBoard().their_pieces().as_int());
 }
 
 }  // namespace pentago
