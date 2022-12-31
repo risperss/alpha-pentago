@@ -47,7 +47,7 @@ PositionList Negamax::order_child_positions(Position position, MoveList moves) {
             [this](const Position& a, const Position& b) {
               TTEntry tta = transposition_table_lookup(a);
               TTEntry ttb = transposition_table_lookup(b);
-              return (is_valid(tta) && !is_valid(ttb)) || tta.value < ttb.value;
+              return (is_valid(tta) && !is_valid(ttb)) || tta.value > ttb.value;
             });
 
   return child_positions;
