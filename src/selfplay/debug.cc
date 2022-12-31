@@ -84,16 +84,41 @@ void selfPlay(int depth) {
   std::cout << history.Last().DebugString() << "\n";
 }
 
-void testNegamax(int depth) {
-  HeuristicEvaluator evaluator = HeuristicEvaluator(kDefaultWeights);
-  Negamax negamax = Negamax(evaluator);
+void testNegamax() {
+  using std::chrono::duration;
+  using std::chrono::duration_cast;
+  using std::chrono::high_resolution_clock;
+  using std::chrono::milliseconds;
 
-  PentagoBoard starting_board = PentagoBoard();
-  Position starting_position = Position(starting_board);
+  for (int depth = 1; depth <= 6; depth++) {
+    HeuristicEvaluator evaluator = HeuristicEvaluator(kDefaultWeights);
+    Negamax negamax = Negamax(evaluator);
 
-  std::cout << "Depth: " << depth << "\n";
-  std::cout << "Value: " << negamax.negamax(starting_position, depth, 1)
-            << "\n";
-  std::cout << "Nodes Visited: " << negamax.getNodesVisited() / 1000 << "k \n";
+    PentagoBoard starting_board = PentagoBoard();
+    Position starting_position = Position(starting_board);
+
+    float value;
+    auto t1 = high_resolution_clock::now();
+    {  // Just for ease of reading
+      value = negamax.negamax(starting_position, depth, 1);
+    }
+    auto t2 = high_resolution_clock::now();
+    auto ms_int = duration_cast<milliseconds>(t2 - t1);
+
+    std::cout << "Depth:\t" << depth << "\n";
+    std::cout << "Value:\t" << value << "\n";
+
+    if (negamax.getNodesVisited() > 10000000) {
+      std::cout << "Nodes Visited:\t" << negamax.getNodesVisited() / 1000000
+                << "m \n";
+    } else if (negamax.getNodesVisited() > 10000) {
+      std::cout << "Nodes Visited:\t" << negamax.getNodesVisited() / 1000
+                << "k \n";
+    } else {
+      std::cout << "Nodes Visited:\t" << negamax.getNodesVisited() << "\n";
+    }
+    std::cout << "Time Elapsed:\t" << ms_int.count() << "\n";
+    std::cout << "--------------------" << std::endl;
+  }
 }
 }  // namespace pentago

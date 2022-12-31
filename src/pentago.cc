@@ -20,7 +20,7 @@ PYBIND11_MODULE(pentago, m) {
   m.def("fitnesses", &pentago::fitnesses);
 
   // used for debugging
-  m.def("self_play", &pentago::selfPlay);
+  m.def("debug", &pentago::testNegamax);
 
   py::class_<pentago::Move>(m, "Move")
       .def(py::init<const std::string&>())

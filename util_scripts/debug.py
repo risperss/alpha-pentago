@@ -1,3 +1,3 @@
-from pentago import self_play
+from pentago import debug
 
-self_play(3)
+debug()
