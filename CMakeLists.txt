@@ -6,12 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 include_directories(src)
 
 add_executable(alpha_pentago
-    src/neural/cmaes.h
-    src/neural/cmaes.cc
     src/neural/heuristic.h
     src/neural/heuristic.cc
-    src/neural/minimax.h
-    src/neural/minimax.cc
     src/neural/negamax.h
     src/neural/negamax.cc
     src/pentago/bitboard.h
@@ -25,7 +21,6 @@ add_executable(alpha_pentago
     src/selfplay/game.cc
     src/utils/bitops.h
     src/utils/exception.h
-    src/utils/lookup.h
     src/utils/hashcat.h
     src/main.cc
 )

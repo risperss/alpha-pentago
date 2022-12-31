@@ -13,7 +13,6 @@ Negamax::Negamax(HeuristicEvaluator heuristic_evaluator) {
 }
 
 float Negamax::negamax(Position position, int depth, int color) {
-  max_ply_seen = position.GetPlyCount() + depth;
   return negamax(position, depth, -FLT_MAX, FLT_MAX, 1);
 }
 
@@ -30,9 +29,10 @@ TTEntry Negamax::transposition_table_lookup(Position position) {
 bool Negamax::is_valid(TTEntry tt_entry) { return tt_entry.depth != -999; }
 
 void Negamax::transposition_table_store(Position position, TTEntry tt_entry) {
-  for (const std::uint64_t hash : PositionHashes(position)) {
-    transposition_table[hash] = tt_entry;
-  }
+  // for (const std::uint64_t hash : PositionHashes(position)) {
+  //   transposition_table[hash] = tt_entry;
+  // }
+  transposition_table[Hash(position)] = tt_entry;
 }
 
 PositionList Negamax::order_child_positions(Position position, MoveList moves) {
@@ -47,7 +47,7 @@ PositionList Negamax::order_child_positions(Position position, MoveList moves) {
             [this](const Position& a, const Position& b) {
               TTEntry tta = transposition_table_lookup(a);
               TTEntry ttb = transposition_table_lookup(b);
-              return (is_valid(tta) && !is_valid(ttb)) || tta.value > ttb.value;
+              return tta.value > ttb.value;
             });
 
   return child_positions;
@@ -83,11 +83,11 @@ float Negamax::negamax(Position position, int depth, float a, float b,
   }
 
   MoveList legal_moves = position.GetBoard().SmartGenerateLegalMoves();
-  PositionList child_positions = order_child_positions(position, legal_moves);
   float value = -FLT_MAX;
 
-  for (const Position child : child_positions) {
-    value = std::max(value, negamax(child, depth - 1, -b, -a, -color));
+  for (const Move move : legal_moves) {
+    value = std::max(
+        value, -negamax(Position(position, move), depth - 1, -b, -a, -color));
     a = std::max(a, value);
 
     if (a >= b) {
@@ -105,6 +105,16 @@ float Negamax::negamax(Position position, int depth, float a, float b,
   }
   tt_entry.depth = depth;
   transposition_table_store(position, tt_entry);
+
+  return value;
+}
+
+float Negamax::iddfs(Position position, int depth, int color) {
+  float value = -FLT_MAX;
+
+  for (int i = 1; i <= depth; i++) {
+    value = std::max(value, negamax(position, i, color));
+  }
 
   return value;
 }

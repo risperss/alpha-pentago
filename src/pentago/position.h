@@ -16,8 +16,8 @@ const std::map<GameResult, std::string> resultString{
     {GameResult::UNDECIDED, "Undecided"}};
 
 const std::map<GameResult, float> kTerminalResultValue{
-    {GameResult::WHITE_WON, kMaxPositionValue},
-    {GameResult::BLACK_WON, kMinPositionValue},
+    {GameResult::WHITE_WON, kMaxBoardValue},
+    {GameResult::BLACK_WON, kMinBoardValue},
     {GameResult::DRAW, 0}};
 
 GameResult operator-(const GameResult& res);

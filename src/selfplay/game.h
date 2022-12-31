@@ -1,7 +1,6 @@
 #include <cstdint>
 #include <unordered_map>
 
-#include "neural/minimax.h"
 #include "pentago/position.h"
 
 namespace pentago {

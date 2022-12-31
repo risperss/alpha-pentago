@@ -17,13 +17,18 @@ struct TTEntry {
 
 using TT = std::unordered_map<uint64_t, TTEntry>;
 
-const TTEntry empty = TTEntry{0, -999, LookupFlag::EXACT};
+const TTEntry empty = TTEntry{kMinBoardValue, -999, LookupFlag::EXACT};
+
+static const std::array<float, kNumWeights> kDefaultWeights = {
+    0.67168461, 0.10707687, 0.06840958, -0.29951185,
+    0.21427413, 0.33170923, 0.68111354, -0.04503335};
 
 class Negamax {
  public:
   Negamax(HeuristicEvaluator heuristic_evaluator);
 
   float negamax(Position position, int depth, int color);
+  float iddfs(Position position, int dpeth, int color);
 
   unsigned long long getNodesVisited() { return nodes_visited; }
 
@@ -40,8 +45,6 @@ class Negamax {
   unsigned long long nodes_visited = 0;
 
   TT transposition_table;
-
-  int max_ply_seen;
 };
 
 }  // namespace pentago
