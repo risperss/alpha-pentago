@@ -1,11 +1,13 @@
 cmake_minimum_required(VERSION 3.22)
-project(alpha_pentago)
+project(pentago)
 
 set(CMAKE_CXX_STANDARD 17)
 
+find_package(pybind11)
+
 include_directories(src)
 
-add_executable(alpha_pentago
+pybind11_add_module(pentago
     src/neural/heuristic.h
     src/neural/heuristic.cc
     src/neural/negamax.h
