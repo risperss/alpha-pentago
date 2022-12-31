@@ -22,10 +22,12 @@ static const std::uint64_t kWinningMasks[] = {
 
 static const int kNumWeights = 8;
 
+using Genome = std::array<float, kNumWeights>;
+
 class HeuristicEvaluator {
  public:
   HeuristicEvaluator() = default;
-  HeuristicEvaluator(std::array<float, kNumWeights> weights);
+  HeuristicEvaluator(Genome genome);
 
   float value(Position position) const;
 
@@ -37,7 +39,7 @@ class HeuristicEvaluator {
                         const std::uint64_t their_board_) const;
 
  private:
-  std::array<float, kNumWeights> weights_;
+  Genome genome_;
 };
 
 }  // namespace pentago

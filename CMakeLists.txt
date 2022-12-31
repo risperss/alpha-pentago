@@ -15,10 +15,6 @@ add_executable(alpha_pentago
     src/pentago/board.cc
     src/pentago/position.h
     src/pentago/position.cc
-    src/selfplay/debug.h
-    src/selfplay/debug.cc
-    src/selfplay/game.h
-    src/selfplay/game.cc
     src/utils/bitops.h
     src/utils/exception.h
     src/utils/hashcat.h

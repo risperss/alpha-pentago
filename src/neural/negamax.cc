@@ -3,12 +3,18 @@
 #include <cfloat>
 #include <cstdint>
 
+#include "neural/heuristic.h"
 #include "utils/hashcat.h"
 
 namespace pentago {
 
-Negamax::Negamax(HeuristicEvaluator heuristic_evaluator) {
-  this->heuristic_evaluator = heuristic_evaluator;
+Negamax::Negamax() {
+  heuristic_evaluator = HeuristicEvaluator(kDefaultGenome);
+  transposition_table = TT();
+}
+
+Negamax::Negamax(Genome genome) {
+  heuristic_evaluator = HeuristicEvaluator(genome);
   transposition_table = TT();
 }
 

@@ -28,6 +28,8 @@ class Position {
 
   Position(const PentagoBoard& board);
 
+  Position(const std::string& grn);
+
   bool IsBlackToMove() const { return ply_count_ % 2 == 1; }
 
   int GetPlyCount() const { return ply_count_; }

@@ -1,5 +1,7 @@
 #include "position.h"
 
+#include <string>
+
 namespace pentago {
 
 Position::Position(const Position& parent, Move m)
@@ -13,6 +15,8 @@ Position::Position(const PentagoBoard& board) {
   board_ = board;
   ply_count_ = board.our_pieces().count() + board.their_pieces().count();
 }
+
+Position::Position(const std::string& grn) { Position(PentagoBoard(grn)); }
 
 std::string Position::DebugString() const {
   return board_.DebugString(IsBlackToMove());

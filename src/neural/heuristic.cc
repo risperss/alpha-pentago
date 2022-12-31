@@ -7,9 +7,7 @@
 #include "utils/bitops.h"
 
 namespace pentago {
-HeuristicEvaluator::HeuristicEvaluator(std::array<float, kNumWeights> weights) {
-  weights_ = weights;
-}
+HeuristicEvaluator::HeuristicEvaluator(Genome genome) { genome_ = genome; }
 
 float HeuristicEvaluator::value(Position position) const {
   const std::uint64_t our_board = position.GetBoard().our_pieces().as_int();
@@ -32,9 +30,9 @@ float HeuristicEvaluator::goodSquaresScore(const std::uint64_t board_) const {
   const std::uint64_t kCornersMask = 0b101101000000101101101101000000101101;
   const std::uint64_t kCentresMask = 0b000000010010000000000000010010000000;
 
-  float score = weights_.at(0) * count(board_ & kSidesMask) +
-                weights_.at(1) * count(board_ & kCornersMask) +
-                weights_.at(2) * count(board_ & kCentresMask);
+  float score = genome_.at(0) * count(board_ & kSidesMask) +
+                genome_.at(1) * count(board_ & kCornersMask) +
+                genome_.at(2) * count(board_ & kCentresMask);
 
   return score;
 }
@@ -44,9 +42,9 @@ float HeuristicEvaluator::centralityScore(const std::uint64_t board_) const {
   std::uint64_t middleRing = 0b000000011110010010010010011110000000;
   std::uint64_t innermostRing = 0b000000000000001100001100000000000000;
 
-  float score = weights_.at(3) * count(board_ & outermostRing) +
-                weights_.at(4) * count(board_ & middleRing) +
-                weights_.at(5) * count(board_ & innermostRing);
+  float score = genome_.at(3) * count(board_ & outermostRing) +
+                genome_.at(4) * count(board_ & middleRing) +
+                genome_.at(5) * count(board_ & innermostRing);
 
   return score;
 }
@@ -58,9 +56,9 @@ float HeuristicEvaluator::fourOfFiveScore(
   for (std::uint64_t mask : kWinningMasks) {
     if (count_few(our_board_ & mask) == 4) {
       if ((their_board_ & mask) == 0) {
-        score += weights_.at(6);
+        score += genome_.at(6);
       } else {
-        score += weights_.at(7);
+        score += genome_.at(7);
       }
     }
   }
