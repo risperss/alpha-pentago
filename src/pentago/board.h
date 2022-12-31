@@ -4,6 +4,7 @@
 #include <map>
 
 #include "pentago/bitboard.h"
+#include "utils/bitops.h"
 
 namespace pentago {
 
@@ -37,6 +38,10 @@ class PentagoBoard {
   MoveList GenerateLegalMoves() const;
 
   BoardResult ComputeBoardResult() const;
+
+  int piece_count() const {
+    return count(our_pieces_.as_int()) + count(their_pieces_.as_int());
+  }
 
   bool full() const { return (our_pieces() | their_pieces()) == 0xFFFFFFFFF; }
 

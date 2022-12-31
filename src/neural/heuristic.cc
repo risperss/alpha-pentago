@@ -22,6 +22,8 @@ float HeuristicEvaluator::value(Position position) const {
   value += fourOfFiveScore(our_board, their_board) -
            fourOfFiveScore(their_board, our_board);
 
+  value -= position.GetPlyCount() * 0.01;
+
   return value;
 }
 

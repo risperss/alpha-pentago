@@ -73,11 +73,7 @@ float Negamax::negamax(Position position, int depth, float a, float b,
     return tt_entry.value;
   }
 
-  BoardResult board_result = BoardResult::UNDECIDED;
-  if (max_ply_seen >= 9) {
-    board_result = position.GetBoard().ComputeBoardResult();
-  }
-
+  BoardResult board_result = position.GetBoard().ComputeBoardResult();
   nodes_visited++;
 
   if (board_result != BoardResult::UNDECIDED) {

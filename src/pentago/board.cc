@@ -181,6 +181,10 @@ void PentagoBoard::ApplyMove(Move move) {
 }
 
 BoardResult PentagoBoard::ComputeBoardResult() const {
+  if (piece_count() <= 9) {
+    return BoardResult::UNDECIDED;
+  }
+
   bool weWon = false;
   bool theyWon = false;
 
