@@ -90,8 +90,8 @@ void testNegamax(int depth) {
 
   PentagoBoard starting_board = PentagoBoard();
   Position starting_position = Position(starting_board);
-  PositionHistory history = PositionHistory(starting_position);
 
+  std::cout << "Depth: " << depth << "\n";
   std::cout << "Value: " << negamax.negamax(starting_position, depth, 1)
             << "\n";
   std::cout << "Nodes Visited: " << negamax.getNodesVisited() / 1000 << "k \n";

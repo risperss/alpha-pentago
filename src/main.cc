@@ -2,4 +2,4 @@
 
 #include "selfplay/debug.h"
 
-int main(void) { pentago::testNegamax(7); }
+int main(void) { pentago::testNegamax(6); }

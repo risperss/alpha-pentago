@@ -13,6 +13,7 @@ Negamax::Negamax(HeuristicEvaluator heuristic_evaluator) {
 }
 
 float Negamax::negamax(Position position, int depth, int color) {
+  max_ply_seen = position.GetPlyCount() + depth;
   return negamax(position, depth, -FLT_MAX, FLT_MAX, 1);
 }
 
@@ -32,6 +33,24 @@ void Negamax::transposition_table_store(Position position, TTEntry tt_entry) {
   for (const std::uint64_t hash : PositionHashes(position)) {
     transposition_table[hash] = tt_entry;
   }
+}
+
+PositionList Negamax::order_child_positions(Position position, MoveList moves) {
+  PositionList child_positions;
+  child_positions.reserve(moves.size());
+
+  for (const Move move : moves) {
+    child_positions.emplace_back(Position(position, move));
+  }
+
+  std::sort(child_positions.begin(), child_positions.end(),
+            [this](const Position& a, const Position& b) {
+              TTEntry tta = transposition_table_lookup(a);
+              TTEntry ttb = transposition_table_lookup(b);
+              return (is_valid(tta) && !is_valid(ttb)) || tta.value < ttb.value;
+            });
+
+  return child_positions;
 }
 
 float Negamax::negamax(Position position, int depth, float a, float b,
@@ -54,21 +73,25 @@ float Negamax::negamax(Position position, int depth, float a, float b,
     return tt_entry.value;
   }
 
-  BoardResult board_result = position.GetBoard().ComputeBoardResult();
+  BoardResult board_result = BoardResult::UNDECIDED;
+  if (max_ply_seen >= 9) {
+    board_result = position.GetBoard().ComputeBoardResult();
+  }
+
   nodes_visited++;
 
-  if (depth == 0) {
-    return heuristic_evaluator.value(position) * color;
-  } else if (board_result != BoardResult::UNDECIDED) {
+  if (board_result != BoardResult::UNDECIDED) {
     return kBoardResultValue.find(board_result)->second * color;
+  } else if (depth == 0) {
+    return heuristic_evaluator.value(position) * color;
   }
 
   MoveList legal_moves = position.GetBoard().SmartGenerateLegalMoves();
+  PositionList child_positions = order_child_positions(position, legal_moves);
   float value = -FLT_MAX;
 
-  for (const Move move : legal_moves) {
-    value = std::max(
-        value, negamax(Position(position, move), depth - 1, -b, -a, -color));
+  for (const Position child : child_positions) {
+    value = std::max(value, negamax(child, depth - 1, -b, -a, -color));
     a = std::max(a, value);
 
     if (a >= b) {

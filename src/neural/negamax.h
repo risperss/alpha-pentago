@@ -32,12 +32,16 @@ class Negamax {
   bool is_valid(TTEntry entry);
   void transposition_table_store(Position position, TTEntry tt_entry);
 
+  PositionList order_child_positions(Position position, MoveList moves);
+
   float negamax(Position position, int depth, float a, float b, int color);
 
   HeuristicEvaluator heuristic_evaluator;
   unsigned long long nodes_visited = 0;
 
   TT transposition_table;
+
+  int max_ply_seen;
 };
 
 }  // namespace pentago

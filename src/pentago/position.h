@@ -44,6 +44,8 @@ class Position {
   int ply_count_ = 0;
 };
 
+using PositionList = std::vector<Position>;
+
 class PositionHistory {
  public:
   PositionHistory() = default;
@@ -71,7 +73,7 @@ class PositionHistory {
   bool IsBlackToMove() const { return Last().IsBlackToMove(); }
 
  private:
-  std::vector<Position> positions_;
+  PositionList positions_;
 };
 
 }  // namespace pentago
