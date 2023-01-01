@@ -23,7 +23,9 @@ Negamax::Negamax(Genome genome) {
 
 NReturn Negamax::best(Position position, int depth, int color) {
   nodes_visited = 0;
-  return negamax(position, Move(std::uint16_t(0)), depth, -FLT_MAX, FLT_MAX, 1);
+  transposition_table = TT();
+  return negamax(position, Move(std::uint16_t(0)), depth, -FLT_MAX, FLT_MAX,
+                 color);
 }
 
 TTEntry Negamax::transposition_table_lookup(Position position) {
@@ -75,7 +77,8 @@ NReturn Negamax::negamax(Position position, Move move, int depth, float a,
   BoardResult board_result = position.GetBoard().ComputeBoardResult();
 
   if (board_result != BoardResult::UNDECIDED) {
-    return {kBoardResultValue.find(board_result)->second * color, move};
+    return {(kBoardResultValue.find(board_result)->second - depth) * color,
+            move};
   } else if (depth == 0) {
     return {heuristic_evaluator.value(position) * color, move};
   }

@@ -17,11 +17,12 @@ while position_history.compute_result() == GameResult.UNDECIDED:
     assert nreturn.move in position.legal_moves()
 
     position_history.push(nreturn.move)
+
+    print(f"Value:\t{color * nreturn.value:.04}")
+    print(f"Move:\t{nreturn.move}")
+    print(f"Nodes:\t{negamax.get_nodes_visited():,}")
+
     color = -color
 
-    print(f"Value:\t{nreturn.value}")
-    print(f"Move:\t{nreturn.move}")
-    print(f"Nodes:\t{negamax.get_nodes_visited()}")
-
 print(position_history.get_last())
-print(f"Result:\t{position_history.compute_result()}")
+print(f"Result:\t{position_history.compute_result().name}")
