@@ -20,9 +20,9 @@ static const std::uint64_t kWinningMasks[] = {
     0x0000000042108400, 0x0000000408102040, 0x0000000020408102,
     0x0000000001084210, 0x0000000084210800};
 
-static const int kNumWeights = 8;
+static const int kGenomeLength = 8;
 
-using Genome = std::array<float, kNumWeights>;
+using Genome = std::array<float, kGenomeLength>;
 
 class HeuristicEvaluator {
  public:

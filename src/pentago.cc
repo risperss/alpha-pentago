@@ -2,6 +2,8 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include <string>
+
 #include "neural/heuristic.h"
 #include "neural/negamax.h"
 #include "pentago/position.h"
@@ -15,7 +17,7 @@ PYBIND11_MODULE(pentago, m) {
   m.doc() = "Pentago Game and Engine";
 
   // used for cmaes
-  m.attr_read("NUM_WEIGHTS") = pentago::kNumWeights;
+  m.attr("NUM_WEIGHTS") = pentago::kGenomeLength;
 
   py::class_<pentago::Move>(m, "Move")
       .def(py::init<const std::string&>())
@@ -31,15 +33,20 @@ PYBIND11_MODULE(pentago, m) {
       .export_values();
 
   py::class_<pentago::Position>(m, "Position")
-      .def(py::init<const pentago::Position&, pentago::Move>())
+      .def(py::init<const pentago::Position&, pentago::Move&>())
       .def(py::init<const std::string&>())
-      .def("__str__", &pentago::DebugString)
-      .def("compute_result", &pentago::ComputeGameResult());
+      .def("__str__", &pentago::Position::DebugString)
+      .def("compute_result", &pentago::Position::ComputeGameResult);
+
+  py::class_<pentago::NReturn>(m, "NReturn")
+      .def_readwrite("value", &pentago::NReturn::value)
+      .def_readwrite("move", &pentago::NReturn::move);
 
   py::class_<pentago::Negamax>(m, "Negamax")
       .def(py::init<>())
-      .def(py::init<Genome>())
-      .def("value", pentago::negamax);
+      .def(py::init<pentago::Genome>())
+      .def("value", &pentago::Negamax::value)
+      .def("get_nodes_visited", &pentago::Negamax::getNodesVisited);
 
 #ifdef VERSION_INFO
   m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);

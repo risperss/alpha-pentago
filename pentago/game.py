@@ -1,42 +1,16 @@
 import re
 
-from pentago import Game, Move, GameResult
+from pentago import Move, GameResult, Position, Negamax
 
-MAX_SEARCH_DEPTH = 4
+EMPTY = "....../....../....../....../....../......"
 
-game = Game()
-game.set_max_search_depth(MAX_SEARCH_DEPTH)
-computer_to_play = False
+position = Position(EMPTY)
+negamax = Negamax()
 
-human_game = False
+print(position)
 
-while game.compute_result() == GameResult.UNDECIDED:
-    print(game)
+nreturn = negamax.value(position, 4, 1)
 
-    if human_game:
-        if computer_to_play:
-            move = game.best_move()
-        else:
-            while True:
-                while True:
-                    user_input = input("Enter your move: ")
-
-                    if re.fullmatch(r"[a-f][1-6]-[1-4][L|R]", user_input):
-                        break
-                    else:
-                        print("Move string is improperly formatted")
-
-                move = Move(user_input)
-
-                if move in game.legal_moves():
-                    break
-                else:
-                    print("Move is not legal")
-    else:
-        move = game.best_move()
-
-    game.push(move)
-    computer_to_play = not computer_to_play
-
-print(game)
-print(game.compute_result().name)
+print(nreturn.value)
+print(nreturn.move)
+print(negamax.get_nodes_visited())

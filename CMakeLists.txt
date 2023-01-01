@@ -20,5 +20,5 @@ pybind11_add_module(pentago
     src/utils/bitops.h
     src/utils/exception.h
     src/utils/hashcat.h
-    src/main.cc
+    src/pentago.cc
 )

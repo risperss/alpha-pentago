@@ -1,9 +1,12 @@
+#include <algorithm>
 #include <cstdint>
 #include <unordered_map>
 
 #include "neural/heuristic.h"
 #include "pentago/board.h"
 #include "pentago/position.h"
+
+#pragma once
 
 namespace pentago {
 
@@ -13,6 +16,14 @@ struct TTEntry {
   float value;
   int depth;
   LookupFlag flag;
+};
+
+struct NReturn {
+  float value;
+  Move move;
+
+  bool operator<(const NReturn& rhs) const { return value < rhs.value; }
+  NReturn operator-() const { return NReturn{-value, move}; }
 };
 
 using TT = std::unordered_map<uint64_t, TTEntry>;
@@ -28,8 +39,7 @@ class Negamax {
   Negamax();
   Negamax(Genome genome);
 
-  float negamax(Position position, int depth, int color);
-  float iddfs(Position position, int dpeth, int color);
+  NReturn value(Position position, int depth, int color);
 
   unsigned long long getNodesVisited() { return nodes_visited; }
 
@@ -38,9 +48,10 @@ class Negamax {
   bool is_valid(TTEntry entry);
   void transposition_table_store(Position position, TTEntry tt_entry);
 
-  PositionList order_child_positions(Position position, MoveList moves);
+  void order_moves(MoveList& legal_moves);
 
-  float negamax(Position position, int depth, float a, float b, int color);
+  NReturn negamax(Position position, Move move, int depth, float a, float b,
+                  int color);
 
   HeuristicEvaluator heuristic_evaluator;
   unsigned long long nodes_visited = 0;

@@ -1,7 +1,10 @@
 #include "negamax.h"
 
+#include <algorithm>
 #include <cfloat>
+#include <chrono>
 #include <cstdint>
+#include <random>
 
 #include "neural/heuristic.h"
 #include "utils/hashcat.h"
@@ -18,8 +21,9 @@ Negamax::Negamax(Genome genome) {
   transposition_table = TT();
 }
 
-float Negamax::negamax(Position position, int depth, int color) {
-  return negamax(position, depth, -FLT_MAX, FLT_MAX, 1);
+NReturn Negamax::value(Position position, int depth, int color) {
+  nodes_visited = 0;
+  return negamax(position, Move(std::uint16_t(0)), depth, -FLT_MAX, FLT_MAX, 1);
 }
 
 TTEntry Negamax::transposition_table_lookup(Position position) {
@@ -35,39 +39,27 @@ TTEntry Negamax::transposition_table_lookup(Position position) {
 bool Negamax::is_valid(TTEntry tt_entry) { return tt_entry.depth != -999; }
 
 void Negamax::transposition_table_store(Position position, TTEntry tt_entry) {
-  // for (const std::uint64_t hash : PositionHashes(position)) {
-  //   transposition_table[hash] = tt_entry;
-  // }
-  transposition_table[Hash(position)] = tt_entry;
-}
-
-PositionList Negamax::order_child_positions(Position position, MoveList moves) {
-  PositionList child_positions;
-  child_positions.reserve(moves.size());
-
-  for (const Move move : moves) {
-    child_positions.emplace_back(Position(position, move));
+  for (const std::uint64_t hash : PositionHashes(position)) {
+    transposition_table[hash] = tt_entry;
   }
-
-  std::sort(child_positions.begin(), child_positions.end(),
-            [this](const Position& a, const Position& b) {
-              TTEntry tta = transposition_table_lookup(a);
-              TTEntry ttb = transposition_table_lookup(b);
-              return tta.value > ttb.value;
-            });
-
-  return child_positions;
 }
 
-float Negamax::negamax(Position position, int depth, float a, float b,
-                       int color) {
+void Negamax::order_moves(MoveList& legal_moves) {
+  unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+  std::shuffle(std::begin(legal_moves), std::end(legal_moves),
+               std::default_random_engine(seed));
+}
+
+NReturn Negamax::negamax(Position position, Move move, int depth, float a,
+                         float b, int color) {
+  nodes_visited++;
   float a_orig = a;
 
   TTEntry tt_entry = transposition_table_lookup(position);
 
   if (is_valid(tt_entry) && tt_entry.depth >= depth) {
     if (tt_entry.flag == LookupFlag::EXACT) {
-      return tt_entry.value;
+      return {tt_entry.value, move};
     } else if (tt_entry.flag == LookupFlag::LOWERBOUND) {
       a = std::max(a, tt_entry.value);
     } else if (tt_entry.flag == LookupFlag::UPPERBOUND) {
@@ -76,35 +68,34 @@ float Negamax::negamax(Position position, int depth, float a, float b,
   }
 
   if (a >= b) {
-    return tt_entry.value;
+    return {tt_entry.value, move};
   }
 
   BoardResult board_result = position.GetBoard().ComputeBoardResult();
-  nodes_visited++;
 
   if (board_result != BoardResult::UNDECIDED) {
-    return kBoardResultValue.find(board_result)->second * color;
+    return {kBoardResultValue.find(board_result)->second * color, move};
   } else if (depth == 0) {
-    return heuristic_evaluator.value(position) * color;
+    return {heuristic_evaluator.value(position) * color, move};
   }
 
   MoveList legal_moves = position.GetBoard().SmartGenerateLegalMoves();
-  float value = -FLT_MAX;
+  NReturn n_return = {-FLT_MAX, move};
 
   for (const Move move : legal_moves) {
-    value = std::max(
-        value, -negamax(Position(position, move), depth - 1, -b, -a, -color));
-    a = std::max(a, value);
+    n_return = std::max(n_return, -negamax(Position(position, move), move,
+                                           depth - 1, -b, -a, -color));
+    a = std::max(a, n_return.value);
 
     if (a >= b) {
       break;
     }
   }
 
-  tt_entry.value = value;
-  if (value <= a_orig) {
+  tt_entry.value = n_return.value;
+  if (n_return.value <= a_orig) {
     tt_entry.flag = LookupFlag::UPPERBOUND;
-  } else if (value >= b) {
+  } else if (n_return.value >= b) {
     tt_entry.flag = LookupFlag::LOWERBOUND;
   } else {
     tt_entry.flag = LookupFlag::EXACT;
@@ -112,17 +103,7 @@ float Negamax::negamax(Position position, int depth, float a, float b,
   tt_entry.depth = depth;
   transposition_table_store(position, tt_entry);
 
-  return value;
-}
-
-float Negamax::iddfs(Position position, int depth, int color) {
-  float value = -FLT_MAX;
-
-  for (int i = 1; i <= depth; i++) {
-    value = std::max(value, negamax(position, i, color));
-  }
-
-  return value;
+  return n_return;
 }
 
 }  // namespace pentago
