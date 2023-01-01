@@ -34,6 +34,8 @@ class Position {
 
   int GetPlyCount() const { return ply_count_; }
 
+  MoveList GenerateLegalMoves();
+
   const PentagoBoard& GetBoard() const { return board_; }
 
   std::string DebugString() const;
@@ -50,7 +52,7 @@ using PositionList = std::vector<Position>;
 
 class PositionHistory {
  public:
-  PositionHistory() = default;
+  PositionHistory();
 
   PositionHistory(Position& starting);
 

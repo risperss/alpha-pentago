@@ -36,7 +36,17 @@ PYBIND11_MODULE(pentago, m) {
       .def(py::init<const pentago::Position&, pentago::Move&>())
       .def(py::init<const std::string&>())
       .def("__str__", &pentago::Position::DebugString)
-      .def("compute_result", &pentago::Position::ComputeGameResult);
+      .def("compute_result", &pentago::Position::ComputeGameResult)
+      .def("legal_moves", &pentago::Position::GenerateLegalMoves);
+
+  py::class_<pentago::PositionHistory>(m, "PositionHistory")
+      .def(py::init<>())
+      .def("push", pybind11::overload_cast<pentago::Move>(
+                       &pentago::PositionHistory::Append))
+      .def("pop", &pentago::PositionHistory::Pop)
+      .def("compute_result", &pentago::PositionHistory::ComputeGameResult)
+      .def("get_last", &pentago::PositionHistory::Last)
+      .def("__len__", &pentago::PositionHistory::GetLength);
 
   py::class_<pentago::NReturn>(m, "NReturn")
       .def_readwrite("value", &pentago::NReturn::value)

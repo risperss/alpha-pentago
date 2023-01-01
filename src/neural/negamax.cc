@@ -45,7 +45,7 @@ void Negamax::transposition_table_store(Position position, TTEntry tt_entry) {
 }
 
 void Negamax::order_moves(MoveList& legal_moves) {
-  // This needs work
+  // TODO: this slows down search... needs work
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
   std::shuffle(std::begin(legal_moves), std::end(legal_moves),
                std::default_random_engine(seed));
@@ -81,13 +81,19 @@ NReturn Negamax::negamax(Position position, Move move, int depth, float a,
   }
 
   MoveList legal_moves = position.GetBoard().SmartGenerateLegalMoves();
-  // order_moves(legal_moves);
+  order_moves(legal_moves);
 
   NReturn n_return = {-FLT_MAX, move};
 
   for (const Move edge : legal_moves) {
-    n_return = std::max(n_return, -negamax(Position(position, edge), edge,
-                                           depth - 1, -b, -a, -color));
+    NReturn candidate =
+        -negamax(Position(position, edge), edge, depth - 1, -b, -a, -color);
+
+    if (candidate > n_return) {
+      n_return.value = candidate.value;
+      n_return.move = edge;
+    }
+
     a = std::max(a, n_return.value);
 
     if (a >= b) {

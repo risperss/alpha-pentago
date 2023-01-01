@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "pentago/board.h"
+
 namespace pentago {
 
 Position::Position(const Position& parent, Move m)
@@ -22,6 +24,10 @@ std::string Position::DebugString() const {
   return board_.DebugString(IsBlackToMove());
 }
 
+MoveList Position::GenerateLegalMoves() {
+  return GetBoard().GenerateLegalMoves();
+}
+
 GameResult Position::ComputeGameResult() const {
   BoardResult result = GetBoard().ComputeBoardResult();
 
@@ -40,6 +46,10 @@ GameResult operator-(const GameResult& res) {
   return res == GameResult::BLACK_WON   ? GameResult::WHITE_WON
          : res == GameResult::WHITE_WON ? GameResult::BLACK_WON
                                         : res;
+}
+
+PositionHistory::PositionHistory() {
+  positions_.emplace_back(Position(PentagoBoard()));
 }
 
 PositionHistory::PositionHistory(Position& starting) {

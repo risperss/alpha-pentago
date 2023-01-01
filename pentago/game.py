@@ -1,16 +1,27 @@
-import re
+from pentago import Move, GameResult, Position, Negamax, PositionHistory
 
-from pentago import Move, GameResult, Position, Negamax
-
+# TODO: Initializing position from string does not work
 EMPTY = "....../....../....../....../....../......"
 
-position = Position(EMPTY)
+position_history = PositionHistory()
 negamax = Negamax()
 
-print(position)
+color = 1
 
-nreturn = negamax.best(position, 5, -1)
+while position_history.compute_result() == GameResult.UNDECIDED:
+    position = position_history.get_last()
+    print(position)
 
-print(nreturn.value)
-print(nreturn.move)
-print(negamax.get_nodes_visited())
+    nreturn = negamax.best(position, 3, color)
+
+    assert nreturn.move in position.legal_moves()
+
+    position_history.push(nreturn.move)
+    color = -color
+
+    print(f"Value:\t{nreturn.value}")
+    print(f"Move:\t{nreturn.move}")
+    print(f"Nodes:\t{negamax.get_nodes_visited()}")
+
+print(position_history.get_last())
+print(f"Result:\t{position_history.compute_result()}")

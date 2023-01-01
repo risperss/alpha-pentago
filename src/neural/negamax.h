@@ -23,6 +23,7 @@ struct NReturn {
   Move move;
 
   bool operator<(const NReturn& rhs) const { return value < rhs.value; }
+  bool operator>(const NReturn& rhs) const { return value > rhs.value; }
   NReturn operator-() const { return NReturn{-value, move}; }
 };
 
@@ -30,9 +31,9 @@ using TT = std::unordered_map<uint64_t, TTEntry>;
 
 const TTEntry empty = TTEntry{kMinBoardValue, -999, LookupFlag::EXACT};
 
-static const Genome kDefaultGenome = {
-    0.67168461,  0.10707687, 55.0,  // 0.06840958,
-    -0.29951185, 0.21427413, 0.33170923, 0.68111354, -0.04503335};
+static const Genome kDefaultGenome = {0.67168461,  0.10707687, 0.06840958,
+                                      -0.29951185, 0.21427413, 0.33170923,
+                                      0.68111354,  -0.04503335};
 
 class Negamax {
  public:
