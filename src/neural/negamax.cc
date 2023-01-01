@@ -21,7 +21,7 @@ Negamax::Negamax(Genome genome) {
   transposition_table = TT();
 }
 
-NReturn Negamax::value(Position position, int depth, int color) {
+NReturn Negamax::best(Position position, int depth, int color) {
   nodes_visited = 0;
   return negamax(position, Move(std::uint16_t(0)), depth, -FLT_MAX, FLT_MAX, 1);
 }
@@ -45,6 +45,7 @@ void Negamax::transposition_table_store(Position position, TTEntry tt_entry) {
 }
 
 void Negamax::order_moves(MoveList& legal_moves) {
+  // This needs work
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
   std::shuffle(std::begin(legal_moves), std::end(legal_moves),
                std::default_random_engine(seed));
@@ -80,10 +81,12 @@ NReturn Negamax::negamax(Position position, Move move, int depth, float a,
   }
 
   MoveList legal_moves = position.GetBoard().SmartGenerateLegalMoves();
+  // order_moves(legal_moves);
+
   NReturn n_return = {-FLT_MAX, move};
 
-  for (const Move move : legal_moves) {
-    n_return = std::max(n_return, -negamax(Position(position, move), move,
+  for (const Move edge : legal_moves) {
+    n_return = std::max(n_return, -negamax(Position(position, edge), edge,
                                            depth - 1, -b, -a, -color));
     a = std::max(a, n_return.value);
 

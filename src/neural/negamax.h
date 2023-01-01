@@ -30,16 +30,16 @@ using TT = std::unordered_map<uint64_t, TTEntry>;
 
 const TTEntry empty = TTEntry{kMinBoardValue, -999, LookupFlag::EXACT};
 
-static const Genome kDefaultGenome = {0.67168461,  0.10707687, 0.06840958,
-                                      -0.29951185, 0.21427413, 0.33170923,
-                                      0.68111354,  -0.04503335};
+static const Genome kDefaultGenome = {
+    0.67168461,  0.10707687, 55.0,  // 0.06840958,
+    -0.29951185, 0.21427413, 0.33170923, 0.68111354, -0.04503335};
 
 class Negamax {
  public:
   Negamax();
   Negamax(Genome genome);
 
-  NReturn value(Position position, int depth, int color);
+  NReturn best(Position position, int depth, int color);
 
   unsigned long long getNodesVisited() { return nodes_visited; }
 

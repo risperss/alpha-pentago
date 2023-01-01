@@ -45,7 +45,7 @@ PYBIND11_MODULE(pentago, m) {
   py::class_<pentago::Negamax>(m, "Negamax")
       .def(py::init<>())
       .def(py::init<pentago::Genome>())
-      .def("value", &pentago::Negamax::value)
+      .def("best", &pentago::Negamax::best)
       .def("get_nodes_visited", &pentago::Negamax::getNodesVisited);
 
 #ifdef VERSION_INFO

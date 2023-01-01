@@ -9,7 +9,7 @@ negamax = Negamax()
 
 print(position)
 
-nreturn = negamax.value(position, 6, 1)
+nreturn = negamax.best(position, 5, -1)
 
 print(nreturn.value)
 print(nreturn.move)
