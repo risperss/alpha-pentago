@@ -15,7 +15,7 @@ const std::map<GameResult, std::string> resultString{
     {GameResult::DRAW, "Draw"},
     {GameResult::UNDECIDED, "Undecided"}};
 
-const std::map<GameResult, float> kTerminalResultValue{
+const std::map<GameResult, float> kGameResultValue{
     {GameResult::WHITE_WON, kMaxBoardValue},
     {GameResult::BLACK_WON, kMinBoardValue},
     {GameResult::DRAW, 0}};

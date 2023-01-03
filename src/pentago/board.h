@@ -40,10 +40,10 @@ class PentagoBoard {
   BoardResult ComputeBoardResult() const;
 
   int piece_count() const {
-    return count(our_pieces_.as_int()) + count(their_pieces_.as_int());
+    return our_pieces_.count() + their_pieces_.count();
   }
 
-  bool full() const { return (our_pieces() | their_pieces()) == 0xFFFFFFFFF; }
+  bool full() const { return piece_count() == 36; }
 
   void SwapBitBoards() { swap(our_pieces_, their_pieces_); }
 

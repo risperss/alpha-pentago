@@ -7,6 +7,7 @@
 #include "utils/bitops.h"
 
 namespace pentago {
+
 HeuristicEvaluator::HeuristicEvaluator(Genome genome) { genome_ = genome; }
 
 float HeuristicEvaluator::value(Position position) const {
@@ -20,7 +21,7 @@ float HeuristicEvaluator::value(Position position) const {
   value += fourOfFiveScore(our_board, their_board) -
            fourOfFiveScore(their_board, our_board);
 
-  value -= position.GetPlyCount() * 0.01;
+  value -= position.GetPlyCount() * 0.1;
 
   return value;
 }
@@ -32,7 +33,7 @@ float HeuristicEvaluator::goodSquaresScore(const std::uint64_t board_) const {
 
   float score = genome_.at(0) * count(board_ & kSidesMask) +
                 genome_.at(1) * count(board_ & kCornersMask) +
-                genome_.at(2) * count(board_ & kCentresMask);
+                genome_.at(2) * count_few(board_ & kCentresMask);
 
   return score;
 }
@@ -44,7 +45,7 @@ float HeuristicEvaluator::centralityScore(const std::uint64_t board_) const {
 
   float score = genome_.at(3) * count(board_ & outermostRing) +
                 genome_.at(4) * count(board_ & middleRing) +
-                genome_.at(5) * count(board_ & innermostRing);
+                genome_.at(5) * count_few(board_ & innermostRing);
 
   return score;
 }
@@ -65,4 +66,5 @@ float HeuristicEvaluator::fourOfFiveScore(
 
   return score;
 }
+
 }  // namespace pentago

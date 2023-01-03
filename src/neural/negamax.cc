@@ -24,8 +24,7 @@ Negamax::Negamax(Genome genome) {
 NReturn Negamax::best(Position position, int depth, int color) {
   nodes_visited = 0;
   transposition_table = TT();
-  return negamax(position, Move(std::uint16_t(0)), depth, -FLT_MAX, FLT_MAX,
-                 color);
+  return negamax(position, depth, -FLT_MAX, FLT_MAX, color);
 }
 
 TTEntry Negamax::transposition_table_lookup(Position position) {
@@ -34,16 +33,18 @@ TTEntry Negamax::transposition_table_lookup(Position position) {
   if (transposition_table.find(hash) != transposition_table.end()) {
     return transposition_table.find(hash)->second;
   } else {
-    return empty;
+    return kEmptyEntry;
   }
 }
 
-bool Negamax::is_valid(TTEntry tt_entry) { return tt_entry.depth != -999; }
+bool Negamax::is_valid(TTEntry tt_entry) { return tt_entry != kEmptyEntry; }
 
 void Negamax::transposition_table_store(Position position, TTEntry tt_entry) {
-  for (const std::uint64_t hash : PositionHashes(position)) {
-    transposition_table[hash] = tt_entry;
-  }
+  // TODO: store symmetries of moves alongside position symmetries
+  // for (const std::uint64_t hash : PositionHashes(position)) {
+  //   transposition_table[hash] = tt_entry;
+  // }
+  transposition_table[Hash(position)] = tt_entry;
 }
 
 void Negamax::order_moves(MoveList& legal_moves) {
@@ -53,48 +54,47 @@ void Negamax::order_moves(MoveList& legal_moves) {
                std::default_random_engine(seed));
 }
 
-NReturn Negamax::negamax(Position position, Move move, int depth, float a,
-                         float b, int color) {
+NReturn Negamax::negamax(Position position, int depth, float a, float b,
+                         int color) {
   nodes_visited++;
   float a_orig = a;
 
   TTEntry tt_entry = transposition_table_lookup(position);
 
-  if (is_valid(tt_entry) && tt_entry.depth >= depth) {
+  if (is_valid(tt_entry)) {
     if (tt_entry.flag == LookupFlag::EXACT) {
-      return {tt_entry.value, move};
+      return {tt_entry.value, tt_entry.move};
     } else if (tt_entry.flag == LookupFlag::LOWERBOUND) {
       a = std::max(a, tt_entry.value);
     } else if (tt_entry.flag == LookupFlag::UPPERBOUND) {
       b = std::min(b, tt_entry.value);
     }
-  }
 
-  if (a >= b) {
-    return {tt_entry.value, move};
+    if (a >= b) {
+      return {tt_entry.value, tt_entry.move};
+    }
   }
 
   BoardResult board_result = position.GetBoard().ComputeBoardResult();
 
   if (board_result != BoardResult::UNDECIDED) {
-    return {(kBoardResultValue.find(board_result)->second - depth) * color,
-            move};
+    return {kBoardResultValue.find(board_result)->second + depth, kNullMove};
   } else if (depth == 0) {
-    return {heuristic_evaluator.value(position) * color, move};
+    return {heuristic_evaluator.value(position), kNullMove};
   }
 
   MoveList legal_moves = position.GetBoard().SmartGenerateLegalMoves();
-  order_moves(legal_moves);
+  // order_moves(legal_moves);
 
-  NReturn n_return = {-FLT_MAX, move};
+  NReturn n_return = {-FLT_MAX, kNullMove};
 
-  for (const Move edge : legal_moves) {
+  for (Move move : legal_moves) {
     NReturn candidate =
-        -negamax(Position(position, edge), edge, depth - 1, -b, -a, -color);
+        -negamax(Position(position, move), depth - 1, -b, -a, -color);
 
     if (candidate > n_return) {
       n_return.value = candidate.value;
-      n_return.move = edge;
+      n_return.move = move;
     }
 
     a = std::max(a, n_return.value);
@@ -112,7 +112,7 @@ NReturn Negamax::negamax(Position position, Move move, int depth, float a,
   } else {
     tt_entry.flag = LookupFlag::EXACT;
   }
-  tt_entry.depth = depth;
+  tt_entry.move = n_return.move;
   transposition_table_store(position, tt_entry);
 
   return n_return;

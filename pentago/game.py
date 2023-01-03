@@ -6,21 +6,27 @@ EMPTY = "....../....../....../....../....../......"
 position_history = PositionHistory()
 negamax = Negamax()
 
+# 1: White, -1: Black
 color = 1
 
 while position_history.compute_result() == GameResult.UNDECIDED:
     position = position_history.get_last()
-    print(position)
 
     nreturn = negamax.best(position, 3, color)
 
-    assert nreturn.move in position.legal_moves()
+    if nreturn.move not in (legal_moves := position.legal_moves()):
+        s = f"Illegal Move {nreturn.move}"
+        raise ValueError(s)
 
     position_history.push(nreturn.move)
 
-    print(f"Value:\t{color * nreturn.value:.04}")
+    to_move = "White" if color == 1 else "Black"
+
+    print(f"Player:\t{to_move}")
+    print(f"Value:\t{nreturn.value:.04}")
     print(f"Move:\t{nreturn.move}")
     print(f"Nodes:\t{negamax.get_nodes_visited():,}")
+    print(position)
 
     color = -color
 
