@@ -21,10 +21,11 @@ Negamax::Negamax(Genome genome) {
   transposition_table = TT();
 }
 
-NReturn Negamax::best(Position position, int depth, int color) {
+NReturn Negamax::best(Position position, int depth) {
   nodes_visited = 0;
+  // TODO: implement smart clearing of transposition table.
   transposition_table = TT();
-  return negamax(position, depth, -FLT_MAX, FLT_MAX, color);
+  return negamax(position, depth, -FLT_MAX, FLT_MAX);
 }
 
 TTEntry Negamax::transposition_table_lookup(Position position) {
@@ -40,22 +41,18 @@ TTEntry Negamax::transposition_table_lookup(Position position) {
 bool Negamax::is_valid(TTEntry tt_entry) { return tt_entry != kEmptyEntry; }
 
 void Negamax::transposition_table_store(Position position, TTEntry tt_entry) {
-  // TODO: store symmetries of moves alongside position symmetries
-  // for (const std::uint64_t hash : PositionHashes(position)) {
-  //   transposition_table[hash] = tt_entry;
-  // }
-  transposition_table[Hash(position)] = tt_entry;
+  for (const std::uint64_t hash : PositionHashes(position)) {
+    transposition_table[hash] = tt_entry;
+  }
 }
 
 void Negamax::order_moves(MoveList& legal_moves) {
-  // TODO: this slows down search... needs work
   unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
   std::shuffle(std::begin(legal_moves), std::end(legal_moves),
                std::default_random_engine(seed));
 }
 
-NReturn Negamax::negamax(Position position, int depth, float a, float b,
-                         int color) {
+NReturn Negamax::negamax(Position position, int depth, float a, float b) {
   nodes_visited++;
   float a_orig = a;
 
@@ -84,13 +81,12 @@ NReturn Negamax::negamax(Position position, int depth, float a, float b,
   }
 
   MoveList legal_moves = position.GetBoard().SmartGenerateLegalMoves();
-  // order_moves(legal_moves);
+  order_moves(legal_moves);
 
   NReturn n_return = {-FLT_MAX, kNullMove};
 
   for (Move move : legal_moves) {
-    NReturn candidate =
-        -negamax(Position(position, move), depth - 1, -b, -a, -color);
+    NReturn candidate = -negamax(Position(position, move), depth - 1, -b, -a);
 
     if (candidate > n_return) {
       n_return.value = candidate.value;

@@ -1,3 +1,5 @@
+import time
+
 from pentago import Move, GameResult, Position, Negamax, PositionHistory
 
 # TODO: Initializing position from string does not work
@@ -6,13 +8,16 @@ EMPTY = "....../....../....../....../....../......"
 position_history = PositionHistory()
 negamax = Negamax()
 
-# 1: White, -1: Black
 color = 1
 
 while position_history.compute_result() == GameResult.UNDECIDED:
     position = position_history.get_last()
 
-    nreturn = negamax.best(position, 3, color)
+    start = time.time()
+    nreturn = negamax.best(position, 4)
+    end = time.time()
+
+    elapsed = end - start
 
     if nreturn.move not in (legal_moves := position.legal_moves()):
         s = f"Illegal Move {nreturn.move}"
@@ -26,6 +31,8 @@ while position_history.compute_result() == GameResult.UNDECIDED:
     print(f"Value:\t{nreturn.value:.04}")
     print(f"Move:\t{nreturn.move}")
     print(f"Nodes:\t{negamax.get_nodes_visited():,}")
+    print(f"Time:\t{elapsed:.04}s")
+    print(f"NPS:\t{int(negamax.get_nodes_visited()/elapsed):,}")
     print(position)
 
     color = -color

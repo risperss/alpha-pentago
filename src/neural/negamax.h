@@ -50,7 +50,7 @@ class Negamax {
   Negamax();
   Negamax(Genome genome);
 
-  NReturn best(Position position, int depth, int color);
+  NReturn best(Position position, int depth);
 
   unsigned long long getNodesVisited() { return nodes_visited; }
 
@@ -63,7 +63,7 @@ class Negamax {
 
   void order_moves(MoveList& legal_moves);
 
-  NReturn negamax(Position position, int depth, float a, float b, int color);
+  NReturn negamax(Position position, int depth, float a, float b);
 
   HeuristicEvaluator heuristic_evaluator;
 
