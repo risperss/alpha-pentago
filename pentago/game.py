@@ -6,15 +6,11 @@ from pentago import Move, GameResult, Position, Negamax, PositionHistory
 EMPTY = "....../....../....../....../....../......"
 
 position_history = PositionHistory()
+negamax = Negamax()
 
 color = 1
 
 while position_history.compute_result() == GameResult.UNDECIDED:
-    if color == 1:
-        negamax = Negamax()
-    else:
-        negamax = Negamax([1, 1, 1, 1, 1, 1, 1, 1])
-
     position = position_history.get_last()
 
     start = time.time()
