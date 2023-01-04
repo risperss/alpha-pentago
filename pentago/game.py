@@ -8,13 +8,13 @@ EMPTY = "....../....../....../....../....../......"
 position_history = PositionHistory()
 negamax = Negamax()
 
-color = 1
+white = True
 
 while position_history.compute_result() == GameResult.UNDECIDED:
     position = position_history.get_last()
 
     start = time.time()
-    nreturn = negamax.best(position, 4)
+    nreturn = negamax.best(position, 3)
     end = time.time()
 
     elapsed = end - start
@@ -25,7 +25,7 @@ while position_history.compute_result() == GameResult.UNDECIDED:
 
     position_history.push(nreturn.move)
 
-    to_move = "White" if color == 1 else "Black"
+    to_move = "White" if white else "Black"
 
     print(f"Player:\t{to_move}")
     print(f"Value:\t{nreturn.value:.04}")
@@ -35,7 +35,7 @@ while position_history.compute_result() == GameResult.UNDECIDED:
     print(f"NPS:\t{int(negamax.get_nodes_visited()/elapsed):,}")
     print(position)
 
-    color = -color
+    white = not white
 
 print(position_history.get_last())
 print(f"Result:\t{position_history.compute_result().name}")
