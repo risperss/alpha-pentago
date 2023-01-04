@@ -42,6 +42,10 @@ class Position {
 
   GameResult ComputeGameResult() const;
 
+  const std::uint64_t white_pieces() const;
+
+  const std::uint64_t black_pieces() const;
+
  private:
   PentagoBoard board_;
 

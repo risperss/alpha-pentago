@@ -52,27 +52,21 @@ void PentagoBoard::SetFromGrn(std::string grn) {
   int whiteNodes = 0;
   int blackNodes = 0;
 
-  if (grn.size() != 41) {
+  if (grn.size() != 36) {
     throw Exception("Bad grn string (wrong size): " + grn);
   }
 
-  int pos = 0;
-
-  for (int i = 0; i < 41; i++) {
+  for (int i = 0; i < 36; i++) {
     char c = grn[i];
 
-    if (c == '.') {
-      pos++;
-    } else if (c == 'w') {
-      our_pieces_.set(pos);
-      whiteNodes++;
-      pos++;
-    } else if (c == 'b') {
-      their_pieces_.set(pos);
-      blackNodes++;
-      pos++;
-    } else if (c == '/') {
+    if (c == 'e') {
       continue;
+    } else if (c == 'w') {
+      our_pieces_.set(i);
+      whiteNodes++;
+    } else if (c == 'b') {
+      their_pieces_.set(i);
+      blackNodes++;
     } else {
       throw Exception("Bad grn string (invalid character): " + grn);
     }
