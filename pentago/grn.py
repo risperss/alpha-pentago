@@ -44,9 +44,6 @@ def to_grn(white_pieces: int, black_pieces: int) -> str:
 # TODO: fix tests
 def to_cpp_grn(grn: str) -> str:
     """Solely to allow the code in c++ to be simpler."""
-    if not grn:
-        grn = to_grn(white_pieces, black_pieces)
-
     numbers = [str(num) for num in range(1, 37)]
     cpp_grn = ""
 
