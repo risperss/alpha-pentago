@@ -1,5 +1,7 @@
 #include "board.h"
 
+#include <string>
+
 #include "neural/heuristic.h"
 #include "pentago/bitboard.h"
 #include "utils/exception.h"
@@ -46,8 +48,13 @@ void PentagoBoard::Clear() {
   std::memset(reinterpret_cast<void*>(this), 0, sizeof(PentagoBoard));
 }
 
-void PentagoBoard::SetFromGrn(std::string grn) {
-  Clear();
+PentagoBoard::PentagoBoard() {
+  our_pieces_ = BitBoard();
+  their_pieces_ = BitBoard();
+}
+
+PentagoBoard::PentagoBoard(const std::string& grn) {
+  PentagoBoard();
 
   int whiteNodes = 0;
   int blackNodes = 0;

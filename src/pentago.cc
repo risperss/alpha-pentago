@@ -33,7 +33,7 @@ PYBIND11_MODULE(pentago, m) {
       .export_values();
 
   py::class_<pentago::Position>(m, "Position")
-      .def(py::init<const pentago::Position&, pentago::Move&>())
+      //   .def(py::init<const pentago::Position&, pentago::Move&>())
       .def(py::init<const std::string&>())
       .def("__str__", &pentago::Position::DebugString)
       .def("compute_result", &pentago::Position::ComputeGameResult)

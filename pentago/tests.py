@@ -24,25 +24,27 @@ def test_legal_moves():
     ],
 )
 def test_to_grn(white_pieces, black_pieces, expected_grn):
-    grn = to_grn(white_pieces, black_pieces)
-
-    assert grn == expected_grn
+    assert to_grn(white_pieces, black_pieces) == expected_grn
 
 
 @pytest.mark.parametrize(
     "white_pieces,black_pieces,expected_grn",
     [
-        (0, 0, 'e' * 36),
-        (1, 2, "wb" + 'e' * 34),
+        (0, 0, "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"),
+        (1, 2, "wbeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"),
     ],
 )
 def test_to_cpp_grn(white_pieces, black_pieces, expected_grn):
-    grn = to_grn(white_pieces, black_pieces)
-    cpp_grn = to_cpp_grn(grn)
-
-    assert cpp_grn == expected_grn
+    assert to_cpp_grn(white_pieces, black_pieces) == expected_grn
 
 
 def test_create_position_from_grn():
     white_pieces = 1
     black_pieces = 2
+
+    cpp_grn = to_cpp_grn(white_pieces, black_pieces)
+
+    position = Position(cpp_grn)
+
+    assert position.white_pieces() == white_pieces
+    assert position.black_pieces() == black_pieces

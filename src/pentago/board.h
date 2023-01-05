@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <map>
+#include <string>
 
 #include "pentago/bitboard.h"
 #include "utils/bitops.h"
@@ -20,10 +21,10 @@ const std::map<BoardResult, float> kBoardResultValue{
 
 class PentagoBoard {
  public:
-  PentagoBoard() = default;
+  PentagoBoard();
 
   // Gaetano Rispoli Notation!
-  PentagoBoard(const std::string& grn) { SetFromGrn(grn); }
+  PentagoBoard(const std::string& grn);
 
   void Clear();
 

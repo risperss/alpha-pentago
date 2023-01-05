@@ -18,7 +18,7 @@ Position::Position(const PentagoBoard& board) {
   ply_count_ = board.our_pieces().count() + board.their_pieces().count();
 }
 
-Position::Position(const std::string& grn) { Position(PentagoBoard(grn)); }
+Position::Position(const std::string& grn) : Position(PentagoBoard(grn)) {}
 
 std::string Position::DebugString() const {
   return board_.DebugString(IsBlackToMove());
