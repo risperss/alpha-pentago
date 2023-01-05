@@ -56,5 +56,40 @@ def to_cpp_grn(grn: str) -> str:
     return cpp_grn
 
 
-def validate_cpp_grn(grn: str):
-    ...
+def validate_grn(grn: str) -> bool:
+    row_count = 0
+
+    allowed_letters = ['w', 'b']
+    allowed_numbers = ['1', '2', '3', '4', '5', '6']
+
+    white_count = 0
+    black_count = 0
+
+    total_count = 0
+    count = 0
+
+    for char in grn:
+        if char in allowed_letters:
+            if char == 'w':
+                white_count += 1
+            else:
+                black_count += 1
+            count += 1
+        elif char in allowed_numbers:
+            count += int(char)
+        else:
+            return False
+
+        if count > 6:
+            return False
+        elif count == 6:
+            total_count += count
+            count = 0
+
+    if total_count != 36:
+        return False
+
+    if black_count not in [white_count, white_count - 1]:
+        return False
+
+    return True

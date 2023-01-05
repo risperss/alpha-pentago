@@ -2,7 +2,7 @@ import pytest
 
 from pentago import Move, GameResult, Position, Negamax, PositionHistory
 
-from grn import to_grn, to_cpp_grn
+from grn import to_grn, to_cpp_grn, validate_grn
 
 
 def test_legal_moves():
@@ -36,6 +36,19 @@ def test_to_grn(white_pieces, black_pieces, expected_grn):
 )
 def test_to_cpp_grn(white_pieces, black_pieces, expected_grn):
     assert to_cpp_grn(to_grn(white_pieces, black_pieces)) == expected_grn
+
+
+@pytest.mark.parametrize(
+    "grn,result",
+    [
+        ("666666", True),
+        ("2wbwb66666", True),
+        ("66666wbwbw1", True),
+        ("1bwbwb66666", False),
+    ]
+)
+def test_validate_grn(grn: str, result: bool):
+    assert validate_grn(grn) == result
 
 
 def test_create_position_from_grn():
