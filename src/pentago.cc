@@ -33,11 +33,13 @@ PYBIND11_MODULE(pentago, m) {
       .export_values();
 
   py::class_<pentago::Position>(m, "Position")
-      .def(py::init<const pentago::Position&, pentago::Move&>())
+      //   .def(py::init<const pentago::Position&, pentago::Move&>())
       .def(py::init<const std::string&>())
       .def("__str__", &pentago::Position::DebugString)
       .def("compute_result", &pentago::Position::ComputeGameResult)
-      .def("legal_moves", &pentago::Position::GenerateLegalMoves);
+      .def("legal_moves", &pentago::Position::GenerateLegalMoves)
+      .def("white_pieces", &pentago::Position::white_pieces)
+      .def("black_pieces", &pentago::Position::black_pieces);
 
   py::class_<pentago::PositionHistory>(m, "PositionHistory")
       .def(py::init<>())
