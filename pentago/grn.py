@@ -4,7 +4,7 @@ Intended for use in the eventual REST API.
 """
 
 
-def _empty_count(empty_count):
+def _empty_count(empty_count: int) -> str:
     grn = ""
 
     grn += str(empty_count % 6) if empty_count % 6 else ""
@@ -13,7 +13,7 @@ def _empty_count(empty_count):
     return grn
 
 
-def to_grn(white_pieces: int, black_pieces: int):
+def to_grn(white_pieces: int, black_pieces: int) -> str:
     """Turns a given bitboard position into a string"""
 
     grn = ""
@@ -41,7 +41,8 @@ def to_grn(white_pieces: int, black_pieces: int):
     return grn
 
 
-def to_cpp_grn(white_pieces: int, black_pieces: int, grn: str = None):
+# TODO: fix tests
+def to_cpp_grn(grn: str) -> str:
     """Solely to allow the code in c++ to be simpler."""
     if not grn:
         grn = to_grn(white_pieces, black_pieces)
@@ -56,3 +57,7 @@ def to_cpp_grn(white_pieces: int, black_pieces: int, grn: str = None):
             cpp_grn += char
 
     return cpp_grn
+
+
+def validate_cpp_grn(grn: str):
+    ...
