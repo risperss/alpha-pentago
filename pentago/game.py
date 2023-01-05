@@ -2,9 +2,6 @@ import time
 
 from pentago import Move, GameResult, Position, Negamax, PositionHistory
 
-# TODO: Initializing position from string does not work
-EMPTY = "....../....../....../....../....../......"
-
 position_history = PositionHistory()
 negamax = Negamax()
 
