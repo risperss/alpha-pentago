@@ -21,6 +21,8 @@ def test_legal_moves():
     [
         (0, 0, "666666"),
         (1, 2, "wb466666"),
+        (2, 0, "1w466666"),
+        (128, 0, "61w46666"),
     ],
 )
 def test_to_grn(white_pieces, black_pieces, expected_grn):
