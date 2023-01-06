@@ -47,7 +47,6 @@ numpy==1.24.0
 orjson==3.8.4
 packaging==22.0
 parso==0.8.3
-pentago @ file:///Users/gaetanorispoli/Documents/dev/alpha-pentago
 pexpect==4.8.0
 pickleshare==0.7.5
 pkginfo==1.9.2

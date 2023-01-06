@@ -44,10 +44,6 @@ std::uint16_t kMoveNum[] = {
     0x00DD, 0x0123, 0x0023, 0x0163, 0x0063, 0x01A3, 0x00A3, 0x01E3, 0x00E3};
 }
 
-void PentagoBoard::Clear() {
-  std::memset(reinterpret_cast<void*>(this), 0, sizeof(PentagoBoard));
-}
-
 PentagoBoard::PentagoBoard() {
   our_pieces_ = BitBoard();
   their_pieces_ = BitBoard();
