@@ -1,0 +1,172 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Pentago Online</title>
+    <style>
+        body {
+            background: white;
+        }
+
+        #board,
+        #instructions {
+            margin: auto;
+            width: 625px;
+        }
+
+        #quad0,
+        #quad1,
+        #quad2,
+        #quad3 {
+            transform-origin: 50% 50%;
+        }
+
+        #alert {
+            visibility: hidden;
+            text-align: center;
+            font-family: sans-serif;
+        }
+
+        #title {
+            text-align: center;
+            font-family: sans-serif;
+        }
+
+        #instructions {
+            font-family: sans-serif;
+        }
+
+        .words {
+            color: black;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="title" class="words">
+        <h1>Pentago Human VS Engine</h1>
+        <p>by Gaetano Rispoli (Jake Brunsman frontend)</p>
+    </div>
+    <br>
+
+    <div id="board">
+        <svg id="quad0" class="quad" width="300" height="300" x="50" y="50">
+            <rect rx="20" ry="20" width="300" height="300" fill="darkred"></rect>
+
+            <circle class="piece row0" cx="50" cy="50" r="30" fill="crimson" onclick="pieceClick(this, 0, 0, 0)">
+            </circle>
+            <circle class="piece row0" cx="150" cy="50" r="30" fill="crimson" onclick="pieceClick(this, 0, 0, 1)">
+            </circle>
+            <circle class="piece row0" cx="250" cy="50" r="30" fill="crimson" onclick="pieceClick(this, 0, 0, 2)">
+            </circle>
+
+            <circle class="piece row1" cx="50" cy="150" r="30" fill="crimson" onclick="pieceClick(this, 0, 1, 0)">
+            </circle>
+            <circle class="piece row1" cx="150" cy="150" r="30" fill="crimson" onclick="pieceClick(this, 0, 1, 1)">
+            </circle>
+            <circle class="piece row1" cx="250" cy="150" r="30" fill="crimson" onclick="pieceClick(this, 0, 1, 2)">
+            </circle>
+
+            <circle class="piece row2" cx="50" cy="250" r="30" fill="crimson" onclick="pieceClick(this, 0, 2, 0)">
+            </circle>
+            <circle class="piece row2" cx="150" cy="250" r="30" fill="crimson" onclick="pieceClick(this, 0, 2, 1)">
+            </circle>
+            <circle class="piece row2" cx="250" cy="250" r="30" fill="crimson" onclick="pieceClick(this, 0, 2, 2)">
+            </circle>
+        </svg>
+
+        <svg id="quad1" class="quad" width="300" height="300" x="351" y="50">
+            <rect rx="20" ry="20" width="300" height="300" fill="darkred"></rect>
+
+            <circle class="piece row0" cx="50" cy="50" r="30" fill="crimson" onclick="pieceClick(this, 1, 0, 0)">
+            </circle>
+            <circle class="piece row0" cx="150" cy="50" r="30" fill="crimson" onclick="pieceClick(this, 1, 0, 1)">
+            </circle>
+            <circle class="piece row0" cx="250" cy="50" r="30" fill="crimson" onclick="pieceClick(this, 1, 0, 2)">
+            </circle>
+
+            <circle class="piece row1" cx="50" cy="150" r="30" fill="crimson" onclick="pieceClick(this, 1, 1, 0)">
+            </circle>
+            <circle class="piece row1" cx="150" cy="150" r="30" fill="crimson" onclick="pieceClick(this, 1, 1, 1)">
+            </circle>
+            <circle class="piece row1" cx="250" cy="150" r="30" fill="crimson" onclick="pieceClick(this, 1, 1, 2)">
+            </circle>
+
+            <circle class="piece row2" cx="50" cy="250" r="30" fill="crimson" onclick="pieceClick(this, 1, 2, 0)">
+            </circle>
+            <circle class="piece row2" cx="150" cy="250" r="30" fill="crimson" onclick="pieceClick(this, 1, 2, 1)">
+            </circle>
+            <circle class="piece row2" cx="250" cy="250" r="30" fill="crimson" onclick="pieceClick(this, 1, 2, 2)">
+            </circle>
+        </svg>
+
+        <svg id="quad2" class="quad" width="300" height="300" x="50" y="351">
+            <rect rx="20" ry="20" width="300" height="300" fill="darkred"></rect>
+
+            <circle class="piece row0" cx="50" cy="50" r="30" fill="crimson" onclick="pieceClick(this, 2, 0, 0)">
+            </circle>
+            <circle class="piece row0" cx="150" cy="50" r="30" fill="crimson" onclick="pieceClick(this, 2, 0, 1)">
+            </circle>
+            <circle class="piece row0" cx="250" cy="50" r="30" fill="crimson" onclick="pieceClick(this, 2, 0, 2)">
+            </circle>
+
+            <circle class="piece row1" cx="50" cy="150" r="30" fill="crimson" onclick="pieceClick(this, 2, 1, 0)">
+            </circle>
+            <circle class="piece row1" cx="150" cy="150" r="30" fill="crimson" onclick="pieceClick(this, 2, 1, 1)">
+            </circle>
+            <circle class="piece row1" cx="250" cy="150" r="30" fill="crimson" onclick="pieceClick(this, 2, 1, 2)">
+            </circle>
+
+            <circle class="piece row2" cx="50" cy="250" r="30" fill="crimson" onclick="pieceClick(this, 2, 2, 0)">
+            </circle>
+            <circle class="piece row2" cx="150" cy="250" r="30" fill="crimson" onclick="pieceClick(this, 2, 2, 1)">
+            </circle>
+            <circle class="piece row2" cx="250" cy="250" r="30" fill="crimson" onclick="pieceClick(this, 2, 2, 2)">
+            </circle>
+        </svg>
+
+        <svg id="quad3" class="quad" width="300" height="300" x="351" y="351">
+            <rect rx="20" ry="20" width="300" height="300" fill="darkred"></rect>
+
+            <circle class="piece row0" cx="50" cy="50" r="30" fill="crimson" onclick="pieceClick(this, 3, 0, 0)">
+            </circle>
+            <circle class="piece row0" cx="150" cy="50" r="30" fill="crimson" onclick="pieceClick(this, 3, 0, 1)">
+            </circle>
+            <circle class="piece row0" cx="250" cy="50" r="30" fill="crimson" onclick="pieceClick(this, 3, 0, 2)">
+            </circle>
+
+            <circle class="piece row1" cx="50" cy="150" r="30" fill="crimson" onclick="pieceClick(this, 3, 1, 0)">
+            </circle>
+            <circle class="piece row1" cx="150" cy="150" r="30" fill="crimson" onclick="pieceClick(this, 3, 1, 1)">
+            </circle>
+            <circle class="piece row1" cx="250" cy="150" r="30" fill="crimson" onclick="pieceClick(this, 3, 1, 2)">
+            </circle>
+
+            <circle class="piece row2" cx="50" cy="250" r="30" fill="crimson" onclick="pieceClick(this, 3, 2, 0)">
+            </circle>
+            <circle class="piece row2" cx="150" cy="250" r="30" fill="crimson" onclick="pieceClick(this, 3, 2, 1)">
+            </circle>
+            <circle class="piece row2" cx="250" cy="250" r="30" fill="crimson" onclick="pieceClick(this, 3, 2, 2)">
+            </circle>
+        </svg>
+
+    </div>
+    <h1 id="alert" class="words">bloop</h1>
+    <script src="pentago.js"></script>
+    <div id="instructions" class="words">
+        <h2>
+            How to Play
+        </h2>
+        <p>
+            Place a stone by clicking any space
+        </p>
+        <p>
+            Spin a quadrant by dragging and rotating 90 degrees
+        </p>
+        <p>
+            First player to get 5 in a row wins!
+        </p>
+    </div>
+</body>
+
+</html>
