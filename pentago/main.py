@@ -8,10 +8,11 @@ from pentago import Move, GameResult, Position, Negamax, PositionHistory
 
 app = FastAPI()
 
+
 origins = [
-    "https://risperss.github.io/pentago/",
-    "https://risperss.github.io/",
+    "*",
 ]
+
 
 app.add_middleware(
     CORSMiddleware,
