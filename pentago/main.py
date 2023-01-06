@@ -10,7 +10,7 @@ app = FastAPI()
 
 origins = [
     "https://risperss.github.io/pentago/",
-    "https://risperss.github.io/".
+    "https://risperss.github.io/",
 ]
 
 app.add_middleware(
