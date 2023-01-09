@@ -26,14 +26,14 @@ class Genome:
 def two_game_match(genome_1: Genome, genome_2: Genome):
     genome_order = [genome_1, genome_2]
     evaluator_order = [Negamax(genome_1.genome), Negamax(genome_2.genome)]
-    depth = 2
+    depth = 4
+    white = True
 
     for game in range(2):
         if game == 1:
             genome_order.reverse()
             evaluator_order.reverse()
 
-        white = True
         position_history = PositionHistory()
 
         while (game_result := position_history.compute_result()) == GameResult.UNDECIDED:
@@ -49,6 +49,8 @@ def two_game_match(genome_1: Genome, genome_2: Genome):
         else:
             genome_order[1].record += 3
 
+        white = not white
+
     return genome_1, genome_2
 
 
@@ -61,16 +63,25 @@ def round_robin(arx):
         generation_objs.append(Genome(index, genome))
 
     n = len(generation)
+    c = 0
 
     for i in range(n-1):
         for j in range(i + 1, n):
+            c += 1
             two_game_match(generation_objs[i], generation_objs[j])
 
+    print(c)
+    print(sum([x for x in range(1, 10)]))
     return generation_objs
 
 
-def swiss_system():
-    generation = arx.transpose().tolist()
+def swiss_system(arx):
+    # generation = arx.transpose().tolist()
+    generation = arx
+    generation_objs = []
+
+    for index, genome in enumerate(generation, start=1):
+        generation_objs.append(Genome(index, genome))
 
 
 def purecmaes():
@@ -171,3 +182,13 @@ def purecmaes():
     # Notice that xmean is expected to be even better.
     xmin = arx[:, arindex[0]]
     return xmin
+
+if __name__ == "__main__":
+    arx = [[0 for _ in range(8)] for x in range(10)]
+    arx[0] = [0.67168461, 0.10707687, 0.06840958, -0.29951185, 0.21427413, 0.33170923, 0.68111354, -0.04503335]
+    arx[1] = [1, 4, 2, -1, 5, 4, 10, 3]
+    arx[2] = [-1, -1, -1, -1, -1, -1, -1, -1]
+    x = round_robin(arx)
+
+    for xx in x:
+        print(xx)
