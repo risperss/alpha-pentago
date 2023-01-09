@@ -1,6 +1,8 @@
-import pentago
+from dataclasses import dataclass
 
 import numpy as np
+
+from pentago import Move, Position, PositionHistory, GameResult, Negamax, NUM_WEIGHTS
 
 
 def niceprint(x):
@@ -14,8 +16,57 @@ def niceprint(x):
     print(s)
 
 
-def round_robin():
-    ...
+@dataclass
+class Genome:
+    genome_id: int
+    genome: list[float]
+    record: int = 0
+
+
+def two_game_match(genome_1: Genome, genome_2: Genome):
+    genome_order = [genome_1, genome_2]
+    evaluator_order = [Negamax(genome_1.genome), Negamax(genome_2.genome)]
+    depth = 2
+
+    for game in range(2):
+        if game == 1:
+            genome_order.reverse()
+            evaluator_order.reverse()
+
+        white = True
+        position_history = PositionHistory()
+
+        while (game_result := position_history.compute_result()) == GameResult.UNDECIDED:
+            evaluator = evaluator_order[0] if white else evaluator_order[1]
+            n_return = evaluator.best(position_history.get_last(), depth)
+            position_history.push(n_return.move)
+
+        if game_result == GameResult.DRAW:
+            genome_1.record += 1
+            genome_2.record += 1
+        elif game_result == GameResult.WHITE_WON:
+            genome_order[0].record += 3
+        else:
+            genome_order[1].record += 3
+
+    return genome_1, genome_2
+
+
+def round_robin(arx):
+    # generation = arx.transpose().tolist()
+    generation = arx
+    generation_objs = []
+
+    for index, genome in enumerate(generation, start=1):
+        generation_objs.append(Genome(index, genome))
+
+    n = len(generation)
+
+    for i in range(n-1):
+        for j in range(i + 1, n):
+            two_game_match(generation_objs[i], generation_objs[j])
+
+    return generation_objs
 
 
 def swiss_system():
@@ -24,7 +75,7 @@ def swiss_system():
 
 def purecmaes():
     # User defined input parameters (need to be edited)
-    N = pentago.NUM_WEIGHTS  # number of objective variables/problem dimension
+    N = NUM_WEIGHTS  # number of objective variables/problem dimension
     xmean = np.random.rand(N) # objective variables initial point
     sigma = 0.05  # coordinate wise standard deviation (step size)
     stopfitness = 1e-14  # stop if fitness < stopfitness (minimization)
@@ -120,7 +171,3 @@ def purecmaes():
     # Notice that xmean is expected to be even better.
     xmin = arx[:, arindex[0]]
     return xmin
-
-x = purecmaes()
-
-print(x)
