@@ -14,6 +14,14 @@ def niceprint(x):
     print(s)
 
 
+def round_robin():
+    ...
+
+
+def swiss_system():
+    generation = arx.transpose().tolist()
+
+
 def purecmaes():
     # User defined input parameters (need to be edited)
     N = pentago.NUM_WEIGHTS  # number of objective variables/problem dimension
