@@ -75,7 +75,13 @@ NReturn Negamax::negamax(Position position, int depth, float a, float b) {
   BoardResult board_result = position.GetBoard().ComputeBoardResult();
 
   if (board_result != BoardResult::UNDECIDED) {
-    return {kBoardResultValue.find(board_result)->second + depth, kNullMove};
+    float terminal_value = kBoardResultValue.find(board_result)->second;
+    if (terminal_value < 0) {
+      terminal_value -= depth;
+    } else if (terminal_value > 0) {
+      terminal_value += depth;
+    }
+    return {terminal_value, kNullMove};
   } else if (depth == 0) {
     return {heuristic_evaluator.value(position), kNullMove};
   }
