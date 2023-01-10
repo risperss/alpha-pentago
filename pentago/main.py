@@ -29,18 +29,16 @@ async def root():
 
 
 @app.get("/positions/{grn}")
-async def get_best_move(grn: str, depth: int = 4):
+async def get_best_move(grn: str):
     if not validate_grn(grn):
         raise HTTPException(status_code=400, detail="Invalid grn")
-    if depth > 6:
-        raise HTTPException(status_code=400, detail="Max allowed search depth is 6")
 
     cpp_grn = to_cpp_grn(grn)
 
     negamax = Negamax()
     position = Position(cpp_grn)
 
-    n_return = negamax.best(position, depth)
+    n_return = negamax.best(position, 4)
 
     move = str(n_return.move)
     value = round(n_return.value, 2)
