@@ -76,9 +76,9 @@ NReturn Negamax::negamax(Position position, int depth, float a, float b) {
 
   if (board_result != BoardResult::UNDECIDED) {
     float terminal_value = kBoardResultValue.find(board_result)->second;
-    if (terminal_value < 0) {
+    if (terminal_value <= 0) {
       terminal_value -= depth;
-    } else if (terminal_value > 0) {
+    } else {
       terminal_value += depth;
     }
     return {terminal_value, kNullMove};
