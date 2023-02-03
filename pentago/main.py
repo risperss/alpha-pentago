@@ -38,7 +38,7 @@ async def get_best_move(grn: str):
     negamax = Negamax()
     position = Position(cpp_grn)
 
-    n_return = negamax.best(position, 4)
+    n_return = negamax.best(position, 3)
 
     move = str(n_return.move)
     value = round(n_return.value, 2)
