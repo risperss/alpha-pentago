@@ -1,5 +1,3 @@
-# Play against engine at https://risperss.github.io/pentago/
-
 ### INSTALLING:
 1. Clone repo
 2. To install package: `pip install .`
